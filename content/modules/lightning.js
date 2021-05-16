@@ -36,6 +36,7 @@ var lightning = {
   
   load: async function () {
     //check for lightning
+    console.log("loading addon (3) {e2fda1a4-762b-4020-b5ad-a41df1933103}");
     let lightning = await AddonManager.getAddonByID("{e2fda1a4-762b-4020-b5ad-a41df1933103}");
     if (lightning !== null) {
       TbSync.dump("Check4Lightning", lightning.version);

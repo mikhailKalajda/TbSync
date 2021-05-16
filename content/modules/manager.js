@@ -29,7 +29,9 @@ var manager = {
       if (TbSync.enabled) {
         // check, if a window is already open and just put it in focus
         if (this.prefWindowObj === null) {
-          this.prefWindowObj = TbSync.window.open("chrome://tbsync/content/manager/accountManager.xul", "TbSyncAccountManagerWindow", "chrome,centerscreen");
+          this.prefWindowObj = TbSync.window.open(
+            "chrome://tbsync/content/manager/accountManager.xul",
+             "TbSyncAccountManagerWindow", "chrome,centerscreen,resizable");
         }
         this.prefWindowObj.focus();
       } else {

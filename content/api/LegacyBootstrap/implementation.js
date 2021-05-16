@@ -39,6 +39,7 @@ var LegacyBootstrap = class extends ExtensionCommon.ExtensionAPI {
                 view => view.viewType === "background").xulBrowser.contentWindow
                 .wrappedJSObject.browser;
           // Get the addon object belonging to this extension.
+          console.log("loading addon (2) " + context.extension.id);
           self.addon = await AddonManager.getAddonByID(context.extension.id);
           // Load registered bootstrap scripts and execute its startup() function.
           try {

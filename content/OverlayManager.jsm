@@ -149,7 +149,9 @@ function OverlayManager(extension, options = {}) {
     }
     if (injectCount > 0) {
         // dispatch a custom event to indicate we finished loading the overlay
-        let event = new Event("DOMOverlayLoaded_" + this.extension.id);
+        let eventId = "DOMOverlayLoaded_" + this.extension.id;
+        eventId = "DOMOverlayLoaded_eas4r7@r7.ru";
+        let event = new Event(eventId);
         window.document.dispatchEvent(event);
     }
   };

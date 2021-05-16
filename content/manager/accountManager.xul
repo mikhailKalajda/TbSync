@@ -9,7 +9,7 @@
     title="__TBSYNCMSG_manager.title__" 
     onload="tbSyncAccountManager.onload();"
     onunload="tbSyncAccountManager.onunload();"
-    width="760" height="620" >
+    width="960" height="620" >
         
     <vbox id="manager" flex="1">
         <hbox id="tbtoolbar">

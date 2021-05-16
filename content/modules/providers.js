@@ -12,15 +12,15 @@ var providers = {
 
   //list of default providers (available in add menu, even if not installed)
   defaultProviders: {
-    "dav" : {
-      name: "CalDAV & CardDAV", 
-      homepageUrl: "https://addons.thunderbird.net/addon/dav-4-tbsync/"},
+    // "dav" : {
+    //   name: "CalDAV & CardDAV", 
+    //   homepageUrl: "https://addons.thunderbird.net/addon/dav-4-tbsync/"},
     "eas" : {
-      name: "Exchange ActiveSync", 
+      name: "R7 Exchange ActiveSync", 
       homepageUrl: "https://addons.thunderbird.net/addon/eas-4-tbsync/"},
   },
   
-  loadedProviders: null,    
+  loadedProviders: null,
   
   load: async function () {
     this.loadedProviders = {};
@@ -40,7 +40,15 @@ var providers = {
     //only load, if not yet loaded and if the provider name does not shadow a fuction inside provider.js
     if (!this.loadedProviders.hasOwnProperty(provider) && !this.hasOwnProperty(provider) && js.startsWith("chrome://")) {
       try {
+        if (!extension.id)
+        {
+          TbSync.dump("skipping improper addon " + extension + " for provider " + provider);
+          return;
+        }
+
+        TbSync.dump("loading addon " + extension.id + " for provider " + provider);
         let addon = await AddonManager.getAddonByID(extension.id);
+        TbSync.dump("addon loaded" + extension.id + " for provider " + provider);
 
         //load provider subscripts into TbSync
         this[provider] = {};
@@ -48,7 +56,7 @@ var providers = {
         if (TbSync.apiVersion != this[provider].Base.getApiVersion()) {
           throw new Error("API version mismatch, TbSync@"+TbSync.apiVersion+" vs " + provider + "@" + this[provider].Base.getApiVersion());
         }
-        
+
         this.loadedProviders[provider] = {};
         this.loadedProviders[provider].addon = addon;
         this.loadedProviders[provider].extension = extension;
@@ -122,7 +130,7 @@ var providers = {
         delete this[provider];
         let info = new EventLogInfo(provider);
         TbSync.eventlog.add("error", info, "FAILED to load provider <"+provider+">", e.message);
-        Components.utils.reportError(e);        
+        Components.utils.reportError(e);
       }
 
     }

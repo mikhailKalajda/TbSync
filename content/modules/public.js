@@ -624,6 +624,12 @@ var SyncData = class {
 // Simple dumper, who can dump to file or console
 // It is suggested to use the event log instead of dumping directly.
 var dump = function (what, aMessage) {
+  if (aMessage) {
+    Services.console.logStringMessage(what + " : " + aMessage);
+  } else {
+    Services.console.logStringMessage(what);
+  }
+
   if (TbSync.prefs.getBoolPref("log.toconsole")) {
     Services.console.logStringMessage("[TbSync] " + what + " : " + aMessage);
   }
@@ -687,6 +693,8 @@ var getString = function (key, provider) {
 var localizeNow = function (window, provider) {
   let document = window.document;
   let keyPrefix = "__" + (provider ? provider.toUpperCase() + "4" : "") + "TBSYNCMSG_";
+
+  TbSync.dump("key " + keyPrefix + " provider " + provider + " window " + window.location.href);
   
   let localization = {
     i18n: null,
@@ -729,18 +737,96 @@ var localizeNow = function (window, provider) {
   localization.updateDocument(document);
 }
 
+var localizeWithKey = function (window, keyPrefix) {
+  let document = window.document;
+  let provider = undefined;
+  let keyPrefix1 = "__TBSYNCMSG_";
+  let keyPrefix2 = "__EAS4TBSYNCMSG_";
+
+  TbSync.dump("key " + keyPrefix + " provider " + provider + " window " + window.location.href);
+  
+  let localization = {
+    i18n: null,
+    
+    updateString(string) {
+      let re1 = new RegExp(keyPrefix1 + "(.+?)__", "g");
+      let s1 =  string.replace(re1, matched => {
+        const key = matched.slice(keyPrefix.length, -2);
+        return TbSync.getString(key, provider) || matched;
+      });
+      let re2 = new RegExp(keyPrefix2 + "(.+?)__", "g");
+      return s1.replace(re2, matched => {
+        const key = matched.slice(keyPrefix.length, -2);
+        return TbSync.getString(key, provider) || matched;
+      });
+    },
+    
+    updateDocument(node, key) {
+      const texts = document.evaluate(
+        'descendant::text()[contains(self::text(), "' + key + '")]',
+        node,
+        null,
+        XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
+        null
+      );
+      for (let i = 0, maxi = texts.snapshotLength; i < maxi; i++) {
+        const text = texts.snapshotItem(i);
+        TbSync.dump(text.nodeValue);
+        if (text.nodeValue.includes(key)) text.nodeValue = this.updateString(text.nodeValue);
+      }
+      
+      const attributes = document.evaluate(
+        'descendant::*/attribute::*[contains(., "' + key + '")]',
+        node,
+        null,
+        XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
+        null
+      );
+      for (let i = 0, maxi = attributes.snapshotLength; i < maxi; i++) {
+        const attribute = attributes.snapshotItem(i);
+        TbSync.dump(attribute.value);
+        if (attribute.value.includes(key)) attribute.value = this.updateString(attribute.value);
+      }
+    }
+  };
+
+  const texts = document.evaluate('descendant::text()',
+  document,
+  null,
+  XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
+  null);
+
+  for (let i = 0, maxi = texts.snapshotLength; i < maxi; i++) {
+    const text = texts.snapshotItem(i);
+    TbSync.dump(text.nodeValue);
+  }
+
+  localization.updateDocument(document, keyPrefix1);
+  localization.updateDocument(document, keyPrefix2);
+}
+
+TbSync.localizeWithKey = localizeWithKey;
+
 var localizeOnLoad = function (window, provider) {
   // standard event if loaded by a standard window
   window.document.addEventListener('DOMContentLoaded', () => {
-    TbSync.localizeNow(window, provider);
+    TbSync.dump("localization " + window.location.href);
+    if (window.location.href.startsWith("chrome://tbsync/content/manager/editAccount.xul?provider=eas")) {
+      TbSync.localizeNow(window, provider);
+    } else {
+      TbSync.localizeNow(window, provider);
+    }
   }, { once: true });
 
   // custom event, fired by the overlay loader after it has finished loading
     // the editAccount dialog is never called as a provider, but from tbsync itself
   let eventId = "DOMOverlayLoaded_"
       + (!provider || window.location.href.startsWith("chrome://tbsync/content/manager/editAccount.") ? "" : provider + "4")
-      + "tbsync@jobisoft.de";
+      + "r7@r7.ru";
+      eventId = "DOMOverlayLoaded_eas4r7@r7.ru"
+  TbSync.dump(window.location.href + " " + eventId);
   window.document.addEventListener(eventId, () => {
+    TbSync.dump("localize  editAccount started");
     TbSync.localizeNow(window, provider);
   }, { once: true });
 }

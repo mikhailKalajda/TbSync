@@ -1,13 +1,13 @@
 {
   "applications": {
     "gecko": {
-      "id": "tbsync@jobisoft.de",
+      "id": "exchange_sync@r7.ru",
       "strict_min_version": "68.0",
       "strict_max_version": "69.*"
     }
   },
   "manifest_version": 2,
-  "name": "TbSync",
+  "name": "R7ExchangeIntegration",
   "version": "2.12",
   "author": "John Bieling",
   "homepage_url": "https://github.com/jobisoft/TbSync",
