@@ -358,5 +358,8 @@
     },
     "toolbar.tooltiptext": {
         "message": "A legújabb változtatások összehangolása"
+    },
+    "extLocale": {
+      "message": "hu"
     }
 }

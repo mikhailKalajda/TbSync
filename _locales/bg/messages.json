@@ -358,5 +358,8 @@
     },
     "toolbar.tooltiptext": {
         "message": "Синхронизирай информацията от всички TbSync регистрации със сървърите"
+    } ,
+    "extLocale": {
+        "message": "bg"
     }
 }

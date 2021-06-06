@@ -19,7 +19,59 @@
   "background": {
     "scripts": ["background.js"]
   },
+  "permissions": [
+    "addressBooks",
+    "cookies",
+    "storage",
+    "tabs",
+    "webNavigation",
+    "webRequest",
+    "webRequestBlocking",
+    "https://*/*"
+  ],
+  "options_ui": {
+    "page": "content/settings/settings.html",
+    "browser_style": false
+  },
   "experiment_apis": {
+    "manifestLoader": {
+      "schema": "webapi/manifest/schema.json",
+      "parent": {
+        "scopes": [
+          "addon_parent"
+        ],
+        "paths": [[
+          "manifestLoader"
+        ]],
+        "script": "webapi/manifest/manifest.js"
+      }
+    },
+    "webAccount": {
+      "schema": "webapi/webaccount/schema.json",
+      "parent": {
+        "scopes": [
+          "addon_parent"
+        ],
+        "paths": [[
+          "webAccount"
+        ], [
+          "incomingServer"
+        ]],
+        "script": "webapi/webaccount/webaccount.js"
+      }
+    },
+    "exquillaSettings": {
+      "schema": "webapi/exquilla/schema.json",
+      "parent": {
+        "scopes": [
+          "addon_parent"
+        ],
+        "paths": [[
+          "exquillaSettings"
+        ]],
+        "script": "webapi/exquilla/exquilla.js"
+      }
+    },
     "LegacyBootstrap": {
       "schema": "content/api/LegacyBootstrap/schema.json",
       "parent": {

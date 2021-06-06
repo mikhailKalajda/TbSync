@@ -1,0 +1,10 @@
+content  tbsync   content/
+locale   tbsync   de  locale/de/
+locale   tbsync   en-US  locale/en-US/
+locale   tbsync   es-ES  locale/es-ES/
+locale   tbsync   fr  locale/fr/
+locale   tbsync   hu  locale/hu/
+locale   tbsync   it  locale/it/
+locale   tbsync   ja  locale/ja/
+locale   tbsync   ru  locale/ru/
+skin     tbsync   classic/1.0   skin/

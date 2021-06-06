@@ -358,5 +358,8 @@
     },
     "toolbar.tooltiptext": {
         "message": "Gleiche alle TbSync Konten mit den Servern ab"
+    },
+    "extLocale": {
+      "message": "de"
     }
 }

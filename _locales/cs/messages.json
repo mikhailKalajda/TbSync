@@ -358,5 +358,8 @@
     },
     "toolbar.tooltiptext": {
         "message": "Synchronizovat poslední změny"
+    },
+    "extLocale": {
+      "message": "cs"
     }
 }

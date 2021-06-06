@@ -1,0 +1,10 @@
+[{
+  "namespace": "exquillaSettings",
+  "functions": [{
+    "name": "openManualAccountCreation",
+    "type": "function",
+    "description": "Opens the ExQuilla account creation wizard",
+    "async": true,
+    "parameters": []
+  }]
+}]

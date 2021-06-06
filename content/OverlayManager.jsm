@@ -475,15 +475,6 @@ function OverlayManager(extension, options = {}) {
     }
   };
 
-
-
-
-
-
-
-
-
-
   //read file from within the XPI package
   this.readChromeFile = function (aURL) {
     if (this.options.verbose>3) Services.console.logStringMessage("[OverlayManager] Reading file: " + aURL);

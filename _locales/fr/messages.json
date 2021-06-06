@@ -358,5 +358,8 @@
     },
     "toolbar.tooltiptext": {
         "message": "Synchroniser les dernières modifications"
+    },
+    "extLocale": {
+      "message": "fr"
     }
 }
