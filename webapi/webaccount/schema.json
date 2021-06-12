@@ -1,0 +1,669 @@
+[{
+  "namespace": "incomingServer",
+  "functions": [{
+    "name": "getGlobalPrimaryIdentity",
+    "type": "function",
+    "description": "Gets the overall primary identity in Thunderbird. I.e. gets the primary identity of the primary account, or the first identity, or the OS user info.",
+    "async": true,
+    "parameters": [],
+    "returns": {
+      "name": "identity",
+      "type": "object",
+      "description": "An object representing the user's identity.",
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "The identity's email address."
+        },
+        "fullName": {
+          "type": "string",
+          "description": "The identity's full name."
+        }
+      }
+    }
+  }, {
+    "name": "getIdentity",
+    "type": "function",
+    "description": "Gets the primary/default identity for this account/server.",
+    "async": true,
+    "parameters": [{
+      "name": "key",
+      "type": "string",
+      "description": "The key for the JsAccount server."
+    }],
+    "returns": {
+      "name": "identity",
+      "type": "object",
+      "description": "An object representing the user's identity.",
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "The identity's email address."
+        },
+        "fullName": {
+          "type": "string",
+          "description": "The identity's full name."
+        }
+      }
+    }
+  }, {
+    "name": "getIdentities",
+    "type": "function",
+    "description": "Gets the all the identities for a given account/server.",
+    "async": true,
+    "parameters": [{
+      "name": "key",
+      "type": "string",
+      "description": "The key for the JsAccount server."
+    }],
+    "returns": {
+      "name": "result",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "The identity's email address."
+          },
+          "fullName": {
+            "type": "string",
+            "description": "The identity's full name."
+          }
+        }
+      }
+    }
+  }, {
+    "name": "getHostName",
+    "type": "function",
+    "description": "Gets the host name for a given server key.",
+    "async": true,
+    "parameters": [{
+      "name": "key",
+      "type": "string",
+      "description": "The key for the JsAccount server."
+    }],
+    "returns": {
+      "name": "result",
+      "type": "string"
+    }
+  }, {
+    "name": "getUsername",
+    "type": "function",
+    "description": "Gets the user name for a given server key.",
+    "async": true,
+    "parameters": [{
+      "name": "key",
+      "type": "string",
+      "description": "The key for the JsAccount server."
+    }],
+    "returns": {
+      "name": "result",
+      "type": "string"
+    }
+  }, {
+    "name": "getPassword",
+    "type": "function",
+    "description": "Gets the password for a given server key.",
+    "async": true,
+    "parameters": [{
+      "name": "key",
+      "type": "string",
+      "description": "The key for the JsAccount server."
+    }, {
+      "name": "msgWindow",
+      "type": "number",
+      "optional": true,
+      "default": 0,
+      "description": "The msgWindow opaque identifier, in case a prompt is needed. Pass null if you don't want to prompt."
+    }],
+    "returns": {
+      "name": "result",
+      "type": "string"
+    }
+  }, {
+    "name": "promptLoginFailed",
+    "type": "function",
+    "description": "Prompts the user to retry a failed login.",
+    "async": true,
+    "parameters": [{
+      "name": "key",
+      "type": "string",
+      "description": "The key for the JsAccount server."
+    }, {
+      "name": "msgWindow",
+      "type": "number",
+      "optional": true,
+      "default": 0,
+      "description": "The msgWindow opaque identifier."
+    }, {
+      "name": "message",
+      "type": "string",
+      "optional": true,
+      "description": "A custom message to display to the user."
+    }],
+    "returns": {
+      "name": "retry",
+      "type": "boolean"
+    }
+  }, {
+    "name": "getBooleanValue",
+    "type": "function",
+    "description": "Gets a boolean value for a given server key.",
+    "async": true,
+    "parameters": [{
+      "name": "key",
+      "type": "string",
+      "description": "The key for the JsAccount server."
+    }, {
+      "name": "property",
+      "type": "string",
+      "description": "The property to retrieve the value."
+    }],
+    "returns": {
+      "name": "result",
+      "type": "boolean"
+    }
+  }, {
+    "name": "getNumberValue",
+    "type": "function",
+    "description": "Gets an integer value for a given server key.",
+    "async": true,
+    "parameters": [{
+      "name": "key",
+      "type": "string",
+      "description": "The key for the JsAccount server."
+    }, {
+      "name": "property",
+      "type": "string",
+      "description": "The property to retrieve the value."
+    }],
+    "returns": {
+      "name": "result",
+      "type": "number"
+    }
+  }, {
+    "name": "getStringValue",
+    "type": "function",
+    "description": "Gets a string value for a given server key.",
+    "async": true,
+    "parameters": [{
+      "name": "key",
+      "type": "string",
+      "description": "The key for the JsAccount server."
+    }, {
+      "name": "property",
+      "type": "string",
+      "description": "The property to retrieve the value."
+    }],
+    "returns": {
+      "name": "result",
+      "type": "string"
+    }
+  }, {
+    "name": "setBooleanValue",
+    "type": "function",
+    "description": "Sets a boolean value for a given server key.",
+    "async": true,
+    "parameters": [{
+      "name": "key",
+      "type": "string",
+      "description": "The key for the JsAccount server."
+    }, {
+      "name": "property",
+      "type": "string",
+      "description": "The property to store the value."
+    }, {
+      "name": "value",
+      "type": "boolean",
+      "description": "The new value of the property."
+    }]
+  }, {
+    "name": "setNumberValue",
+    "type": "function",
+    "description": "Sets an integer value for a given server key.",
+    "async": true,
+    "parameters": [{
+      "name": "key",
+      "type": "string",
+      "description": "The key for the JsAccount server."
+    }, {
+      "name": "property",
+      "type": "string",
+      "description": "The property to store the value."
+    }, {
+      "name": "value",
+      "type": "number",
+      "description": "The new value of the property."
+    }]
+  }, {
+    "name": "setStringValue",
+    "type": "function",
+    "description": "Sets a string value for a given server key.",
+    "async": true,
+    "parameters": [{
+      "name": "key",
+      "type": "string",
+      "description": "The key for the JsAccount server."
+    }, {
+      "name": "property",
+      "type": "string",
+      "description": "The property to store the value."
+    }, {
+      "name": "value",
+      "type": "string",
+      "description": "The new value of the property."
+    }]
+  }, {
+    "name": "sendFolderTree",
+    "type": "function",
+    "description": "Pushes the folder tree to the back end",
+    "async": true,
+    "parameters": [{
+      "name": "key",
+      "type": "string",
+      "description": "The key for the JsAccount server."
+    }, {
+      "name": "folderTree",
+      "type": "any",
+      "description": "The folder hierarchy."
+    }]
+  }, {
+    "name": "notifyFolderCopied",
+    "type": "function",
+    "description": "Notifies that a folder was copied on the server.",
+    "async": "true",
+    "parameters": [{
+      "name": "key",
+      "type": "string",
+      "description": "The key for the JsAccount server."
+    }, {
+      "name": "oldFolder",
+      "type": "string",
+      "description": "The folder id of the copied folder."
+    }, {
+      "name": "oldParent",
+      "type": "string",
+      "description": "The folder id containing the copied folder."
+    }, {
+      "name": "newFolder",
+      "type": "string",
+      "description": "The folder id of the copy."
+    }, {
+      "name": "newParent",
+      "type": "string",
+      "description": "The folder id containing the copy."
+    }]
+  }, {
+    "name": "notifyFolderCreated",
+    "type": "function",
+    "description": "Notifies that a folder was created on the server.",
+    "async": "true",
+    "parameters": [{
+      "name": "key",
+      "type": "string",
+      "description": "The key for the JsAccount server."
+    }, {
+      "name": "parent",
+      "type": "string",
+      "description": "The folder id containing the new folder."
+    }, {
+      "name": "folder",
+      "type": "string",
+      "description": "The folder id of the new folder."
+    }, {
+      "name": "name",
+      "type": "string",
+      "description": "The name of the new folder."
+    }, {
+      "name": "total",
+      "type": "number",
+      "description": "The total item count of the new folder."
+    }, {
+      "name": "unread",
+      "type": "number",
+      "description": "The unread count of the new folder."
+    }]
+  }, {
+    "name": "notifyFolderDeleted",
+    "type": "function",
+    "description": "Notifies that a folder was deleted on the server.",
+    "async": "true",
+    "parameters": [{
+      "name": "key",
+      "type": "string",
+      "description": "The key for the JsAccount server."
+    }, {
+      "name": "folder",
+      "type": "string",
+      "description": "The item id of the deleted folder."
+    }, {
+      "name": "parent",
+      "type": "string",
+      "description": "The folder id containing the deleted folder."
+    }]
+  }, {
+    "name": "notifyFolderModified",
+    "type": "function",
+    "description": "Notifies that a folder was modified on the server.",
+    "async": "true",
+    "parameters": [{
+      "name": "key",
+      "type": "string",
+      "description": "The key for the JsAccount server."
+    }, {
+      "name": "folder",
+      "type": "string",
+      "description": "The folder id of the modified folder."
+    }, {
+      "name": "name",
+      "type": "string",
+      "description": "The current name of the modified folder."
+    }, {
+      "name": "total",
+      "type": "number",
+      "description": "The total item count of the modified folder."
+    }, {
+      "name": "unread",
+      "type": "number",
+      "description": "The unread count of the modified folder."
+    }]
+  }, {
+    "name": "notifyFolderMoved",
+    "type": "function",
+    "description": "Notifies that a folder was moved on the server.",
+    "async": "true",
+    "parameters": [{
+      "name": "key",
+      "type": "string",
+      "description": "The key for the JsAccount server."
+    }, {
+      "name": "oldFolder",
+      "type": "string",
+      "description": "The old folder id of the moved folder."
+    }, {
+      "name": "oldParent",
+      "type": "string",
+      "description": "The folder id from which the folder was moved."
+    }, {
+      "name": "newFolder",
+      "type": "string",
+      "description": "The new folder id of the folder."
+    }, {
+      "name": "newParent",
+      "type": "string",
+      "description": "The folder id to which the folder was moved."
+    }]
+  }, {
+    "name": "notifyMessageCopied",
+    "type": "function",
+    "description": "Notifies that a message was copied on the server.",
+    "async": "true",
+    "parameters": [{
+      "name": "key",
+      "type": "string",
+      "description": "The key for the JsAccount server."
+    }, {
+      "name": "oldMessage",
+      "type": "string",
+      "description": "The item id of the copied message."
+    }, {
+      "name": "oldFolder",
+      "type": "string",
+      "description": "The folder id containing the copied message."
+    }, {
+      "name": "newMessage",
+      "type": "string",
+      "description": "The item id of the copy."
+    }, {
+      "name": "newFolder",
+      "type": "string",
+      "description": "The folder id containing the copy."
+    }]
+  }, {
+    "name": "notifyMessageCreated",
+    "type": "function",
+    "description": "Notifies that a message was created on the server.",
+    "async": "true",
+    "parameters": [{
+      "name": "key",
+      "type": "string",
+      "description": "The key for the JsAccount server."
+    }, {
+      "name": "newMessage",
+      "type": "string",
+      "description": "The item id of the new message."
+    }, {
+      "name": "folder",
+      "type": "string",
+      "description": "The folder id containing the new message."
+    }]
+  }, {
+    "name": "notifyMessageDeleted",
+    "type": "function",
+    "description": "Notifies that a message was deleted on the server.",
+    "async": "true",
+    "parameters": [{
+      "name": "key",
+      "type": "string",
+      "description": "The key for the JsAccount server."
+    }, {
+      "name": "oldMessage",
+      "type": "string",
+      "description": "The item id of the deleted message."
+    }, {
+      "name": "folder",
+      "type": "string",
+      "description": "The folder id containing the deleted message."
+    }]
+  }, {
+    "name": "notifyMessageModified",
+    "type": "function",
+    "description": "Notifies that a message was modified on the server.",
+    "async": "true",
+    "parameters": [{
+      "name": "key",
+      "type": "string",
+      "description": "The key for the JsAccount server."
+    }, {
+      "name": "message",
+      "type": "string",
+      "description": "The item id of the modified message."
+    }, {
+      "name": "folder",
+      "type": "string",
+      "description": "The folder id containing the modified message."
+    }]
+  }, {
+    "name": "notifyMessageMoved",
+    "type": "function",
+    "description": "Notifies that a message was moved on the server.",
+    "async": "true",
+    "parameters": [{
+      "name": "key",
+      "type": "string",
+      "description": "The key for the JsAccount server."
+    }, {
+      "name": "oldMessage",
+      "type": "string",
+      "description": "The old item id of the moved message."
+    }, {
+      "name": "oldFolder",
+      "type": "string",
+      "description": "The folder id from which the message was moved."
+    }, {
+      "name": "newMessage",
+      "type": "string",
+      "description": "The new item id of the message."
+    }, {
+      "name": "newFolder",
+      "type": "string",
+      "description": "The folder id to which the message was moved."
+    }]
+  }, {
+    "name": "getServersOfTypes",
+    "type": "function",
+    "description": "Gets the server keys for given server types.",
+    "async": true,
+    "parameters": [{
+      "name": "types",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "The type of server."
+    }],
+    "returns": {
+      "name": "keys",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }]
+}, {
+  "namespace": "webAccount",
+  "functions": [{
+    "name": "markAddressBookAsReadOnly",
+    "type": "function",
+    "description": "Marks an address book as read only in the UI.",
+    "async": true,
+    "parameters": [{
+      "name": "uid",
+      "type": "string",
+      "description": "The UID of the address book."
+    }]
+  }, {
+    "name": "wizard",
+    "type": "function",
+    "description": "Opens the Create Account.wizard.",
+    "async": true,
+    "parameters": []
+  }, {
+    "name": "verifyLogin",
+    "type": "function",
+    "description": "Create a new Thunderbird account object.",
+    "async": true,
+    "parameters": [{
+      "name": "scheme",
+      "type": "string",
+      "description": "The account type as registered with the dispatcher."
+    }, {
+      "name": "hostname",
+      "type": "string",
+      "description": "The server host name."
+    }, {
+      "name": "authMethod",
+      "type": "number",
+      "description": "Which authentication method to use."
+    }, {
+      "name": "username",
+      "type": "string",
+      "description": "The user's login name."
+    }, {
+      "name": "password",
+      "type": "string",
+      "description": "The user's password."
+    }],
+    "returns": {
+      "name": "status",
+      "type": "object",
+      "description": "An object providing the status of the operation.",
+      "properties": {
+        "message": {
+          "type": "string",
+          "description": "The text of any exception."
+        },
+        "code": {
+          "type": "string",
+          "description": "An internal error identifier."
+        }
+      }
+    }
+  }, {
+    "name": "createAccount",
+    "type": "function",
+    "description": "Create a new Thunderbird account object.",
+    "async": true,
+    "parameters": [{
+      "name": "scheme",
+      "type": "string",
+      "description": "The account type as registered with the dispatcher."
+    }, {
+      "name": "fullname",
+      "type": "string",
+      "description": "The user's full name as seen in their From header."
+    }, {
+      "name": "email",
+      "type": "string",
+      "description": "The user's email address."
+    }, {
+      "name": "hostname",
+      "type": "string",
+      "description": "The server host name."
+    }, {
+      "name": "authMethod",
+      "type": "number",
+      "description": "Which authentication method to try."
+    }, {
+      "name": "username",
+      "type": "string",
+      "description": "The user's login name."
+    }, {
+      "name": "password",
+      "type": "string",
+      "description": "The user's password."
+    }],
+    "returns": {
+      "name": "key",
+      "type": "string",
+      "description": "The key for the new serveru."
+    }
+  }, {
+    "name": "setSchemeOptions",
+    "type": "function",
+    "description": "Sets the options for a registered scheme",
+    "async": true,
+    "parameters": [{
+      "name": "scheme",
+      "type": "string",
+      "description": "The scheme used to distinguish account types."
+    }, {
+      "name": "options",
+      "type": "object",
+      "description": "Additional options used by this account type.",
+      "additionalProperties": true
+    }]
+  }],
+  "events": [{
+    "name": "dispatcher",
+    "type": "function",
+    "description": "The master dispatcher for JsAccount requests.",
+    "parameters": [{
+      "name": "key",
+      "type": "string",
+      "description": "The key for the JsAccount server."
+    }, {
+      "name": "operation",
+      "type": "string",
+      "description": "The name of the JsAccount operation."
+    }, {
+      "name": "data",
+      "type": "object",
+      "description": "Additional operation-dependent data."
+    }, {
+      "name": "msgWindow",
+      "type": "number",
+      "description": "An opaque identifier used by getPassword."
+    }],
+    "returns": {
+      "type": "any",
+      "description": "Operation-dependent return value."
+    },
+    "extraParameters": [{
+      "name": "scheme",
+      "type": "string",
+      "description": "The scheme used to distinguish account types."
+    }]
+  }]
+}]

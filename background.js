@@ -17,7 +17,7 @@ async function main() {
   // Load chrome.manifest
   await browser.manifestLoader.registerResourceMapping("tbsync", "modules/");
 
-  //await browser.manifestLoader.registerComponent("{AB68A3B5-2971-40d3-89FA-0AE1D9611224}", "@mozilla.org/autocomplete/search;1?name=exquilla-ab", "components/ewsAbAutocomplete.js");
+  await browser.manifestLoader.registerComponent("{AB68A3B5-2971-40d3-89FA-0AE1D9611224}", "@mozilla.org/autocomplete/search;1?name=exquilla-ab", "components/ewsAbAutocomplete.js");
 
   await browser.manifestLoader.registerComponent("{4D08B157-4381-48a8-8E9C-8833315F2B29}", "@mozilla.org/accountmanager/extension;1?name=exquillaserver", "components/am-ewsServerComponent.js");
   await browser.manifestLoader.registerCategory("mailnews-accountmanager-extensions", "ExquillaAccountManagerServer", "@mozilla.org/accountmanager/extension;1?name=exquillaserver");
@@ -28,9 +28,9 @@ async function main() {
   // JS URL
   await browser.manifestLoader.registerComponent("{86D28AF0-73F0-4728-8377-A9D4836B7BC3}", "@mesquilla.com/ewsurl;1", "components/ewsUrlComponent.js");
 
-  // TODO: JS AB Directory
-  //await browser.manifestLoader.registerComponent("{62EC44B5-D647-4023-96D6-EAE7A17DCD79}", "@mozilla.org/addressbook/directory;1?type=exquilla-directory", "components/ewsAbDirectoryComponent.js");
-  //await browser.manifestLoader.registerComponent("{BDE94D3E-5A66-4027-AADA-13CE8FE762E6}", "@mozilla.org/addressbook/directory-factory;1?name=exquilla-directory", "components/ewsAbDirectoryComponent.js");
+  // JS AB Directory
+  await browser.manifestLoader.registerComponent("{62EC44B5-D647-4023-96D6-EAE7A17DCD79}", "@mozilla.org/addressbook/directory;1?type=exquilla-directory", "components/ewsAbDirectoryComponent.js");
+  await browser.manifestLoader.registerComponent("{BDE94D3E-5A66-4027-AADA-13CE8FE762E6}", "@mozilla.org/addressbook/directory-factory;1?name=exquilla-directory", "components/ewsAbDirectoryComponent.js");
 
 
   // JS Service implementation

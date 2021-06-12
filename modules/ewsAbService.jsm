@@ -61,31 +61,30 @@ LoadServerListener.prototype =
       log.info("Address book load failed for server " + this.server ? this.server.prettyName : "Unknown");
     else
     {
-      log.warn('no excuilla adress book for now');
       // Now that we have all of the folders, make sure that we have a skink AB for each
       //  relevant native folder.
-      //let folderIds = new StringArray();
-      //let mailbox = this.exqServer.nativeMailbox;
-      //let contactsFolder = mailbox.getDistinguishedNativeFolder("contacts");
-      //let ewsService = Cc["@mozilla.org/messenger/messageservice;1?type=exquilla"]
-      //                   .getService().wrappedJSObject;
-      // TODO: ewsService.addAbFromNativeContactFolder(contactsFolder);
+      let folderIds = new StringArray();
+      let mailbox = this.exqServer.nativeMailbox;
+      let contactsFolder = mailbox.getDistinguishedNativeFolder("contacts");
+      let ewsService = Cc["@mozilla.org/messenger/messageservice;1?type=exquilla"]
+                        .getService().wrappedJSObject;
+      ewsService.addAbFromNativeContactFolder(contactsFolder);
       // also add the GAL
-      //let rootFolder = mailbox.getDistinguishedNativeFolder("msgfolderroot");
-      // TODO: ewsService.addAbFromNativeContactFolder(rootFolder);
+      let rootFolder = mailbox.getDistinguishedNativeFolder("msgfolderroot");
+      ewsService.addAbFromNativeContactFolder(rootFolder);
 
-      // let directories = MailServices.ab.directories;
-      // let serverURI = this.server.serverURI;
-      // for (let directory of /* COMPAT for TB 68 */toArray(directories, Ci.nsIAbDirectory))
-      // {
-      //   log.debug("Should we load directory " + directory.URI + " name " + directory.dirName);
-      //   let jsDirectory;
-      //   try {
-      //     jsDirectory = safeGetJS(directory);
-      //   } catch (e) {}
-      //   if (jsDirectory && jsDirectory.serverURI == serverURI)
-      //     jsDirectory.loadDirectoryCards(null);
-      // }
+      let directories = MailServices.ab.directories;
+      let serverURI = this.server.serverURI;
+      for (let directory of /* COMPAT for TB 68 */toArray(directories, Ci.nsIAbDirectory))
+      {
+        log.debug("Should we load directory " + directory.URI + " name " + directory.dirName);
+        let jsDirectory;
+        try {
+          jsDirectory = safeGetJS(directory);
+        } catch (e) {}
+        if (jsDirectory && jsDirectory.serverURI == serverURI)
+          jsDirectory.loadDirectoryCards(null);
+      }
     }
 
     // restart another server
