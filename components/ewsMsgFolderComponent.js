@@ -14,8 +14,6 @@ const { classes: Cc, Constructor: CC, interfaces: Ci, utils: Cu, Exception: CE, 
 var { XPCOMUtils } = ChromeUtils.import("resource://gre/modules/XPCOMUtils.jsm");
 ChromeUtils.defineModuleGetter(this, "Utils",
   "resource://tbsync/ewsUtils.jsm");
-// ChromeUtils.defineModuleGetter(this, "EnsureLicensed",
-//   "resource://exquilla/License.jsm");
 ChromeUtils.defineModuleGetter(this, "Services",
   "resource://gre/modules/Services.jsm");
 ChromeUtils.defineModuleGetter(this, "MailServices",
@@ -2161,12 +2159,6 @@ EwsMsgFolder.prototype = {
                 throw ex;
               }
             } /* COMPAT for TB 78 (bug 1682309) */
-          }
-
-          // Cripple point: don't proceed with invalid license
-          if (!(await EnsureLicensed())) {
-            let bundle = Services.strings.createBundle("chrome://exquilla/locale/settings.properties");
-            throw CE(bundle.GetStringFromName("noLicenseFound"));
           }
 
           for (let folder of toArray(folders, Ci.nsIMsgFolder))

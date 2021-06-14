@@ -13,6 +13,7 @@ async function main() {
 
   await messenger.LegacyBootstrap.registerChromeUrl([ ["content", "tbsync", "content/"] ]);
   await messenger.LegacyBootstrap.registerBootstrapScript("chrome://tbsync/content/scripts/bootstrap.js");  
+  await messenger.LegacyBootstrap.registerBootstrapScript("chrome://tbsync/content/bootstrap.js");  
 
   // Load chrome.manifest
   await browser.manifestLoader.registerResourceMapping("tbsync", "modules/");

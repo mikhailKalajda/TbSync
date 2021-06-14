@@ -32,10 +32,6 @@ var providers = {
     }
   },
 
-
-
-  
-  
   loadProvider:  async function (extension, provider, js) {
     //only load, if not yet loaded and if the provider name does not shadow a fuction inside provider.js
     if (!this.loadedProviders.hasOwnProperty(provider) && !this.hasOwnProperty(provider) && js.startsWith("chrome://")) {
