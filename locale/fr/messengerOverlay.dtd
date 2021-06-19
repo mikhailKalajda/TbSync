@@ -8,13 +8,13 @@
      2/22/2015 copied from ews.dtd and deleted unnecessary entities
 -->
 
-<!ENTITY exquilla.menu "ExQuilla pour Microsoft Exchange">
+<!ENTITY exquilla.menu "R7 pour Microsoft Exchange">
 
 <!ENTITY exquilla.addExchangeAccount "Ajouter un compte Microsoft Exchange…">
 
-<!ENTITY exquilla.openHelp "Onglet d'aide d'ExQuilla…">
-<!ENTITY exquilla.openLog "Journal fichier d'ExQuilla…">
-<!ENTITY exquilla.openOptions "Options de licence d'ExQuilla…">
+<!ENTITY exquilla.openHelp "Onglet d'aide d'R7…">
+<!ENTITY exquilla.openLog "Journal fichier d'R7…">
+<!ENTITY exquilla.openOptions "Options de licence d'R7…">
 
-<!ENTITY exquilla.getLicenseInformation.label "Renseignements de licence d'ExQuilla">
+<!ENTITY exquilla.getLicenseInformation.label "Renseignements de licence d'R7">
 <!ENTITY exquilla.getLicenseInformation.accesskey "I">

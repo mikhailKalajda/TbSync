@@ -23,7 +23,7 @@ function notifyNeedsRestart() {
         return;
       }
     } else {
-      // This is an upgrade from a previous version of ExQuilla
+      // This is an upgrade from a previous version of R7 plugin
       boxEl.remove();
     }
   }

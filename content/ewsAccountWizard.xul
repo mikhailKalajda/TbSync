@@ -41,201 +41,18 @@
 <?xml-stylesheet href="./skin/accountWizard.css" type="text/css"?>
 
 <!DOCTYPE overlay [
+<!ENTITY % ewsAccountWizardDTD SYSTEM "chrome://tbsync/locale/ewsAccountWizard.dtd" >
+%ewsAccountWizardDTD;
+<!ENTITY % AccountWizardDTD SYSTEM "chrome://messenger/locale/AccountWizard.dtd" >
+%AccountWizardDTD;
 <!ENTITY % acDTD SYSTEM "chrome://messenger/locale/accountCreation.dtd">
 %acDTD;
 ]>
 
-<wizard id="AccountWizard" 
-  title="Добавить учетную запись Microsoft Exchange…"
-  style="width: 50em; height: 38em;"
-  onload="exquilla.AW.onAccountWizardLoad();"
-  xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-
-  <stringbundle id="bundle_prefs" src="chrome://messenger/locale/prefs.properties"/>
-  <stringbundle id="bundle_messenger" src="chrome://messenger/locale/messenger.properties"/>
-  <stringbundle id="bundle_dom" src="chrome://global/locale/dom/dom.properties"/>
-  <script type="application/javascript" src="chrome://messenger/content/amUtils.js"/>
-  <script type="application/javascript" src="chrome://messenger/content/accountUtils.js"/>
-  <script type="application/javascript" src="chrome://messenger/content/ispUtils.js"/>
-  <script type="application/javascript" src="chrome://messenger/content/AccountWizard.js"/>
-  <script type="application/javascript" src="chrome://tbsync/content/ewsAccountWizard.js"/>
-  <script type="application/javascript" src="chrome://messenger/content/aw-done.js"/>
-
-  <dummy id="accounttype" hidden="true"/>
-  <dummy id="incomingpage" hidden="true"/>
-  <dummy id="outgoingpage" hidden="true"/>
-  <dummy id="newsserver" hidden="true"/>
-  <dummy id="accnamepage" hidden="true"/>
-  <dummy id="deferStorage" hidden="true"/>
-
-  <wizardpage id="identitypage" pageid="identitypage"
-              label="Авторизация">
-    <vbox flex="1">
-      <grid>
-        <columns>
-          <column />
-          <column flex="1"/>
-        </columns>
-        <rows>
-          <row>
-            <label class="label, serverLabel"  id="emailFieldLabel" value="email"
-                   control="email"/>
-            <textbox mailtype="identity" name="email"
-                     placeholder="you@example.com"
-                     oninput="exquilla.AW.identityPageValidate();"
-                     id="email" flex="6" class="uri-element"/>
-          </row>
-          <row>
-            <label class="label, serverLabel" value="password"
-                   control="exquillaPassword" />
-            <textbox id="exquillaPassword" flex="6" type="password"
-                     class="uri-element" placeholder='*'/>
-          </row>
-          <row>
-            <label />
-            <checkbox id="exquillaSavePassword"
-                      label="Запомнить пароль"
-                      checked="true"/>
-          </row>
-        </rows>
-      </grid>
-      <separator/>
-      <description>Domain credentials used for logging into your Microsoft Exchange account. (Most users should just use their email address, and don't need to set these)</description>
-      <radiogroup onselect="exquilla.AW.onSetCredentialsType();">
-        <radio id='exquillaUseEmailCredentials' label='Login with email address (recommended)'
-               accesskey='e' />
-        <radio id='exquillaUseDomainCredentials' label='Login with username and domain'
-               accesskey='u'/>
-        <groupbox>
-          <hbox align="center" class="serverDataBox">
-            <label class="label, serverLabel" value="User name"
-                   accesskey="S" control="exquillaUserName"/>
-            <textbox id="exquillaUserName" flex="1" class="uri-element"
-                     oninput="exquilla.AW.identityPageValidate();"/>
-          </hbox>
-          <hbox align="center" class="serverDataBox">
-            <label class="label, serverLabel" value="Domain"
-                   accesskey="D" control="exquillaDomain"/>
-            <textbox id="exquillaDomain" flex="1" class="uri-element"/>
-          </hbox>
-        </groupbox>
-      </radiogroup>
-    </vbox>
-  </wizardpage>
-  <wizardpage id="exquillaServerPage" pageid="exquillaServerPage" 
-              label="Microsoft Exchange Server">
-    <vbox flex="1">
-        <vbox id="exquillaIncomingServerbox">
-          <description>Можно выполнить автообнаружение веб-адреса Microsoft Exchange EWS (рекомендуется) или ввести его вручную</description>
-          <radiogroup onselect="exquilla.AW.onUseAutodiscovery();">
-            <groupbox id="exquillaAutoURL">
-              <hbox>
-                <radio id="exquillaUseAutodiscovery" label="Автообнаружение"/>
-                <button id="exquillaDoAutodiscovery"
-                        label="не выполнять автообнаружение"
-                        oncommand="exquilla.AW.autodiscover();"/>
-              </hbox>
-              <separator class="thin"/>
-              <hbox align="center">
-                <vbox id="exquillaADStatusImg" pack="start"/>
-                <textbox id="exquillaadresult" flex="1" disabled="true"
-                         value="Не выполнено"/>
-              </hbox>
-            </groupbox>
-            <groupbox id="exquillaManualURL">
-              <hbox>
-                <radio id="exquillaNoAutodiscover" label="Вручную"/>
-                <button id="exquillaTestUrl"
-                        label="Тест веб-адреса EWS"
-                        oncommand="exquilla.AW.ewsTestUrl([document.getElementById('exquillaserverurl').value], Ci.nsMsgAuthMethod.anything);"/>
-              </hbox>
-              <separator class="thin"/>
-              <hbox>
-                <label class="label, serverLabel" value="Веб-адрес Microsoft Exchange EWS"
-                       control="exquillaserverurl"/>
-                <textbox id="exquillaserverurl" flex="1" class="uri-element"
-                         disabled="true"
-                         onblur="exquilla.AW.serverPageValidate();"
-                         oninput="document.documentElement.canAdvance = false;"/>
-              </hbox>
-              <description>Настройки сервера Exchange</description>
-              <hbox align="center" class="serverDataBox">
-                <label class="label, serverLabel" value="Полное имя сервера;"
-                       control="fullName"/>
-                <textbox mailtype="identity" name="fullName" class="uri-element"
-                         id="fullName" flex="1"/>
-              </hbox>
-              <separator class="thin"/>
-              <hbox align="center">
-                <vbox id="exquillaURLStatusImg" pack="start"/>
-                <textbox disabled="true" id="exquillaUrlResult"/>
-              </hbox>
-            </groupbox>
-          </radiogroup>
-          <vbox>
-            <checkbox id="exquillaUseMail"
-                      label="Использовать Почту Microsoft Exchange"
-                      align="left"
-                      checked="true"/>
-            <checkbox id="exquillaUseAB"
-                      label="Использовать Адресную книгу Microsoft Exchange"
-                      align="left"
-                      checked="true"/>
-            <checkbox id="exquillaUseCalendar"
-                      label="Использовать Календарь Microsoft Exchange"
-                      align="left"
-                      checked="true"/>
-          </vbox>
-        </vbox>
-    </vbox>
-  </wizardpage>
-
-  <wizardpage id="done" pageid="done" 
-              label="Завершение">
-    <vbox flex="1">
-      <description>Завершение настройки</description>
-      <separator class="thin"/>
-      <grid>
-        <columns>
-          <column/>
-          <column flex="1"/>
-        </columns>
-        <rows>
-          <row align="center" id="identity.email">
-            <label class="label" flex="1" id="identity.email.label" value="Эл. почта"/>
-            <label class="label" id="identity.email.text"/>
-          </row>
-          <row align="center" id="login.username">
-            <label class="label" flex="1" id="login.username.label" value="Имя пользователя для входа:"/>
-            <label class="label" id="login.username.text"/>
-          </row>
-          <row align="center" id="login.domain">
-            <label class="label" flex="1" id="login.domain.label" value="Домен:"/>
-            <label class="label" id="login.domain.text"/>
-          </row>
-          <row align="center" id="identity.fullName">
-            <label class="label" flex="1" id="identity.fullName.label" value="Полное имя"/>
-            <label class="label" id="identity.fullName.text"/>
-          </row>
-          <row align="center" id="server.ewsURL">
-            <label class="label" flex="1" id="server.ewsURL.label" value="Веб-адрес Microsoft Exchange EWS:"/>
-            <label class="label" id="server.ewsURL.text"/>
-          </row>
-        </rows>
-      </grid>
-      <checkbox id="downloadMsgs" hidden="true"/>
-      <spacer flex="1"/>
-      <description>Завершить</description>
-    </vbox>
-  </wizardpage>
-</wizard>
-<!-- 
-<wizard id="AccountWizard" 
-        title="&ews.addExchangeAccount;"
+<wizard id="AccountWizard" title="&ews.addExchangeAccount;"
         onload="exquilla.AW.onAccountWizardLoad();"
         style="&ews.accountWizard.size;"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-        
 
   <stringbundle id="bundle_prefs" src="chrome://messenger/locale/prefs.properties"/>
   <stringbundle id="bundle_messenger" src="chrome://messenger/locale/messenger.properties"/>
@@ -244,9 +61,11 @@
   <script type="application/javascript" src="chrome://messenger/content/accountUtils.js"/>
   <script type="application/javascript" src="chrome://messenger/content/ispUtils.js"/>
   <script type="application/javascript" src="chrome://messenger/content/AccountWizard.js"/>
-  <script type="application/javascript" src="chrome://tbsync/content/ewsAccountWizard.js"/>
+  <script type="application/javascript" src="chrome://exquilla/content/ewsAccountWizard.js"/>
   <script type="application/javascript" src="chrome://messenger/content/aw-done.js"/>
 
+  <!-- These elements exist because the core account wizard code
+       expects to be able to attach event handlers to them. -->
   <dummy id="accounttype" hidden="true"/>
   <dummy id="incomingpage" hidden="true"/>
   <dummy id="outgoingpage" hidden="true"/>
@@ -254,6 +73,7 @@
   <dummy id="accnamepage" hidden="true"/>
   <dummy id="deferStorage" hidden="true"/>
 
+  <!-- Identity page : Collects user's login and email address -->
   <wizardpage id="identitypage" pageid="identitypage"
               label="&identityTitle.label;">
     <vbox flex="1">
@@ -310,116 +130,5 @@
     </vbox>
   </wizardpage>
 
-  <wizardpage id="exquillaServerPage" pageid="exquillaServerPage" 
-              label="&ews.ExchangeServer;">
-    <vbox flex="1">
-        <vbox id="exquillaIncomingServerbox">
-          <description>&ews.autodiscoverintro;</description>
-          <radiogroup onselect="exquilla.AW.onUseAutodiscovery();">
-            <groupbox id="exquillaAutoURL">
-              <hbox>
-                <radio id="exquillaUseAutodiscovery" label="&ews.autodiscoverOption;"/>
-                <button id="exquillaDoAutodiscovery"
-                        label="&ews.autodiscover.label;"
-                        accesskey='&ews.autodiscover.accesskey;'
-                        oncommand="exquilla.AW.autodiscover();"/>
-              </hbox>
-              <separator class="thin"/>
-              <hbox align="center">
-                <vbox id="exquillaADStatusImg" pack="start"/>
-                <textbox id="exquillaadresult" flex="1" disabled="true"
-                         value="&ews.adStatus.notdone;"/>
-              </hbox>
-            </groupbox>
-            <groupbox id="exquillaManualURL">
-              <hbox>
-                <radio id="exquillaNoAutodiscover" label="&ews.manualOption;"/>
-                <button id="exquillaTestUrl"
-                        label="&ews.testURL;"
-                        oncommand="exquilla.AW.ewsTestUrl([document.getElementById('exquillaserverurl').value], Ci.nsMsgAuthMethod.anything);"/>
-              </hbox>
-              <separator class="thin"/>
-              <hbox>
-                <label class="label, serverLabel" value="&ews.ewsURL.label;"
-                       accesskey="&ews.ewsURL.accesskey;" control="exquillaserverurl"/>
-                <textbox id="exquillaserverurl" flex="1" class="uri-element"
-                         disabled="true"
-                         onblur="exquilla.AW.serverPageValidate();"
-                         oninput="document.documentElement.canAdvance = false;"/>
-              </hbox>
-              <description>&fullnameDesc.label; &fullnameExample.label;</description>
-              <hbox align="center" class="serverDataBox">
-                <label class="label, serverLabel" value="&fullnameLabel.label;"
-                       accesskey="&fullnameLabel.accesskey;" control="fullName"/>
-                <textbox mailtype="identity" name="fullName" class="uri-element"
-                         id="fullName" flex="1"/>
-              </hbox>
-              <separator class="thin"/>
-              <hbox align="center">
-                <vbox id="exquillaURLStatusImg" pack="start"/>
-                <textbox disabled="true" id="exquillaUrlResult"/>
-              </hbox>
-            </groupbox>
-          </radiogroup>
-          <vbox>
-            <checkbox id="exquillaUseMail"
-                      label="&ews.useMail;"
-                      align="left"
-                      accesskey="&ews.useMail.accesskey;"
-                      checked="true"/>
-            <checkbox id="exquillaUseAB"
-                      label="&ews.useAB;"
-                      align="left"
-                      accesskey="&ews.useAB.accesskey;"
-                      checked="true"/>
-            <checkbox id="exquillaUseCalendar"
-                      label="&ews.useCalendar;"
-                      align="left"
-                      accesskey="&ews.useCalendar.accesskey;"
-                      checked="true"/>
-          </vbox>
-        </vbox>
-    </vbox>
-  </wizardpage>
-
-  <wizardpage id="done" pageid="done" 
-              label="&completionTitle.label;">
-    <vbox flex="1">
-      <description>&completionText.label;</description>
-      <separator class="thin"/>
-      <grid>
-        <columns>
-          <column/>
-          <column flex="1"/>
-        </columns>
-        <rows>
-          <row align="center" id="identity.email">
-            <label class="label" flex="1" id="identity.email.label" value="&emailLabel.label;"/>
-            <label class="label" id="identity.email.text"/>
-          </row>
-          <row align="center" id="login.username">
-            <label class="label" flex="1" id="login.username.label" value="&ews.loginUserName.label;"/>
-            <label class="label" id="login.username.text"/>
-          </row>
-          <row align="center" id="login.domain">
-            <label class="label" flex="1" id="login.domain.label" value="&ews.domainResult.label;"/>
-            <label class="label" id="login.domain.text"/>
-          </row>
-          <row align="center" id="identity.fullName">
-            <label class="label" flex="1" id="identity.fullName.label" value="&fullnameLabel.label;"/>
-            <label class="label" id="identity.fullName.text"/>
-          </row>
-          <row align="center" id="server.ewsURL">
-            <label class="label" flex="1" id="server.ewsURL.label" value="&ews.ewsURLResult.label;"/>
-            <label class="label" id="server.ewsURL.text"/>
-          </row>
-        </rows>
-      </grid>
-      <checkbox id="downloadMsgs" hidden="true"/>
-      <spacer flex="1"/>
-      <description>&clickFinish.label;</description>
-    </vbox>
-  </wizardpage>
 
 </wizard>
- -->

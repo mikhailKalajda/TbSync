@@ -6,13 +6,13 @@
      corresponding text, and should be unique in this file
 -->
 
-<!ENTITY exquilla.menu "ExQuilla für Microsoft Exchange">
+<!ENTITY exquilla.menu "R7 für Microsoft Exchange">
 
 <!ENTITY exquilla.addExchangeAccount "Microsoft Exchange Account hinzufügen…">
 
-<!ENTITY exquilla.openHelp "ExQuilla Hilfeseite öffnen…">
-<!ENTITY exquilla.openLog "ExQuilla Logdatei öffnen…">
-<!ENTITY exquilla.openOptions "ExQuilla Lizenz-Optionen…">
+<!ENTITY exquilla.openHelp "R7 Hilfeseite öffnen…">
+<!ENTITY exquilla.openLog "R7 Logdatei öffnen…">
+<!ENTITY exquilla.openOptions "R7 Lizenz-Optionen…">
 
-<!ENTITY exquilla.getLicenseInformation.label "ExQuilla Lizenz Informationen">
+<!ENTITY exquilla.getLicenseInformation.label "R7 Lizenz Informationen">
 <!ENTITY exquilla.getLicenseInformation.accesskey "I">

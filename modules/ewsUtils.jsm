@@ -449,7 +449,7 @@ AsyncDriver.prototype =
       }
       catch (ex) {
         if (ex != StopIteration) {
-          re(ex, 'ExQuilla generator exception');
+          re(ex, 'R7 plugin generator exception');
           curGenerator.next();
         }
       }
@@ -1301,7 +1301,7 @@ class EwsFormatter extends Log.BasicFormatter {
 // method possibilities.
 function configureLogging(localName)
 {
-  dump("ExQuilla Configure logging for " + localName + "\n");
+  dump("R7 plugin Configure logging for " + localName + "\n");
   //var stack = new Error().stack;
   //dump("Stack: " + stack + "\n");
   const LOGGER_NAME = "exquilla." + localName;
@@ -1365,11 +1365,11 @@ function configureLogging(localName)
   if (logDumping) {
     let dumpAppender = new Log.DumpAppender(formatter);
     dumpAppender.level = Log.Level[llevel];
-    dump("Setting up ExQuilla logging to dump for " + localName + " with level:" + llevel + "\n");
+    dump("Setting up R7 plugin logging to dump for " + localName + " with level:" + llevel + "\n");
     log.addAppender(dumpAppender);
   }
   else
-    dump("NOT Setting up ExQuilla logging to dump\n");
+    dump("NOT Setting up R7 plugin logging to dump\n");
 
   // If enabled in the preferences, add a file appender.
   if (logFile && fileAppender) {

@@ -6,13 +6,13 @@
      corresponding text, and should be unique in this file
 -->
 
-<!ENTITY exquilla.menu "ExQuilla a Microsoft Exchange számára">
+<!ENTITY exquilla.menu "R7 a Microsoft Exchange számára">
 
 <!ENTITY exquilla.addExchangeAccount "Microsoft Exchange postafiók hozzáadása…">
 
-<!ENTITY exquilla.openHelp "ExQuilla súgó lap…">
-<!ENTITY exquilla.openLog "ExQuilla naplófájl…">
-<!ENTITY exquilla.openOptions "ExQuilla licenc beállítások…">
+<!ENTITY exquilla.openHelp "R7 súgó lap…">
+<!ENTITY exquilla.openLog "R7 naplófájl…">
+<!ENTITY exquilla.openOptions "R7 licenc beállítások…">
 
-<!ENTITY exquilla.getLicenseInformation.label "ExQuilla licencinformációk">
+<!ENTITY exquilla.getLicenseInformation.label "R7 licencinformációk">
 <!ENTITY exquilla.getLicenseInformation.accesskey "I">

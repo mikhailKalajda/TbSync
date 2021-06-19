@@ -71,7 +71,7 @@ var exquilla = Object.create(
     let appVersion = Services.appinfo.version;
     let OS = Services.appinfo.OS;
     log.config('exquilla onLoad() AppVersion: ' + appVersion + " OS: " + OS);
-    (async () => log.config("ExQuilla version is " + await getExtensionVersion()))();
+    (async () => log.config("R7 version is " + await getExtensionVersion()))();
 
     // With the removal of Thunderbird from the rapid release cycle, multirelease binaries
     //  need to support the old ESR version, was well as current versions. I'm not yet sure
@@ -321,7 +321,7 @@ var exquilla = Object.create(
       //  and create the correct non-directory entry
       if (directory.leafName.endsWith(".sbd"))
         return;
-      log.warn("Fixing invalid directory created by an earlier version of ExQuilla with name " + directory.leafName);
+      log.warn("Fixing invalid directory created by an earlier version of R7 with name " + directory.leafName);
 
       try {
 
@@ -659,7 +659,7 @@ var exquilla = Object.create(
         {
           case Ci.nsMsgViewCommandType.markThreadRead:
           {
-            log.debug("markThreadRead on an ExQuilla folder");
+            log.debug("markThreadRead on an R7 folder");
             // Use MarkMessagesRead, that is what the user thinks he is actually doing,
             //  and this uses a proper folder command.
             return exquilla.folderDisplayDoCommand.call(gFolderDisplay, Ci.nsMsgViewCommandType.markMessagesRead);
