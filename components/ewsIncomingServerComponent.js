@@ -105,7 +105,6 @@ EwsIncomingServer.prototype = {
     let rootFolder = null;
     try {
       rootFolder = this.cppBase.rootFolder;
-      log.info("rootFolder was set from this.cppBase.rootFolder");
     } catch (e) { log.error(e);}
 
     /* COMPAT for TB 68 */
@@ -118,7 +117,6 @@ EwsIncomingServer.prototype = {
       //  and try again.
       rdf.UnregisterResource(serverResource);
       rootFolder = this.cppBase.rootFolder;
-      log.info("rootFolder was set from this.cppBase.rootFolder for tb68");
     }
     /* COMPAT for TB 68 */
     if (!rootFolder)

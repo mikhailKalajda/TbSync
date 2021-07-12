@@ -216,13 +216,13 @@
         "message": "Zkusit znovu připojit k serveru"
     },
     "menu.settingslabel": {
-        "message": "Nastavení synchronizace (TbSync)"
+        "message": "Nastavení synchronizace (R7)"
     },
     "password.account": {
         "message": "Účet:"
     },
     "password.description": {
-        "message": "Prosím aktualizujte přihlašovací údaje pro následující účet TbSync:"
+        "message": "Prosím aktualizujte přihlašovací údaje pro následující účet R7:"
     },
     "password.password": {
         "message": "Heslo:"
@@ -668,7 +668,7 @@
         "message": "Invalid synchronization key (status 9), resyncing"
     },
     "status.InvalidServerOptions": {
-        "message": "The server does not provide information about the supported ActiveSync versions. Is EAS blocked for this user or this client (TbSync)? You could try to set the ActiveSync version manually."
+        "message": "The server does not provide information about the supported ActiveSync versions. Is EAS blocked for this user or this client (R7)? You could try to set the ActiveSync version manually."
     },
     "status.OK": {
         "message": "OK"

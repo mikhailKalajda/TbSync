@@ -118,7 +118,7 @@ EwsProtocol.Properties = {
                         Ci.nsISupports,
                         ],
 
-  classDescription:   "ExQuilla Protocol",
+  classDescription:   "R7 Protocol",
 };
 
 EwsProtocol.prototype = {

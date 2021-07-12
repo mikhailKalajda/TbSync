@@ -40,14 +40,14 @@ exquilla.msgHVOoverlay = (function _msgHVOoverlay()
     let oldHandleMultipleAttachments = HandleMultipleAttachments;
     HandleMultipleAttachments = function _HandleMultipleAttachments(attachments, action)
     { try {
-      log.debug("ExQuilla HandleMultipleAttachments()");
+      log.debug("R7 HandleMultipleAttachments()");
       if (!attachments || !attachments.length)
       {
         log.warn("No attachments found during attachment operation");
         return;
       }
 
-      // determine if this is an ExQuilla message
+      // determine if this is an R7 message
       let uri = attachments[0].uri;
       if (!(attachments[0].uri.substring(0, 8) == 'exquilla'))
       {

@@ -41,12 +41,16 @@
 <?xml-stylesheet href="./skin/accountWizard.css" type="text/css"?>
 
 <!DOCTYPE overlay [
+<!ENTITY % ewsAccountWizardDTD SYSTEM "chrome://tbsync/locale/ewsAccountWizard.dtd" >
+%ewsAccountWizardDTD;
+<!ENTITY % AccountWizardDTD SYSTEM "chrome://messenger/locale/AccountWizard.dtd" >
+%AccountWizardDTD;
 <!ENTITY % acDTD SYSTEM "chrome://messenger/locale/accountCreation.dtd">
 %acDTD;
 ]>
 
 <wizard id="AccountWizard" 
-  title="Добавить учетную запись Microsoft Exchange…"
+  title="&ews.addExchangeAccount;"
   style="width: 50em; height: 38em;"
   onload="exquilla.AW.onAccountWizardLoad();"
   xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
@@ -60,6 +64,7 @@
   <script type="application/javascript" src="chrome://messenger/content/AccountWizard.js"/>
   <script type="application/javascript" src="chrome://tbsync/content/ewsAccountWizard.js"/>
   <script type="application/javascript" src="chrome://messenger/content/aw-done.js"/>
+  <script type="text/javascript" src="chrome://tbsync/content/manager/accounts.js" /> 
 
   <dummy id="accounttype" hidden="true"/>
   <dummy id="incomingpage" hidden="true"/>
@@ -68,8 +73,9 @@
   <dummy id="accnamepage" hidden="true"/>
   <dummy id="deferStorage" hidden="true"/>
 
+  <!-- Identity page : Collects user's login and email address -->
   <wizardpage id="identitypage" pageid="identitypage"
-              label="Авторизация">
+              label="&identityTitle.label;">
     <vbox flex="1">
       <grid>
         <columns>
@@ -78,44 +84,45 @@
         </columns>
         <rows>
           <row>
-            <label class="label, serverLabel"  id="emailFieldLabel" value="email"
-                   control="email"/>
+            <label class="label, serverLabel"  id="emailFieldLabel" value="&email.label;"
+                   accesskey="&email.accesskey;" control="email"/>
             <textbox mailtype="identity" name="email"
                      placeholder="you@example.com"
                      oninput="exquilla.AW.identityPageValidate();"
                      id="email" flex="6" class="uri-element"/>
           </row>
           <row>
-            <label class="label, serverLabel" value="password"
-                   control="exquillaPassword" />
+            <label class="label, serverLabel" value="&password.label;"
+                   control="exquillaPassword" accesskey="&password.accesskey;" />
             <textbox id="exquillaPassword" flex="6" type="password"
-                     class="uri-element" placeholder='*'/>
+                     class="uri-element" placeholder='&password.placeholder;'/>
           </row>
           <row>
             <label />
             <checkbox id="exquillaSavePassword"
-                      label="Запомнить пароль"
+                      label="&rememberPassword.label;"
+                      accesskey="&rememberPassword.accesskey;"
                       checked="true"/>
           </row>
         </rows>
       </grid>
       <separator/>
-      <description>Domain credentials used for logging into your Microsoft Exchange account. (Most users should just use their email address, and don't need to set these)</description>
+      <description>&ews.authenticationIntro;</description>
       <radiogroup onselect="exquilla.AW.onSetCredentialsType();">
-        <radio id='exquillaUseEmailCredentials' label='Login with email address (recommended)'
-               accesskey='e' />
-        <radio id='exquillaUseDomainCredentials' label='Login with username and domain'
-               accesskey='u'/>
+        <radio id='exquillaUseEmailCredentials' label='&ews.useEmailCredentials;'
+               accesskey='&ews.useEmailCredentials.accesskey;' />
+        <radio id='exquillaUseDomainCredentials' label='&ews.useDomainCredentials;'
+               accesskey='&ews.useDomainCredentials.accesskey;'/>
         <groupbox>
           <hbox align="center" class="serverDataBox">
-            <label class="label, serverLabel" value="User name"
-                   accesskey="S" control="exquillaUserName"/>
+            <label class="label, serverLabel" value="&ews.username;"
+                   accesskey="&ews.username.accesskey;" control="exquillaUserName"/>
             <textbox id="exquillaUserName" flex="1" class="uri-element"
                      oninput="exquilla.AW.identityPageValidate();"/>
           </hbox>
           <hbox align="center" class="serverDataBox">
-            <label class="label, serverLabel" value="Domain"
-                   accesskey="D" control="exquillaDomain"/>
+            <label class="label, serverLabel" value="&ews.domain;"
+                   accesskey="&ews.domain.accesskey;" control="exquillaDomain"/>
             <textbox id="exquillaDomain" flex="1" class="uri-element"/>
           </hbox>
         </groupbox>

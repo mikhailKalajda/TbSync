@@ -44,6 +44,8 @@ Utils.importLocally(this);
 var { XPCOMUtils } = ChromeUtils.import("resource://gre/modules/XPCOMUtils.jsm");
 var { Services } = ChromeUtils.import("resource://gre/modules/Services.jsm");
 var { MailServices } = ChromeUtils.import("resource:///modules/MailServices.jsm");
+var { TbSync } = ChromeUtils.import("chrome://tbsync/content/tbsync.jsm");
+
 ChromeUtils.defineModuleGetter(this, "EwsNativeService",
                                "resource://tbsync/EwsNativeService.jsm");
 var _log = null;
@@ -51,6 +53,8 @@ XPCOMUtils.defineLazyGetter(this, "log", () => {
   if (!_log) _log = Utils.configureLogging("account");
   return _log;
 });
+
+const eas = TbSync.providers.eas;
 
 if (typeof(exquilla) == "undefined")
   var exquilla = {};
@@ -73,8 +77,8 @@ exquilla.AW = (function exquillaAW()
 
   function alertAutodiscover(aFoundAutodiscover, aServerErrorMsg)
   {
-    let alertText = aFoundAutodiscover ? "Найден сайт автообнаружения, но не удается найти подходящую запись. Возможно, это произошло потому, что ваш сервер не поддерживает Exchange Web Services (EWS). Если ваш сервер не поддерживает EWS, то работа ExQuilla невозможна. Если это по вашему мнению произошло в результате ошибки, попытайтесь вручную ввести веб-адрес EWS."
-                                       : "Невозможно найти сайт автообнаружения для вашего адреса электронной почты – он либо не существует, либо неправильно введено имя или пароль. Это может быть по причине отсутствия поддержки Exchange Web Services (EWS) вашим сервером. Если ваш сервер не поддерживает EWS, то работа ExQuilla невозможна. Если это по вашему мнению произошло в результате ошибки, попытайтесь вручную ввести веб-адрес EWS.";
+    let alertText = aFoundAutodiscover ? "Найден сайт автообнаружения, но не удается найти подходящую запись. Возможно, это произошло потому, что ваш сервер не поддерживает Exchange Web Services (EWS). Если ваш сервер не поддерживает EWS, то работа Р7 невозможна. Если это по вашему мнению произошло в результате ошибки, попытайтесь вручную ввести веб-адрес EWS."
+                                       : "Невозможно найти сайт автообнаружения для вашего адреса электронной почты – он либо не существует, либо неправильно введено имя или пароль. Это может быть по причине отсутствия поддержки Exchange Web Services (EWS) вашим сервером. Если ваш сервер не поддерживает EWS, то работа Р7 невозможна. Если это по вашему мнению произошло в результате ошибки, попытайтесь вручную ввести веб-адрес EWS.";
     title = "Сбой автообнаружения";
     let promptService = Cc["@mozilla.org/embedcomp/prompt-service;1"]
                           .getService(Ci.nsIPromptService);
@@ -87,6 +91,8 @@ exquilla.AW = (function exquillaAW()
 
   function ewsOnAccountWizardLoad()
   { try {
+    exquilla.providerData = new TbSync.ProviderData("eas");
+
     // The account manager tries to install most of the event listeners.
     // Override them with our functionality before it loads.
     window.acctTypePageUnload = doNothing;
@@ -313,6 +319,40 @@ exquilla.AW = (function exquillaAW()
     return true;
   }
 
+  function addAccount (user, password, servertype, accountname, url)
+  {
+    log.info("starting addAccount for url " + url);
+    TbSync.dump("user=" + user + ", password=" + password + ", servertype=" + servertype + ", accountname=" + accountname + ", url=" + url);
+    try
+    {
+      let newAccountEntry = exquilla.providerData.getDefaultAccountEntries();
+      log.info("newAccountEntry is " + JSON.stringify(newAccountEntry));
+      newAccountEntry.user = user;
+      newAccountEntry.servertype = servertype;
+  
+      if (url) {
+        let newUrl = url.replace("/EWS/Exchange.asmx", "/Microsoft-Server-ActiveSync");
+
+        //if no protocoll is given, prepend "https://"
+          if (newUrl.substring(0,4) != "http" || newUrl.indexOf("://") == -1) {
+            newUrl = "https://" + newUrl.split("://").join("/");
+          }
+          newAccountEntry.host = eas.network.stripAutodiscoverUrl(newUrl);
+          newAccountEntry.https = (newUrl.substring(0,5) == "https");
+      }
+
+      // Add the new account.
+      log.info("addeding accunt " + accountname + " " + JSON.stringify(newAccountEntry));
+      let newAccountData = exquilla.providerData.addAccount(accountname, newAccountEntry);
+      log.info("account added " + JSON.stringify(newAccountData));
+      eas.network.getAuthData(newAccountData).updateLoginData(user, password);
+
+      tbSyncAccounts.toggleAccountEnableState(newAccountData._accountID);
+    } catch(e) {
+      log.error(e);
+    }
+  }
+
   function overrideAccountWizard()
   { try {
 
@@ -323,8 +363,9 @@ exquilla.AW = (function exquillaAW()
     // given account, incoming server, and so forth
     finishAccount = function exquillaFinishAccount(account, accountData) 
     {
-      if (accountData.incomingServer) {
-
+      log.info('accountData=' +  JSON.stringify(accountData));
+      if (accountData.incomingServer) 
+      {
         var destServer = account.incomingServer;
         var srcServer = accountData.incomingServer;
         copyObjectToInterface(destServer, srcServer, true);
@@ -366,6 +407,7 @@ exquilla.AW = (function exquillaAW()
 
       if (destIdentity) // does this account have an identity?
       {   
+        log.info('destIdentity=' +  JSON.stringify(destIdentity));
           if (accountData.identity && accountData.identity.email) {
               // fixup the email address if we have a default domain
               var emailArray = accountData.identity.email.split('@');
@@ -410,8 +452,15 @@ exquilla.AW = (function exquillaAW()
               destIdentity.smtpServerKey =
                 (isDefaultSmtpServer) ? "" : smtpServer.key;
            }
-       } // if the account has an identity...
 
+      } // if the account has an identity...
+
+      addAccount(
+        accountData.incomingServer.username,
+        accountData.incomingServer.password,
+        "auto",
+        accountData.incomingServer.username,
+        accountData.incomingServer["ServerType-exquilla"].ewsURL);
     }
 
     // override global AccountDataToPageData to correct account type
@@ -469,7 +518,6 @@ exquilla.AW = (function exquillaAW()
         return oldSetDefaultCopiesAndFoldersPrefs(identity, server, accountData);
       }
     }
-
   } catch (e) {log.warn(re(e));}}
 
   function serverPageInit()

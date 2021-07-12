@@ -47,7 +47,7 @@ var messenger = {
       if (TbSync) {
         let status = TbSync.window.document.getElementById("tbsync.status");
         if (status) {
-          let label = "TbSync: ";
+          let label = "R7: ";
           
           if (TbSync.enabled) {
 

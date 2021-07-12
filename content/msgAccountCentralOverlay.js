@@ -19,7 +19,7 @@ exquilla.cloneSetupButton = function _cloneSetupButton() {
   }
   let setupExquilla = setupEmail.cloneNode(false);
   setupExquilla.id = "setupExquilla";
-  setupExquilla.textContent = "ExQuilla";
+  setupExquilla.textContent = "Плагин R7";
   setupExquilla.removeAttribute("data-l10n-id");
   setupExquilla.setAttribute("onclick", "ChromeUtils.import('resource://tbsync/ewsUtils.jsm').Utils.openAccountWizard();");
   setupEmail.parentElement.appendChild(setupExquilla);

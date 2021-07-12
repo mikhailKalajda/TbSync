@@ -9,9 +9,9 @@
   "manifest_version": 2,
   "name": "R7ExchangeIntegration",
   "version": "2.12",
-  "author": "John Bieling",
-  "homepage_url": "https://github.com/jobisoft/TbSync",
-  "default_locale": "en-US",
+  "author": "АО НКТ",
+  "homepage_url": "https://r7-office.ru/organizer",
+  "default_locale": "ru",
   "description": "__MSG_extensionDescription__",
   "icons": {
     "32": "content/skin/tbsync.png"

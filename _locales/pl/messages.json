@@ -216,13 +216,13 @@
         "message": "Spróbuj ponownie połączyć z serwerem"
     },
     "menu.settingslabel": {
-        "message": "Ustawienia synchronizacji (TbSync)"
+        "message": "Ustawienia synchronizacji (R7)"
     },
     "password.account": {
         "message": "Konto:"
     },
     "password.description": {
-        "message": "Zaktualizuj dane logowania dla następującego konta TbSync:"
+        "message": "Zaktualizuj dane logowania dla następującego konta R7:"
     },
     "password.password": {
         "message": "Hasło:"
@@ -668,7 +668,7 @@
         "message": "Nieprawidłowy klucz synchronizacji (status 9), ponowna synchronizacja"
     },
     "status.InvalidServerOptions": {
-        "message": "Serwer nie dostarcza informacji o obsługiwanych wersjach ActiveSync. Czy EAS jest zablokowany dla tego użytkownika lub tego klienta (TbSync)? Możesz spróbować ręcznie ustawić wersję ActiveSync."
+        "message": "Serwer nie dostarcza informacji o obsługiwanych wersjach ActiveSync. Czy EAS jest zablokowany dla tego użytkownika lub tego klienta (R7)? Możesz spróbować ręcznie ustawić wersję ActiveSync."
     },
     "status.OK": {
         "message": "OK"

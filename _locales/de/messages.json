@@ -216,7 +216,7 @@
         "message": "Erneut versuchen mit dem Server zu verbinden"
     },
     "menu.settingslabel": {
-        "message": "Synchronisationseinstellungen (TbSync)"
+        "message": "Synchronisationseinstellungen (R7)"
     },
     "password.account": {
         "message": "Konto:"
@@ -668,7 +668,7 @@
         "message": "Ungültiger Synchronisationsschlüssel, es wird neu synchronisiert"
     },
     "status.InvalidServerOptions": {
-        "message": "Der Server sendet keine Informationen zu den unterstützten ActiveSync Versionen. Ist EAS für diesen Benutzer bzw. für dieses Programm (TbSync) freigeschaltet? Sie können versuchen, die ActiveSync Version manuell festzulegen."
+        "message": "Der Server sendet keine Informationen zu den unterstützten ActiveSync Versionen. Ist EAS für diesen Benutzer bzw. für dieses Programm (R7) freigeschaltet? Sie können versuchen, die ActiveSync Version manuell festzulegen."
     },
     "status.OK": {
         "message": "Ok"
