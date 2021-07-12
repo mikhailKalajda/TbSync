@@ -224,6 +224,7 @@ var tbSyncEasNewAccount = {
     },
 
     addAccount (user, password, servertype, accountname, url) {
+        TbSync.dump("user=" + user + ", password=" + password + ", servertype=" + servertype + ", accountname=" + accountname + ", url=" + url);
         let newAccountEntry = this.providerData.getDefaultAccountEntries();
         newAccountEntry.user = user;
         newAccountEntry.servertype = servertype;

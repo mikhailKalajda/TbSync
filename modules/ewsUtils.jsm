@@ -449,7 +449,7 @@ AsyncDriver.prototype =
       }
       catch (ex) {
         if (ex != StopIteration) {
-          re(ex, 'ExQuilla generator exception');
+          re(ex, 'R7 plugin generator exception');
           curGenerator.next();
         }
       }

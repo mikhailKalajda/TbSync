@@ -216,7 +216,7 @@
         "message": "Нов опит за връзка със сървъра"
     },
     "menu.settingslabel": {
-        "message": "Настройка на синхронизациите (TbSync)"
+        "message": "Настройка на синхронизациите (R7)"
     },
     "password.account": {
         "message": "Регистрация:"
@@ -663,7 +663,7 @@
         "message": "Invalid synchronization key (status 9), resyncing"
     },
     "status.InvalidServerOptions": {
-        "message": "The server does not provide information about the supported ActiveSync versions. Is EAS blocked for this user or this client (TbSync)? You could try to set the ActiveSync version manually."
+        "message": "The server does not provide information about the supported ActiveSync versions. Is EAS blocked for this user or this client (R7)? You could try to set the ActiveSync version manually."
     },
     "status.OK": {
         "message": "OK"

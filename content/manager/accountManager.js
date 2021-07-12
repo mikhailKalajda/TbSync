@@ -136,5 +136,5 @@ var tbSyncAccountManager = {
       listOfSponsors.appendChild(template);
     }
     listOfSponsors.removeChild(listOfSponsors.firstElementChild);
-  }        
+  }
 };

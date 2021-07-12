@@ -60,6 +60,7 @@
   <script type="application/javascript" src="chrome://messenger/content/AccountWizard.js"/>
   <script type="application/javascript" src="chrome://tbsync/content/ewsAccountWizard.js"/>
   <script type="application/javascript" src="chrome://messenger/content/aw-done.js"/>
+  <script type="text/javascript" src="chrome://tbsync/content/manager/accounts.js" /> 
 
   <dummy id="accounttype" hidden="true"/>
   <dummy id="incomingpage" hidden="true"/>

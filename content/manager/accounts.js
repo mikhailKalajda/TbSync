@@ -162,7 +162,8 @@ var tbSyncAccounts = {
     
     if (accountsList.selectedItem !== null && !isNaN(accountsList.selectedItem.value) && !TbSync.core.isSyncing(accountsList.selectedItem.value)) {            
       let isConnected = TbSync.core.isConnected(accountsList.selectedItem.value);
-      if (!isConnected || window.confirm(TbSync.getString("prompt.Disable"))) {           
+      if (!isConnected || window.confirm(TbSync.getString("prompt.Disable"))) {
+        TbSync.dump('run tbSyncAccounts.toggleAccountEnableState for ' + accountsList.selectedItem.value);
         tbSyncAccounts.toggleAccountEnableState(accountsList.selectedItem.value);
       }
     }
