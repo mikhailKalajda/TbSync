@@ -14,6 +14,8 @@ if (typeof(Services) == 'undefined')
 if (typeof(MailServices) == 'undefined')
   var { MailServices } = ChromeUtils.import("resource:///modules/MailServices.jsm");
 
+ var { TbSync } = ChromeUtils.import("chrome://tbsync/content/tbsync.jsm");
+
 var exquilla = Object.create(
 (function _exquilla()
 {
@@ -70,7 +72,7 @@ var exquilla = Object.create(
     // Log basic info into log file
     let appVersion = Services.appinfo.version;
     let OS = Services.appinfo.OS;
-    log.config('exquilla onLoad() AppVersion: ' + appVersion + " OS: " + OS);
+    log.info('exquilla onLoad() AppVersion: ' + appVersion + " OS: " + OS);
     (async () => log.config("R7 version is " + await getExtensionVersion()))();
 
     // With the removal of Thunderbird from the rapid release cycle, multirelease binaries
@@ -102,7 +104,7 @@ var exquilla = Object.create(
     let children = exAccountBranch.getChildList("", {});
     var testEx = new Error();
     testEx.code = "startup";
-    log.error("Test error logging", testEx);
+
     function showAccounts(text) {
       log.debug("Accounts at " + text + ": " + rootBranch.getCharPref("mail.accountmanager.accounts"));
     }
@@ -867,6 +869,21 @@ var exquilla = Object.create(
       return;
 
     let serverURI = folder.server.serverURI;
+
+    log.info('OnItemRemoved on folder ' + serverURI);
+    log.info('Folder info is ' + folder.name + ", userName=" + folder.username + ", hostName=" + folder.hostname);
+    let accounts = TbSync.db.getAccounts();
+    for (let i=0; i<accounts.IDs.length; i++) {
+      var tbSyncAccountData = accounts.data[accounts.IDs[i]];
+      log.info('TbSync account info is ' + JSON.stringify(tbSyncAccountData));
+      log.info('host is ' + tbSyncAccountData.host + '/' + folder.hostname + ', user is ' + tbSyncAccountData.user + '/' + folder.username);
+      if (tbSyncAccountData.host == folder.hostname && tbSyncAccountData.user == folder.username)
+      {
+        log.info('deleting account ' + accounts.IDs[i])
+        TbSync.db.removeAccount(accounts.IDs[i]);
+      }
+    }
+
     //dl('need to remove calendars with server URI ' + serverURI);
     let calendarManager;
     try {
