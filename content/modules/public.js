@@ -240,12 +240,12 @@ var AccountData = class {
   getAllFoldersIncludingCache() {
     let allFolders = [];
     let folders = TbSync.db.findFolders({}, {"accountID": this.accountID});
-    for (let i=0; i < folders.length; i++) {          
+    for (let i=0; i < folders.length; i++) {
       allFolders.push(new TbSync.FolderData(this, folders[i].folderID));
     }
     return allFolders;
   }
-  
+
   getFolder(setting, value) {
     // ES6 supports variable keys by putting it into brackets
     let folders = TbSync.db.findFolders({[setting]: value, "cached": false}, {"accountID": this.accountID});

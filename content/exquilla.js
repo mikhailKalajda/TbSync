@@ -407,9 +407,9 @@ var exquilla = Object.create(
     rootBranch.addObserver("mail.identity.", this, false);
 
     try {
-      let windowTitle = Services.strings.createBundle("chrome://tbsync/locale/settings.properties").GetStringFromName(AppConstants.XP_UNIX ? "windowTitle" : "windowTitleWin") + "…";
-      document.getElementById("exquilla.openSettingsTab").setAttribute("label", windowTitle);
-      document.getElementById("appmenu_exquilla_openSettingsTab").setAttribute("label", windowTitle);
+      //let windowTitle = Services.strings.createBundle("chrome://tbsync/locale/settings.properties").GetStringFromName(AppConstants.XP_UNIX ? "windowTitle" : "windowTitleWin") + "…";
+      //document.getElementById("exquilla.openSettingsTab").setAttribute("label", windowTitle);
+      //document.getElementById("appmenu_exquilla_openSettingsTab").setAttribute("label", windowTitle);
       // email context menu
       let emailContextMenu = document.getElementById("emailAddressPopup");
       emailContextMenu.addEventListener("popupshowing", this.onEmailAddressPopup, false);

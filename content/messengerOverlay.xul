@@ -25,11 +25,10 @@
     <menu id='exquilla-menu' class='menu-iconic' label='&exquilla.menu;'
           image='chrome://tbsync/skin/letter-x-icon-16.png'>
       <menupopup>
-        <menuitem id="exquilla.openSettingsTab"
-                  oncommand="exquilla.openSettingsTab();"/>
+        <!-- <menuitem id="exquilla.openSettingsTab"  oncommand="exquilla.openSettingsTab();"/> -->
         <menuitem label="&exquilla.addExchangeAccount;"
                   oncommand="exquilla.Utils.openAccountWizard();"/>
-        <menuitem label='&exquilla.openHelp;' oncommand='exquilla.openHelpTab();'/>
+        <!-- <menuitem label='&exquilla.openHelp;' oncommand='exquilla.openHelpTab();'/> -->
         <menuitem label='&exquilla.openLog;' oncommand='exquilla.openLog();'/>
       </menupopup>
     </menu>
@@ -51,17 +50,17 @@
   <panelmultiview id="appMenu-multiView">
     <panelview id="appMenu-exquillaView" title="&exquilla.menu;" class="PanelUI-subView">
       <vbox class="panel-subview-body">
-        <toolbarbutton id="appmenu_exquilla_openSettingsTab"
+        <!-- <toolbarbutton id="appmenu_exquilla_openSettingsTab"
                        class="subviewbutton"
-                       oncommand="exquilla.openSettingsTab();"/>
+                       oncommand="exquilla.openSettingsTab();"/> -->
         <toolbarbutton id="appmenu_exquilla_addExchangeAccount"
                        class="subviewbutton"
                        label="&exquilla.addExchangeAccount;"
                        oncommand="exquilla.Utils.openAccountWizard();"/>
-        <toolbarbutton id="appmenu_exquilla_openHelp"
+        <!-- <toolbarbutton id="appmenu_exquilla_openHelp"
                        class="subviewbutton"
                        label="&exquilla.openHelp;"
-                       oncommand="exquilla.openHelpTab();"/>
+                       oncommand="exquilla.openHelpTab();"/> -->
         <toolbarbutton id="appmenu_exquilla_openLog"
                        class="subviewbutton"
                        label="&exquilla.openLog;"

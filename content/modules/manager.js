@@ -170,10 +170,13 @@ manager.FolderList = class {
    * @param folderData         [in] FolderData of the folder in the row
    */        
   getRow(document, folderData) {
+    TbSync.dump('get row for folder ' + JSON.stringify(folderData));
     //create checkBox for select state
     let itemSelCheckbox = document.createXULElement("checkbox");
     itemSelCheckbox.setAttribute("updatefield", "selectbox");
     itemSelCheckbox.setAttribute("style", "margin: 0px 0px 0px 3px;");
+    itemSelCheckbox.setAttribute("selected", true);
+    itemSelCheckbox.setAttribute("checked", true);
     itemSelCheckbox.addEventListener("command", this.toggleFolder);
 
     //icon
@@ -200,10 +203,10 @@ manager.FolderList = class {
         menuitem.addEventListener("command", this.updateReadOnly);
         for (const [attr, value] of Object.entries(rwAttributes)) {
           menuitem.setAttribute(attr, value);
-        }                    
+        }
         menupopup.appendChild(menuitem);
       }
-      
+
       {
         let menuitem = document.createXULElement("menuitem");
         menuitem.downloadonly = true;
@@ -212,7 +215,7 @@ manager.FolderList = class {
         menuitem.addEventListener("command", this.updateReadOnly);
         for (const [attr, value] of Object.entries(roAttributes)) {
           menuitem.setAttribute(attr, value);
-        }                    
+        }
         menupopup.appendChild(menuitem);
       }
       itemACL.appendChild(menupopup);
@@ -262,9 +265,9 @@ manager.FolderList = class {
     let row = document.createXULElement("hbox");
     row.setAttribute("style", "min-height: 24px;");
     row.appendChild(itemVGroup1);
-    row.appendChild(itemVGroup2);            
-    row.appendChild(itemVGroup3);            
-    return row;               
+    row.appendChild(itemVGroup2);
+    row.appendChild(itemVGroup3);
+    return row;
   }
 
 
@@ -285,8 +288,8 @@ manager.FolderList = class {
         // hasTarget() can throw an error, ignore that here
         try {
           if (!folder.targetData.hasTarget() || element.ownerDocument.defaultView.confirm(TbSync.getString("prompt.Unsubscribe"))) {
-            folder.targetData.removeTarget();           
-            folder.setFolderProperty("selected", false);          
+            folder.targetData.removeTarget();
+            folder.setFolderProperty("selected", false);
           } else {
             if (element) {
               //undo users action
@@ -344,7 +347,7 @@ manager.FolderList = class {
     let foldername = TbSync.providers[this.provider].StandardFolderList.getFolderDisplayName(folderData);
     let status = folderData.getFolderStatus();
     let selected = folderData.getFolderProperty("selected");
-    
+    TbSync.dump('updateRow '+ foldername + ' status ' + status + ' selected ' + selected);
     // get updatefields
     let fields = {}
     for (let f of listItem.querySelectorAll("[updatefield]")) {

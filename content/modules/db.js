@@ -339,13 +339,16 @@ var db = {
   // FOLDER FUNCTIONS
 
   addFolder: function(accountID) {
+    TbSync.dump('addFolder ' + accountID);
     let folderID = TbSync.generateUUID();
-    let provider = this.getAccountProperty(accountID, "provider");        
+    let provider = this.getAccountProperty(accountID, "provider");
     
-    if (!this.folders.hasOwnProperty(accountID)) this.folders[accountID] = {};                        
+    if (!this.folders.hasOwnProperty(accountID)) this.folders[accountID] = {};
     
     //create folder with default settings
     this.folders[accountID][folderID] = TbSync.providers.getDefaultFolderEntries(accountID);
+    this.folders[accountID][folderID]["status"] = "pending";
+    this.folders[accountID][folderID]["selected"] = true;
     this.saveFolders();
     return folderID;
   },
@@ -405,7 +408,7 @@ var db = {
   
   resetFolderProperty: function (accountID, folderID, field) {
     let provider = this.getAccountProperty(accountID, "provider");
-    let defaults = TbSync.providers.getDefaultFolderEntries(accountID);        
+    let defaults = TbSync.providers.getDefaultFolderEntries(accountID);
     if (this.isValidFolderProperty(accountID, field)) {
       //handle internal fields, that do not have a default value (see isValidFolderProperty)
       this.folders[accountID][folderID][field] = defaults[field] ? defaults[field] : "";
