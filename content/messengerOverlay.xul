@@ -25,7 +25,8 @@
     <menu id='exquilla-menu' class='menu-iconic' label='&exquilla.menu;'
           image='chrome://tbsync/skin/letter-x-icon-16.png'>
       <menupopup>
-        <!-- <menuitem id="exquilla.openSettingsTab"  oncommand="exquilla.openSettingsTab();"/> -->
+        <menuitem label="Настройки синхронизации" 
+          oncommand="TbSync.manager.openManagerWindow();"/>
         <menuitem label="&exquilla.addExchangeAccount;"
                   oncommand="exquilla.Utils.openAccountWizard();"/>
         <!-- <menuitem label='&exquilla.openHelp;' oncommand='exquilla.openHelpTab();'/> -->
@@ -50,9 +51,7 @@
   <panelmultiview id="appMenu-multiView">
     <panelview id="appMenu-exquillaView" title="&exquilla.menu;" class="PanelUI-subView">
       <vbox class="panel-subview-body">
-        <!-- <toolbarbutton id="appmenu_exquilla_openSettingsTab"
-                       class="subviewbutton"
-                       oncommand="exquilla.openSettingsTab();"/> -->
+        <!-- <menuitem id="tbsync.accountmgrEntry" label="__TBSYNCMSG_menu.settingslabel__" insertbefore="menu_accountmgr" oncommand="TbSync.manager.openManagerWindow(event);" /> -->
         <toolbarbutton id="appmenu_exquilla_addExchangeAccount"
                        class="subviewbutton"
                        label="&exquilla.addExchangeAccount;"

@@ -25,7 +25,7 @@ var manager = {
 
 
   openManagerWindow: function(event) {
-    if (!event.button) { //catches zero or undefined
+    if (!event || !event.button) { //catches zero or undefined
       if (TbSync.enabled) {
         // check, if a window is already open and just put it in focus
         if (this.prefWindowObj === null) {

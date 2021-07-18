@@ -14,6 +14,5 @@
     <statusbarpanel id="tbsync.status" appendto="status-bar" label="TbSync" context="tbsync.statusmenu" onclick="TbSync.manager.openManagerWindow(event);" />
 
     <!--menuitem id="tbsync.taskPopupEntry" label="__TBSYNCMSG_menu.settingslabel__" appendto="taskPopup" onclick="TbSync.manager.openManagerWindow(event);" / -->
-    <menuitem id="tbsync.accountmgrEntry" label="__TBSYNCMSG_menu.settingslabel__" insertbefore="menu_accountmgr" oncommand="TbSync.manager.openManagerWindow(event);" />
 
-</overlay>        
+</overlay>

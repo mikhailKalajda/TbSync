@@ -34,18 +34,17 @@ var tbSyncAccountManager = {
     const LOAD_FLAGS_NONE = Components.interfaces.nsIWebNavigation.LOAD_FLAGS_NONE;
 
     //set active tab (css selector for background color)
-    for (let i=0; i<TbSync.AccountManagerTabs.length; i++) {            
+    for (let i=0; i<TbSync.AccountManagerTabs.length; i++) {
       if (i==t) document.getElementById("tbSyncAccountManager.t" + i).setAttribute("active","true");
       else document.getElementById("tbSyncAccountManager.t" + i).setAttribute("active","false");
     }
     TbSync.manager.prefWindowObj.document.getElementById("tbSyncAccountManager.installProvider").hidden=true;
-    
+
     //load XUL
     document.getElementById("tbSyncAccountManager.contentWindow").setAttribute("src", "chrome://tbsync/content/manager/"+TbSync.AccountManagerTabs[t]);
   },
-  
-  
-  
+
+
   //help tab
   getLogPref: function() {
     let log = document.getElementById("tbSyncAccountManager.logLevel");
