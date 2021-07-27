@@ -12,6 +12,8 @@
 if (typeof(exquilla) == 'undefined')
   var exquilla = {};
 
+var { TbSync } = ChromeUtils.import("chrome://tbsync/content/tbsync.jsm");
+
 exquilla.abOverlay = (function _abOverlay()
 {
   const Cc = Components.classes;
@@ -80,6 +82,7 @@ exquilla.abOverlay = (function _abOverlay()
 
   function onLoad()
   {
+    TbSync.dump('ab overlay on load');
     let dirTree = GetDirTree();
     dirTree.controllers.appendController(exquilla.abOverlay.abController);
 

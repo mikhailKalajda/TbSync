@@ -398,7 +398,7 @@
         "message": "Отчество:"
     },
     "abCard.OtherAddress": {
-        "message": "Адрес:"
+        "message": "Улица:"
     },
     "abCard.OtherCity": {
         "message": "Город:"
