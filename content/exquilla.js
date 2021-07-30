@@ -860,50 +860,67 @@ var exquilla = Object.create(
 
   function OnItemRemoved(aParentItem, folder)
   {
-    // When an account is removed, also remove any corresponding calendars
-
-    // should be a root ews folder
-    if (!(folder instanceof Ci.nsIMsgFolder) ||
-        !(folder.isServer) ||
-        !(folder.server.type == 'exquilla'))
-      return;
-
-    let serverURI = folder.server.serverURI;
-
-    log.info('OnItemRemoved on folder ' + serverURI);
-    log.info('Folder info is ' + folder.name + ", userName=" + folder.username + ", hostName=" + folder.hostname);
-    let accounts = TbSync.db.getAccounts();
-    for (let i=0; i<accounts.IDs.length; i++) {
-      var tbSyncAccountData = accounts.data[accounts.IDs[i]];
-      log.info('TbSync account info is ' + JSON.stringify(tbSyncAccountData));
-      log.info('host is ' + tbSyncAccountData.host + '/' + folder.hostname + ', user is ' + tbSyncAccountData.user + '/' + folder.username);
-      if (tbSyncAccountData.host == folder.hostname && tbSyncAccountData.user == folder.username)
-      {
-        log.info('deleting account ' + accounts.IDs[i])
-        TbSync.db.removeAccount(accounts.IDs[i]);
-      }
-    }
-
-    //dl('need to remove calendars with server URI ' + serverURI);
-    let calendarManager;
     try {
-      calendarManager = Cc["@mozilla.org/calendar/manager;1"]
-                          .getService(Ci.calICalendarManager);
-    } catch (e) {}
-    if (!calendarManager)
-      return;
+      // When an account is removed, also remove any corresponding calendars
 
-    let calendars = calendarManager.getCalendars({});
-    // we'll remove the calendar if it has a matching URI
-    // TODO: support subcalendar folders
-    for (let calendar of calendars)
-    {
-      //dl('calendar spec is ' + calendar.uri.spec);
-      if (calendar.uri.spec.indexOf(serverURI) != -1)
+      // should be a root ews folder
+      if (!(folder instanceof Ci.nsIMsgFolder) ||
+          !(folder.isServer) ||
+          !(folder.server.type == 'exquilla'))
       {
-        //dl('removing calendar');
-        calendarManager.unregisterCalendar(calendar);
+        return;
       }
+
+      let serverURI = folder.server.serverURI;
+
+      try {
+        log.info('OnItemRemoved on folder ' + serverURI);
+        log.info('Folder info is ' + folder.name + ", userName=" + folder.username + ", hostName=" + folder.hostname);
+        let accounts = TbSync.db.getAccounts();
+        for (let i=0; i<accounts.IDs.length; i++) {
+          var tbSyncAccountData = accounts.data[accounts.IDs[i]];
+          log.info('TbSync account info is ' + JSON.stringify(tbSyncAccountData));
+          log.info('host is ' + tbSyncAccountData.host + '/' + folder.hostname + ', user is ' + tbSyncAccountData.user + '/' + folder.username);
+          if (tbSyncAccountData.host == folder.hostname && tbSyncAccountData.user == folder.username)
+          {
+            log.info('deleting account ' + accounts.IDs[i])
+            TbSync.db.removeAccount(accounts.IDs[i]);
+          }
+        }
+      } catch (e) {
+        log.warn('OnItemRemoved tbsync failed');
+        log.error(e);
+      }
+
+      try {
+        //dl('need to remove calendars with server URI ' + serverURI);
+        let calendarManager;
+        try {
+          calendarManager = Cc["@mozilla.org/calendar/manager;1"]
+                              .getService(Ci.calICalendarManager);
+        } catch (e) {}
+        if (!calendarManager)
+          return;
+
+        let calendars = calendarManager.getCalendars({});
+        // we'll remove the calendar if it has a matching URI
+        // TODO: support subcalendar folders
+        for (let calendar of calendars)
+        {
+          //dl('calendar spec is ' + calendar.uri.spec);
+          if (calendar.uri.spec.indexOf(serverURI) != -1)
+          {
+            //dl('removing calendar');
+            calendarManager.unregisterCalendar(calendar);
+          }
+        }
+      } catch(e) {
+        log.warn('OnItemRemoved tbsync failed');
+        log.error(e);
+      }
+    } catch (e) {
+      log.warn('OnItemRemoved failed');
+      log.error(e);
     }
   }
 
