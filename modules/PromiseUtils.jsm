@@ -204,7 +204,7 @@ PromiseUtils.promiseAsyncFetch = function(aFile) {
 }
 
 PromiseUtils.promiseAutodiscover = function promiseAutodiscover
-  (aEmail, aUsername, aDomain, aPassword, aSavePassword, aWindow, aSiteCallback)
+  (aEmail, aUsername, aDomain, aPassword, aSavePassword, aServerinDomain, aWindow, aSiteCallback)
 {
   let { EwsAutoDiscover } = ChromeUtils.import("resource://exquilla/autodiscover.js");
 
@@ -223,7 +223,7 @@ PromiseUtils.promiseAutodiscover = function promiseAutodiscover
     }
   };
 
-  EwsAutoDiscover.doAutodiscover(aEmail, aUsername, aDomain, aPassword, aSavePassword, adListener, aWindow, aSiteCallback);
+  EwsAutoDiscover.doAutodiscover(aEmail, aUsername, aDomain, aPassword, aSavePassword, aServerinDomain, adListener, aWindow, aSiteCallback);
   return base.promise;
 }
 

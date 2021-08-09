@@ -120,7 +120,7 @@ EwsNativeMachine.prototype = {
         if (!aMailbox.isOnline)
         {
           result = await PromiseUtils.promiseAutodiscover(aMailbox.email.length ? aMailbox.email : aMailbox.username,
-            aMailbox.username, aMailbox.domain, aMailbox.password, false, domWindow(), null);
+            aMailbox.username, aMailbox.domain, aMailbox.password, false, '', domWindow(), null);
 
           if (result.status == Cr.NS_OK && result.foundSite)
           {
@@ -2188,7 +2188,7 @@ async function promiseAutodiscoverUrl(aMailbox, aEventListener)
   let result = {status: Cr.NS_ERROR_FAILURE};
   try {
     result = await PromiseUtils.promiseAutodiscover(aMailbox.email.length ? aMailbox.email : aMailbox.username,
-              aMailbox.username, aMailbox.domain, aMailbox.password, false, domWindow(), null);
+              aMailbox.username, aMailbox.domain, aMailbox.password, false, '', domWindow(), null);
 
     if (result.foundSite)
     {

@@ -296,6 +296,7 @@ exquilla.AW = (function exquillaAW()
     var password = _e("exquillaPassword").value;
     var savePassword = _e("exquillaSavePassword").checked;
     var email = _e("email").value.trim();
+    var serverInDomain = _e("serverInDomain").value.trim();
 
     // only set the domain if it is we are not using an email address as username
     if (name.length && !domain.length)
@@ -309,12 +310,13 @@ exquilla.AW = (function exquillaAW()
     }
 
     setPageData(pageData, "identity", "email", email);
+    setPageData(pageData, "identity", "serverinDomain", serverInDomain);
     setPageData(pageData, "login", "username", name);
     setPageData(pageData, "login", "domain", domain);
     setPageData(pageData, "login", "password", password);
     setPageData(pageData, "login", "savePassword", savePassword);
-    log.config("identity page: email=" + email + " username=" + name + " domain=" + domain);
-    log.debug("identity password set? "+ (password.length ? "true" : "false") + " savePassword? " + savePassword);
+    log.info("identity page: email=" + email + " username=" + name + " domain=" + domain + " serverInDomain=" +serverInDomain);
+    log.info("identity password set? "+ (password.length ? "true" : "false") + " savePassword? " + savePassword);
 
     return true;
   }
@@ -704,6 +706,8 @@ exquilla.AW = (function exquillaAW()
     let domain = pageData.login.domain.value;
     let password = pageData.login.password.value;
     let savePassword = pageData.login.savePassword.value;
+    log.info( pageData.identity.email.value + " " + pageData.identity.serverinDomain );
+    let serverinDomain = pageData.identity.serverinDomain.value;
     _e("exquillaadresult").value = "Выполняется";
     _e("exquillaAutoURL").setAttribute("status", "loading");
     function setStatus(text) {
@@ -711,8 +715,8 @@ exquilla.AW = (function exquillaAW()
       "Выполняется" + (text ? (" " + text) : "");
     }
     adListener.successCallback = successCallback;
-
-    return EwsAutoDiscover.doAutodiscover(email, username, domain, password, savePassword, adListener, window, setStatus);
+    log.info('autodiscover form serverinDomain=' + serverinDomain)
+    return EwsAutoDiscover.doAutodiscover(email, username, domain, password, savePassword, serverinDomain, adListener, window, setStatus);
   } catch (e) {log.warn(re(e));}}
   /**/
   let adListener = {

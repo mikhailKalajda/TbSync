@@ -84,6 +84,13 @@
         </columns>
         <rows>
           <row>
+            <label class="label, serverLabel"  id="serverInDomainFieldLabel" value="Имя сервера в домене (опционально)"
+                   control="emserverInDomainail"/>
+            <textbox mailtype="identity" name="serverInDomain"
+                     placeholder="exchsv"
+                     id="serverInDomain" flex="6" class="uri-element"/>
+          </row>
+          <row>
             <label class="label, serverLabel"  id="emailFieldLabel" value="&email.label;"
                    accesskey="&email.accesskey;" control="email"/>
             <textbox mailtype="identity" name="email"

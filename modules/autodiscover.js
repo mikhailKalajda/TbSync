@@ -28,7 +28,7 @@ XPCOMUtils.defineLazyGetter(this, "log", () => {
   return _log;
 });
 
-function doAutodiscover(aEmail, aUsername, aDomain, aPassword, aSavePassword, aListener, aWindow, aSiteCallback)
+function doAutodiscover(aEmail, aUsername, aDomain, aPassword, aSavePassword, aServerinDomain, aListener, aWindow, aSiteCallback)
 {
   async function coroutine()
   {
@@ -112,14 +112,15 @@ function doAutodiscover(aEmail, aUsername, aDomain, aPassword, aSavePassword, aL
 
       log.config('DNS status for autodiscover prefix is ' + CN(status) +
                   ' address is ' + (record ? record.getNextAddrAsString() : ""));
+      let serverinDomain = eventListener.mServerinDomain ? eventListener.mServerinDomain + "." : "";
       if (status == 0)
       {
         // try to use the autodiscover prefixed url. Use the http: version first to look for a redirect,
         //  so that we don't ask for a certificate if we're just going to redirect anyway.
-        urls.push("http://" + prefixedURL);
-        urls.push("https://" + prefixedURL);
+        urls.push("http://" + serverinDomain + prefixedURL);
+        urls.push("https://" + serverinDomain + prefixedURL);
       }
-      urls.push("https://" + host);
+      urls.push("https://" + serverinDomain + host);
       let urlIndex = 0;
       for (let urlbase of urls)
       { try {
@@ -284,7 +285,7 @@ function doAutodiscover(aEmail, aUsername, aDomain, aPassword, aSavePassword, aL
   log.config('doAutodiscover email is ' + aEmail + ' username is ' + aUsername + ' domain is ' + aDomain);
   // Clear HTTP authentication session in case we configure 2 accounts on the same server
   Cc['@mozilla.org/network/http-auth-manager;1'].getService(Ci.nsIHttpAuthManager).clearAll();
-  var eventListener = new EventListener(aEmail, aUsername, aDomain, aPassword, aSavePassword);
+  var eventListener = new EventListener(aEmail, aUsername, aDomain, aPassword, aSavePassword, aServerinDomain);
 
   coroutine();
 }
@@ -302,8 +303,9 @@ function informUserOfCertError(targetSite, aWindow)
   return params.exceptionAdded;
 }
 
-function EventListener(aEmail, aUsername, aDomain, aPassword, aSavePassword)
+function EventListener(aEmail, aUsername, aDomain, aPassword, aSavePassword, aServerinDomain)
 {
+  this.mServerinDomain = aServerinDomain;
   this.mRequest = null;
   this.mUrl = null;
   this.mEmail = aEmail;
