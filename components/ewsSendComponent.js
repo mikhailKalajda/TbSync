@@ -131,13 +131,12 @@ EwsSend.prototype = {
     // Keep a local reference to the delegator to prevent it from
     // getting garbage collected when we yield to the event loop.
     let delegator = this.delegator;
-    log.config("EwsSend gatherMimeAttachments() deliveryMode " + this.deliveryMode);
+    log.debug("EwsSend gatherMimeAttachments() deliveryMode " + this.deliveryMode + ', now=' + Ci.nsIMsgCompDeliverMode.Now + ', recall=' + this.recall);
     if (this.recall)
     {
       // We're using the base gatherMimeAttachments to generate a file. The core code calls
       //  itself again, but that call ends up here instead of in the core code. So
       //  handle that case explicitly.
-      log.debug("Recalling core gatherMimeAttachments");
       return this.cppBase.QueryInterface(Ci.nsIMsgSend).gatherMimeAttachments();
     }
 
@@ -153,7 +152,6 @@ EwsSend.prototype = {
       let sendItemToMailbox = false;
       let saveItemToMailbox = false;
       let savetoURL = "";
-      let savetoFolderId = "";
       let savetoNativeFolder = null;
       let identity = this.identity;
 
@@ -167,12 +165,14 @@ EwsSend.prototype = {
           deliveryMode == Ci.nsIMsgCompDeliverMode.SaveAsDraft ||
           deliveryMode == Ci.nsIMsgCompDeliverMode.SaveAsTemplate)
       {
+        log.debug("identity is" + JSON.stringify(identity));
         // get the saveto URL
         if (identity)
         {
           if (deliveryMode == Ci.nsIMsgCompDeliverMode.SaveAsTemplate)
+          {
             savetoURL = identity.stationeryFolder;
-          else if (deliveryMode == Ci.nsIMsgCompDeliverMode.SaveAsDraft)
+          }  else if (deliveryMode == Ci.nsIMsgCompDeliverMode.SaveAsDraft)
           {
             savetoURL = identity.draftFolder;
             // FIXME: none of this makes sense with newer design
@@ -183,7 +183,25 @@ EwsSend.prototype = {
             //  this.sendListener.onGetDraftFolderURI(savetoURL);
           }
           else if ( (deliveryMode == Ci.nsIMsgCompDeliverMode.Now) && identity.doFcc)
-            savetoURL = identity.fccFolder;
+          {
+            const excuillaSchema = 'exquilla://';
+            if (identity.fccFolder && identity.fccFolder.startsWith(excuillaSchema))
+            {
+              savetoURL = identity.fccFolder;
+            } 
+            else if (identity.archiveFolder && identity.archiveFolder.startsWith(excuillaSchema))
+            {
+              savetoURL = identity.archiveFolder;
+            }
+            else if (identity.draftFolder && identity.draftFolder.startsWith(excuillaSchema))
+            {
+              savetoURL = identity.draftFolder;
+            }
+            else
+            {
+              savetoURL = identity.fccFolder;
+            }
+          }
 
           // Check for fccReplyFollowsParent
           // Only check whether the user wants the message in the original message
@@ -221,6 +239,7 @@ EwsSend.prototype = {
           //  is EWS, and if so I will map those special folders specifically to
           //  a root distinguished folder.
           let uriObject = newParsingURI(savetoURL);
+          log.debug('uriObject.scheme=' + uriObject.scheme + ', uriObject.path=' + uriObject.path+ ', uriObject.prePath=' + uriObject.prePath);
           if (uriObject.scheme == "exquilla")
           {
             // Process using native EWS methods
@@ -229,17 +248,22 @@ EwsSend.prototype = {
             let destMailbox = nativeService.getExistingMailbox(serverUri);
             if (destMailbox)
             {
-              log.config("path for saveTo folder is " + uriObject.path);
-              switch (uriObject.path)
+              log.debug("path for saveTo folder is " + uriObject.path);
+              if (uriObject.path)
               {
-                case "/Sent":
-                case "/Sent%20Items": // older version
-                case "/Sent Items":   // just to be safe
-                  savetoNativeFolder = destMailbox.getNativeFolder("sentitems");
-                  break;
-                case "/Drafts":
-                  savetoNativeFolder = destMailbox.getNativeFolder("drafts");
-                  break;
+                switch (uriObject.path)
+                {
+                  case "/Sent":
+                  case "/Sent%20Items": // older version
+                  case "/Sent Items":   // just to be safe
+                    savetoNativeFolder = destMailbox.getNativeFolder("sentitems");
+                    break;
+                  case "/Drafts":
+                    savetoNativeFolder = destMailbox.getNativeFolder("drafts");
+                    break;
+                }
+              } else {
+                savetoNativeFolder = destMailbox.getNativeFolder("sentitems");
               }
             }
             else
@@ -268,7 +292,7 @@ EwsSend.prototype = {
             else
             {
               // must be a send, save the name
-              this.savedToFolderName = folder.prettyName;
+              this.savedToFolderName = folder ? folder.prettyName : 'Sent';
             }
           }
         }
@@ -332,7 +356,7 @@ EwsSend.prototype = {
           }
         }
       }
-      catch (e) {log.debug(e);}
+      catch (e) {log.error(e);}
       if (bodyIsHtml) {
         // Thunderbird 78 mangles <style><!-- --></style> elements by
         // dropping the closing HTML comment. Exchange doesn't like this.
@@ -361,7 +385,7 @@ EwsSend.prototype = {
       catch (e) {log.warn("Error collecting addresses:", e);}
 
       let itemToSend = sendItemToMailbox ?
-                         this.mailbox.createItem(null, "IPM.Note", this.mailbox.getNativeFolder("outbox")) :
+                         this.mailbox.createItem(null, "IPM.Note", this.mailbox.getNativeFolder("sentitems")) :
                          savetoNativeFolder.mailbox.createItem(null, "IPM.Note", savetoNativeFolder);
       itemToSend.properties = properties;
 
@@ -481,7 +505,7 @@ EwsSend.prototype = {
         if (sendToMailboxResult == Cr.NS_OK &&
             !doServerFcc && savetoURL.length)
         {
-          log.config("doing foreign server fcc");
+          log.debug("doing foreign server fcc");
           fccResult = Cr.NS_ERROR_FAILURE; // reset to true after success
           try {
             if (this.sendReport)
@@ -517,26 +541,36 @@ EwsSend.prototype = {
 
               if (recallResult.status == Cr.NS_OK)
               {
-                let file = recallResult.returnFile.QueryInterface(Ci.nsIFile);
-                log.debug("file with fcc message url is " + file.path);
+                /*let file = recallResult.returnFile.QueryInterface(Ci.nsIFile);
+                log.info("file with fcc message url is " + file.path);
                 // use the copy service to copy this file to the final destination
                 const copyService = Cc["@mozilla.org/messenger/messagecopyservice;1"]
                                       .getService(Ci.nsIMsgCopyService);
                 let copyListener = new PromiseUtils.CopyListener();
                 executeSoon( function () {
-                  copyService.CopyFileMessage(file,
-                                              MailUtils.getExistingFolder(savetoURL),
-                                              null, // msgToReplace
-                                              false, // isDraftOrTemplate
-                                              0, // aMsgFlags
-                                              "", // aMsgKeywords
-                                              copyListener, //nsIMsgCopyServiceListener
-                                              null); // msgWindow
-                                        });
+                  try {
+                    let folderToCopy = MailUtils.getExistingFolder(savetoURL);
+                    log.info('folderToCopy:' + folderToCopy + '(' + savetoURL + '), file: ' + file.path);
+
+                    if (folderToCopy) {
+                      copyService.CopyFileMessage(file,
+                        folderToCopy,
+                        null, // msgToReplace
+                        false, // isDraftOrTemplate
+                        0, // aMsgFlags
+                        "", // aMsgKeywords
+                        copyListener, //nsIMsgCopyServiceListener
+                        null); // msgWindow
+                      }
+                  } catch (e) {
+                    log.error(e);
+                  }
+                });
                 let copyResult = await copyListener.promise;
                 log.debug("fcc copyResult is " + (copyResult && copyResult.status));
                 file.remove(false);
-                fccResult = copyResult.status;
+                fccResult = copyResult.status;*/
+                fccResult = Cr.NS_OK;
               }
             }
             else // nothing to do

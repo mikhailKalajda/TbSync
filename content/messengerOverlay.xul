@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?xml-stylesheet href="chrome://exquilla/skin/messengerOverlay.css" type="text/css"?>
+<?xml-stylesheet href="chrome://tbsync/skin/messengerOverlay.css" type="text/css"?>
 
 <!DOCTYPE overlay [
 <!ENTITY % messengerOverlayDTD SYSTEM "chrome://tbsync/locale/messengerOverlay.dtd" >

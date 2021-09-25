@@ -101,21 +101,20 @@ EwsCompose.prototype = {
     }
   },
 
+  SendMsg(msgType, identity, accountKey, msgWindow, progress)
+  {
+    log.info("SendMsg called");
+    this.sendMsgToServer(msgType, identity, accountKey);
+    },
+
   sendMsgToServer(msgType, identity, accountKey)
   {
     // Because we are overriding the send function for ALL sends, I am going to be
     //  cautious, and use the standard compose send method if anything fails
    try
    {
-    log.config("sendMsgToServer");
+    log.info("sendMsgToServer msgType=" + msgType + ", identity=" + JSON.stringify(identity) + ", accountKey=" + JSON.stringify(accountKey));
 
-    // Testing
-    if (msgType >= 100)
-    {
-      log.warning("Testing ewsCompose");
-      this.sendMsgToEwsServer(msgType, identity, accountKey, null);
-      return;
-    }
     // determine if we should use EWS sending or native SMTP sending
     /* currentAccountKey is unreliable
        (see https://bugzilla.mozilla.org/show_bug.cgi?id=449482#c16)
@@ -138,7 +137,7 @@ EwsCompose.prototype = {
       else if (msgType == Ci.nsIMsgCompDeliverMode.SaveAsTemplate)
         destinationURI = identity.stationeryFolder;
       if (destinationURI)
-        log.config('destinationURI is ' + destinationURI);
+        log.info('destinationURI is ' + destinationURI);
     }
 
     if (!incomingServer && destinationURI)
@@ -148,7 +147,7 @@ EwsCompose.prototype = {
         incomingServer = folder.server;
     }
 
-    log.debug("identity.smtpServerKey is " + identity.smtpServerKey);
+    log.info("identity.smtpServerKey is " + identity.smtpServerKey);
 
     // Normally these keys are for the smtp services, but keys for ews accounts are
     //  actually accountManager keys.
@@ -159,25 +158,33 @@ EwsCompose.prototype = {
         outgoing = MailServices.accounts.getIncomingServer(identity.smtpServerKey);
       } catch (e) {}
     }
+    else {
+      outgoing = incomingServer;
+    }
     let ewsServer = safeGetJS(outgoing, "EwsIncomingServer");
     if (ewsServer)
     {
-      log.config("Should send using EWS");
+      log.info("Should send using EWS");
       this.sendMsgToEwsServer(msgType, identity, accountKey, ewsServer.nativeMailbox);
       return;
     }
-  } catch(e) {log.error(e);} // logs error without throwing, so falls through to normal send
+  } catch(e) {
+    log.info('Sending using EWS failed');
+    log.error(e);
+  } // logs error without throwing, so falls through to normal send
 
-  log.config("Sending using standard compose send");
+  log.info("Sending using standard compose send");
   this.cppBase.QueryInterface(Ci.nsIMsgCompose)
               .sendMsgToServer(msgType, identity, accountKey);
+  log.info("Sending using compose done");
   },
 
   // ews version of nsMsgCompose::Send
   sendMsgToEwsServer(deliverMode, identity, accountKey, mailbox)
-  { try {
+  { 
+    try {
 
-    log.config("Send EWS message to fullName: " + identity.fullName +
+    log.info("Send EWS message to fullName: " + identity.fullName +
                " email: " + identity.email +
                " mode: " + deliverMode);
 
@@ -214,6 +221,7 @@ EwsCompose.prototype = {
 
     let headerParser = Cc["@mozilla.org/messenger/headerparser;1"]
                          .getService(Ci.nsIMsgHeaderParser);
+    log.info('sendMsgToEwsServer: identity.fullName=' + identity.fullName + ', identity.email=' + identity.email);
     let sender =  headerParser.makeMimeAddress(identity.fullName, identity.email);
     compFields.from = sender.length ? sender : identity.email;
     compFields.organization = identity.organization;
