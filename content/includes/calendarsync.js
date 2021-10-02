@@ -11,13 +11,25 @@
 const cal = TbSync.lightning.cal;
 const ICAL = TbSync.lightning.ICAL;
 
+var { Utils } = ChromeUtils.import("resource://tbsync/ewsUtils.jsm");
+Utils.importLocally(this);
+var { XPCOMUtils } = ChromeUtils.import("resource://gre/modules/XPCOMUtils.jsm");
+
+var _log = null;
+XPCOMUtils.defineLazyGetter(this, "log", () => {
+  if (!_log) _log = Utils.configureLogging("account");
+  return _log;
+});
+
+
 var Calendar = {
 
     // --------------------------------------------------------------------------- //
     // Read WBXML and set Thunderbird item
     // --------------------------------------------------------------------------- //
     setThunderbirdItemFromWbxml: function (tbItem, data, id, syncdata, mode = "standard") {
-        
+        log.info('setThunderbirdItemFromWbxml data=');
+        log.info(JSON.stringify(data));
         let item = tbItem instanceof TbSync.lightning.TbItem ? tbItem.nativeItem : tbItem;
         
         let asversion = syncdata.accountData.getAccountProperty("asversion");
@@ -205,6 +217,8 @@ var Calendar = {
         let item = tbItem instanceof TbSync.lightning.TbItem ? tbItem.nativeItem : tbItem;
 
         let asversion = syncdata.accountData.getAccountProperty("asversion");
+
+        log.info('getWbxmlFromThunderbirdItem asversion=' + asversion);
         let wbxml = eas.wbxmltools.createWBXML("", syncdata.type); //init wbxml with "" and not with precodes, and set initial codepage
         let nowDate = new Date();
 
