@@ -15,6 +15,16 @@
 
 // https://msdn.microsoft.com/en-us/library/dd299454(v=exchg.80).aspx
 
+var { Utils } = ChromeUtils.import("resource://tbsync/ewsUtils.jsm");
+Utils.importLocally(this);
+var { XPCOMUtils } = ChromeUtils.import("resource://gre/modules/XPCOMUtils.jsm");
+
+var _log = null;
+XPCOMUtils.defineLazyGetter(this, "log", () => {
+  if (!_log) _log = Utils.configureLogging("account");
+  return _log;
+});
+
 var sync = {
 
     finish: function (aStatus = "", msg = "", details = "") {
@@ -298,7 +308,7 @@ var sync = {
                     break;
 
                 case "Calendar":
-                case "Tasks":                            
+                case "Tasks":
                     //save current value of readOnly (or take it from the setting)
                     lightningReadOnly = syncData.target.calendar.getProperty("readOnly") || syncData.currentFolderData.getFolderProperty( "downloadonly");                       
                     syncData.target.calendar.setProperty("readOnly", false);
@@ -317,7 +327,7 @@ var sync = {
             syncData.target.calendar.endBatch();
             syncData.target.calendar.setProperty("readOnly", lightningReadOnly);
         }
-        
+
         if (error) throw error;
     },
 
@@ -647,7 +657,37 @@ wbxml.ctag();*/
         }
     },
 
-    revertLocalChanges: async function (syncData)  {       
+    getAttachment: async function(syncData, fileReference) {
+        // BUILD WBXML
+        let wbxml = eas.wbxmltools.createWBXML();
+        wbxml.switchpage("ItemOperations");
+        wbxml.otag("ItemOperations");
+        wbxml.otag("Fetch");
+        wbxml.atag("Store", "Mailbox");
+        wbxml.switchpage("AirSyncBase");
+        wbxml.atag("FileReference", fileReference);
+        wbxml.switchpage("ItemOperations");
+        wbxml.ctag(); //Fetch
+        wbxml.ctag(); //ItemOperations
+
+        //SEND REQUEST & VALIDATE RESPONSE
+        try {
+            let xml = eas.wbxmltools.convert2xml(wbxml);
+            log.info("Get attachment request=" + wbxml + ', xml=' + xml);
+            let response = await eas.network.sendRequest(wbxml.getBytes(), "ItemOperations", syncData);
+
+            //get data from wbxml response
+            var wbxmlData = eas.network.getDataFromResponse(response);
+            log.info("Get attachment data=" + JSON.stringify(wbxmlData));
+            log.info("Get attachment response=" + JSON.stringify(response));
+            return wbxmlData;
+        } catch (e) {
+            log.error('Get attachment data failed', e);
+            //we do not handle errors, IF there was an error, wbxmlData is empty and will trigger the fallback
+        }
+    },
+
+    revertLocalChanges: async function (syncData)  {
         let maxnumbertosend = eas.prefs.getIntPref("maxitems");
         syncData.progressData.reset(0, syncData.target.getItemsFromChangeLog().length);
         if (syncData.progressData.todo == 0) {
@@ -766,7 +806,7 @@ wbxml.ctag();*/
                                         eas.sync[syncData.type].setThunderbirdItemFromWbxml(newItem, data, ServerId, syncData);
                                         await syncData.target.addItem(newItem);
                                     } catch (e) {
-                                        eas.xmltools.printXmlData(add[count], true); //include application data in log                  
+                                        eas.xmltools.printXmlData(add[count], true); //include application data in log
                                         TbSync.eventlog.add("warning", syncData.eventLogInfo, "BadItemSkipped::JavaScriptError", newItem.toString());
                                         throw e; // unable to add item to Thunderbird - fatal error
                                     }

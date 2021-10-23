@@ -464,7 +464,7 @@ var HttpRequest = class {
             let loader =  Components.classes["@mozilla.org/network/stream-loader;1"].createInstance(Components.interfaces.nsIStreamLoader);
             loader.init(this.listener);
             this.listener = loader;
-        }        
+        }
 
         this._startTimeout();
         this._xhr.httpchannel.asyncOpen(this.listener, this._xhr.httpchannel);

@@ -398,7 +398,8 @@ var wbxmltools = {
             0x38: 'IsLeapMonth',
             0x39: 'FirstDayOfWeek',
             0x3a: 'OnlineMeetingConfLink',
-            0x3b: 'OnlineMeetingExternalLink'
+            0x3b: 'OnlineMeetingExternalLink',
+            0x3c: 'ClientUid'
         },
         // Code Page 5: Move
         {
@@ -683,7 +684,25 @@ var wbxmltools = {
             0x18: 'Preview',
             0x19: 'BodyPartPreference',
             0x1A: 'BodyPart',
-            0x1B: 'Status'
+            0x1B: 'Status',
+            0x1C: 'Add',
+            0x1D: 'Delete',
+            0x1E: 'ClientId',
+            0x1F: 'Content',
+            0x20: 'Location',
+            0x21: 'Annotation',
+            0x22: 'Street',
+            0x23: 'City',
+            0x24: 'State',
+            0x25: 'Country',
+            0x26: 'PostalCode',
+            0x27: 'Latitude',
+            0x28: 'Longitude',
+            0x29: 'Accuracy',
+            0x2A: 'Altitude',
+            0x2B: 'AltitudeAccuracy',
+            0x2C: 'LocationUri',
+            0x2D: 'InstanceId'
         },
         // Code Page 18: Settings
         {

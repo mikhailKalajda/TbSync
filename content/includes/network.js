@@ -255,6 +255,7 @@ var network = {
         for (;;) {
 
             if (rv.errorType) {
+                TbSync.dump(JSON.stringify(rv));
                 let retry = false;
                 
                 if (ALLOWED_RETRIES[rv.errorType] > 0) {
@@ -351,7 +352,7 @@ var network = {
         TbSync.dump("Sending (EAS v"+syncData.accountData.getAccountProperty("asversion") +")", "POST " + eas.network.getEasURL(syncData.accountData) + '?Cmd=' + command + '&User=' + encodeURIComponent(connection.user) + '&DeviceType=' +deviceType + '&DeviceId=' + deviceId, true);
 
         const textEncoder = new TextEncoder();
-        let encoded = textEncoder.encode(wbxml);            
+        let encoded = textEncoder.encode(wbxml);
         // console.log("wbxml: " + wbxml);
         // console.log("byte array: " + encoded);
         // console.log("length :" + wbxml.length + " vs " + encoded.byteLength + " vs " + encoded.length);
@@ -375,7 +376,7 @@ var network = {
             if (syncData.accountData.getAccountProperty("asversion") == "2.5") {
                 syncData.req.setRequestHeader("MS-ASProtocolVersion", "2.5");
             } else {
-                syncData.req.setRequestHeader("MS-ASProtocolVersion", "14.0");
+                syncData.req.setRequestHeader("MS-ASProtocolVersion", "16.0");
             }
             syncData.req.setRequestHeader("Content-Length", encoded.length);
             if (syncData.accountData.getAccountProperty("provision")) {
@@ -452,46 +453,50 @@ var network = {
                         if (allowSoftFail) {
                             resolve("");
                         } else {
-                            reject(eas.sync.finish("error", "httperror::" + syncData.req.status));
+                            reject(eas.sync.finish("error", "httperror::" + syncData.req.status + ', response::' + JSON.stringify(syncData.req)));
                         }
                 }
             };
 
             syncData.req.send(encoded);
-            
+
         });
     },
 
     // RESPONSE EVALUATION
 
     logXML : function (wbxml, what) {
-        let rawxml = eas.wbxmltools.convert2xml(wbxml);
-        let xml = null;
-        if (rawxml)  {
-            xml = rawxml.split('><').join('>\n<');
-        }
-
-        //include xml in log, if userdatalevel 2 or greater
-        if (TbSync.prefs.getIntPref("log.userdatalevel") > 1) {
-
-            //log raw wbxml if userdatalevel is 3 or greater
-            if (TbSync.prefs.getIntPref("log.userdatalevel") > 2) {
-                let charcodes = [];
-                for (let i=0; i< wbxml.length; i++) charcodes.push(wbxml.charCodeAt(i).toString(16));
-                let bytestring = charcodes.join(" ");
-                TbSync.dump("WBXML: " + what, "\n" + bytestring);
+        try {
+            let rawxml = eas.wbxmltools.convert2xml(wbxml);
+            let xml = null;
+            if (rawxml)  {
+                xml = rawxml.split('><').join('>\n<');
             }
-
-            if (xml) {
-                //raw xml is save xml with all special chars in user data encoded by encodeURIComponent - KEEP that in order to be able to analyze logged XML 
-                //let xml = decodeURIComponent(rawxml.split('><').join('>\n<'));
-                TbSync.dump("XML: " + what, "\n" + xml);
-            } else {
-                TbSync.dump("XML: " + what, "\nFailed to convert WBXML to XML!\n");
-            }
-        }
     
-        return xml;
+            //include xml in log, if userdatalevel 2 or greater
+            if (TbSync.prefs.getIntPref("log.userdatalevel") > 1) {
+    
+                //log raw wbxml if userdatalevel is 3 or greater
+                if (TbSync.prefs.getIntPref("log.userdatalevel") > 2) {
+                    let charcodes = [];
+                    for (let i=0; i< wbxml.length; i++) charcodes.push(wbxml.charCodeAt(i).toString(16));
+                    let bytestring = charcodes.join(" ");
+                    TbSync.dump("WBXML: " + what, "\n" + bytestring);
+                }
+    
+                if (xml) {
+                    //raw xml is save xml with all special chars in user data encoded by encodeURIComponent - KEEP that in order to be able to analyze logged XML 
+                    //let xml = decodeURIComponent(rawxml.split('><').join('>\n<'));
+                    TbSync.dump("XML: " + what, "\n" + xml);
+                } else {
+                    TbSync.dump("XML: " + what, "\nFailed to convert WBXML to XML!\n");
+                }
+            }
+        
+            return xml;
+        } catch (e) {
+            TbSync.dump("LogXML failed " + e.message);
+        }
     },
     
     //returns false on parse error and null on empty response (if allowed)
@@ -1095,7 +1100,7 @@ var network = {
                 if (allowedRetries > 0) {
                     if (oauthData) {
                         oauthData.accessToken = "";
-                        retry = true;                            
+                        retry = true;
                     } else {
                         syncData.setSyncState("passwordprompt");
                         let authData = eas.network.getAuthData(syncData.accountData);
@@ -1389,7 +1394,7 @@ var network = {
                     return;
                 }
 
-                resolve({"url":req.responseURL, "error":req.status, "server":""});                     
+                resolve({"url":req.responseURL, "error":req.status, "server":""});
             };
 
             req.send();

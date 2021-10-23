@@ -21,18 +21,17 @@ XPCOMUtils.defineLazyGetter(this, "log", () => {
   return _log;
 });
 
-
 var Calendar = {
 
     // --------------------------------------------------------------------------- //
     // Read WBXML and set Thunderbird item
     // --------------------------------------------------------------------------- //
     setThunderbirdItemFromWbxml: function (tbItem, data, id, syncdata, mode = "standard") {
-        log.info('setThunderbirdItemFromWbxml data=');
-        log.info(JSON.stringify(data));
-        let item = tbItem instanceof TbSync.lightning.TbItem ? tbItem.nativeItem : tbItem;
-        
         let asversion = syncdata.accountData.getAccountProperty("asversion");
+        log.info('setThunderbirdItemFromWbxml v' +  asversion + ' data=' + JSON.stringify(data));
+
+        let item = tbItem instanceof TbSync.lightning.TbItem ? tbItem.nativeItem : tbItem;
+
         item.id = id;
         eas.sync.setItemSubject(item, syncdata, data);
         if (TbSync.prefs.getIntPref("log.userdatalevel") > 2) TbSync.dump("Processing " + mode + " calendar item", item.title + " (" + id + ")");
@@ -57,7 +56,7 @@ var Calendar = {
             }
         }
         let timezone = eas.tools.guessTimezoneByStdDstOffset(stdOffset, dstOffset, easTZ.standardName);
-        
+
         if (data.StartTime) {
             let utc = cal.createDateTime(data.StartTime); //format "19800101T000000Z" - UTC
             item.startDate = utc.getInTimezone(timezone);
@@ -208,6 +207,17 @@ var Calendar = {
         else item.deleteProperty("STATUS");
 
         //TODO: attachements (needs EAS 16.0!)
+        if (data.Attachments && data.Attachments.Attachment)
+        {
+            log.info('downloading attachment');
+            try {
+                var attachment = eas.sync.getAttachment(syncdata, data.Attachments.Attachment.FileReference).then(r => r);
+                log.info('downloaded attachment ' + JSON.stringify(attachment));
+            } catch(e)
+            {
+                log.error(e);
+            }
+        }
     },
 
     // --------------------------------------------------------------------------- //

@@ -159,7 +159,7 @@ var Tasks = {
                 reminderTime = UtcDate.toISOString();
             } else {
                 reminderTime = eas.tools.getIsoUtcString(alarms[0].alarmDate, true);
-            }                
+            }
             wbxml.atag("ReminderTime", reminderTime);
             wbxml.atag("ReminderSet", "1");
         } else {
