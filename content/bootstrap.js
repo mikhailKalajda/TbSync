@@ -25,6 +25,7 @@ let onInitDoneObserver = {
         //load this provider add-on into TbSync
         if (valid) {
             await TbSync.providers.loadProvider(gExtension, "eas", "chrome://tbsync/content/provider.js");
+            await TbSync.providers.loadProvider(gExtension, "dav", "chrome://dav4tbsync/content/provider.js");
         }
     }
 }
@@ -42,6 +43,7 @@ function shutdown(addon, extension) {
     try {
         var { TbSync } = ChromeUtils.import("chrome://tbsync/content/tbsync.jsm");
         TbSync.providers.unloadProvider("eas");
+        TbSync.providers.unloadProvider("dav");
     } catch (e) {
         //if this fails, TbSync has been unloaded already and has unloaded this addon as well
     }

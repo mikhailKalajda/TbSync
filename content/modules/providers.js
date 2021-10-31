@@ -12,11 +12,11 @@ var providers = {
 
   //list of default providers (available in add menu, even if not installed)
   defaultProviders: {
-    // "dav" : {
-    //   name: "CalDAV & CardDAV", 
-    //   homepageUrl: "https://addons.thunderbird.net/addon/dav-4-tbsync/"},
+    "dav" : {
+      name: "CalDAV & CardDAV",
+      homepageUrl: "https://addons.thunderbird.net/addon/dav-4-tbsync/"},
     "eas" : {
-      name: "R7 Exchange ActiveSync", 
+      name: "R7 Exchange ActiveSync",
       homepageUrl: "https://addons.thunderbird.net/addon/eas-4-tbsync/"},
   },
   
@@ -34,6 +34,7 @@ var providers = {
 
   loadProvider:  async function (extension, provider, js) {
     //only load, if not yet loaded and if the provider name does not shadow a fuction inside provider.js
+    TbSync.dump("Loading addon " + extension + " provider " + provider);
     if (!this.loadedProviders.hasOwnProperty(provider) && !this.hasOwnProperty(provider) && js.startsWith("chrome://")) {
       try {
         if (!extension.id)
@@ -88,7 +89,7 @@ var providers = {
             TbSync.db.setFolderProperty(folders[f].accountID, folders[f].folderID, "status", "aborted");
           }
         }
-        
+
         Services.obs.notifyObservers(null, "tbsync.observer.manager.updateProviderList", provider);
         Services.obs.notifyObservers(null, "tbsync.observer.manager.updateSyncstate", null);
 
@@ -128,7 +129,6 @@ var providers = {
         TbSync.eventlog.add("error", info, "FAILED to load provider <"+provider+">", e.message);
         Components.utils.reportError(e);
       }
-
     }
   },
   
