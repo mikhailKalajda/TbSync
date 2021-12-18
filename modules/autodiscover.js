@@ -81,9 +81,11 @@ function doAutodiscover(aEmail, aUsername, aDomain, aPassword, aSavePassword, aS
         let { DNS } = ChromeUtils.import("resource:///modules/DNS.jsm");
         let SRV = await DNS.srv(Services.io.newURI("http://_autodiscover._tcp." + host).asciiHost);
         adServerFromSRV = SRV[0].host;
-        log.debug("getSrv returned " + adServerFromSRV);
+        log.warn("getSrv returned " + adServerFromSRV);
       } catch (ex) {
         // Some sort of DNS failure, e.g. no SRV record
+        log.warn(" Some sort of DNS failure, e.g. no SRV record");
+        log.error(ex);
       }
 
       if (adServerFromSRV.length)
@@ -95,13 +97,13 @@ function doAutodiscover(aEmail, aUsername, aDomain, aPassword, aSavePassword, aS
       let prefixedURL = "autodiscover." + host;
       let flags = Ci.nsIDNSService.RESOLVE_CANONICAL_NAME;
       let record;
-      log.debug('calling asyncResolve for hostname ' + prefixedURL);
+      log.warn('calling asyncResolve for hostname ' + prefixedURL);
       // use the example from extensions/irc/js/lib/dcc.js
       let th = Cc["@mozilla.org/thread-manager;1"].getService(Ci.nsIThreadManager).currentThread;
       let promiseDnsResolve = new Promise(resolve => {
         dnsService.asyncResolve(prefixedURL, flags,
           { onLookupComplete: function onLookupComplete(aRequest, aRecord, aStatus)
-            { log.debug('onLookupComplete: status is ' + CN(aStatus));
+            { log.warn('onLookupComplete: status is ' + CN(aStatus));
               record = aRecord;
               status = aStatus;
               resolve();
@@ -110,7 +112,7 @@ function doAutodiscover(aEmail, aUsername, aDomain, aPassword, aSavePassword, aS
       });
       await promiseDnsResolve;
 
-      log.config('DNS status for autodiscover prefix is ' + CN(status) +
+      log.warn('DNS status for autodiscover prefix is ' + CN(status) +
                   ' address is ' + (record ? record.getNextAddrAsString() : ""));
       let serverinDomain = eventListener.mServerinDomain ? eventListener.mServerinDomain + "." : "";
       if (status == 0)
@@ -126,12 +128,12 @@ function doAutodiscover(aEmail, aUsername, aDomain, aPassword, aSavePassword, aS
       { try {
         // outer loop to try each url in urls
         let urlv2 = urlbase + '/autodiscover/autodiscover.json/v1.0/';
-        log.config('try autodiscover to url ' + urlv2);
+        log.warn('try autodiscover to url ' + urlv2);
         if (aSiteCallback) aSiteCallback(urlv2); // just to show the url in UI
         try {
           let response = await fetch(urlv2 + aEmail + '?Protocol=Ews');
           status = response.status;
-          if (status == 200) {
+          if (status === 200) {
             let json = await response.json();
             if (/\/Exchange\.asmx$/i.test(json.Url)) {
               eventListener.mFoundAutodiscover = true;
@@ -140,6 +142,7 @@ function doAutodiscover(aEmail, aUsername, aDomain, aPassword, aSavePassword, aS
             }
           }
         } catch (ex) {
+          log.warn('try autodiscover to url ' + urlv2 + ' failed');
           log.warn(ex);
         }
 
@@ -151,7 +154,7 @@ function doAutodiscover(aEmail, aUsername, aDomain, aPassword, aSavePassword, aS
         { // inner loop of redirects
           eventListener.mUrl = url;
           // if the url is a simple http: we are just looking for redirect, so shorten the timeout
-          let shortTimeout = (originalUrl.indexOf("http:") == 0);
+          let shortTimeout = (originalUrl.indexOf("http:") === 0);
           if (shortTimeout)
             eventListener.mTimeout /= 2;
           const promiseRequest = new Promise(resolve => {
@@ -166,8 +169,8 @@ function doAutodiscover(aEmail, aUsername, aDomain, aPassword, aSavePassword, aS
             eventListener.mTimeout *= 2;
           status = eventListener.mStatus;
 
-          if ( ((status == 301 ||  status == 302 || status == 303 || status == 307) ||
-               (eventListener.mChannelStatus == Cr.NS_ERROR_REDIRECT_LOOP)))
+          if ( ((status === 301 ||  status === 302 || status === 303 || status === 307) ||
+               (eventListener.mChannelStatus === Cr.NS_ERROR_REDIRECT_LOOP)))
           {
             url = eventListener.mLocation;
             if (url && url.length)
@@ -176,7 +179,7 @@ function doAutodiscover(aEmail, aUsername, aDomain, aPassword, aSavePassword, aS
               //  not FBA so switch the original to this new url.
               if (originalUrl.indexOf("http:") == 0)
                 originalUrl = url;
-              log.config("redirecting to " + url + " originalUrl is now " + originalUrl);
+              log.warn("redirecting to " + url + " originalUrl is now " + originalUrl);
               redirectCount++;
               continue; // try redirect
             }
@@ -192,37 +195,37 @@ function doAutodiscover(aEmail, aUsername, aDomain, aPassword, aSavePassword, aS
             if (informUserOfCertError(url, aWindow))
             {
               // resend the request
-              log.config('resending request after cert error');
+              log.warn('resending request after cert error');
               continue;
             }
           }
 
-          if (status == 200)
+          if (status === 200)
           {
             if (eventListener.mRedirectUrl)
             {
               url = eventListener.mRedirectUrl;
               eventListener.mRedirectUrl = '';
-              log.config("redirecting to " + url);
+              log.warn("redirecting to " + url);
               redirectCount++;
               continue; // try redirect
             }
 
-            log.config("request succeeded, ews url length=" + eventListener.mEwsUrl.length +
+            log.warn("request succeeded, ews url length=" + eventListener.mEwsUrl.length +
                       " contentType " + eventListener.mRequest.channel.contentType);
             // if parsed, show what we got
             //if (eventListener.mRequest.responseXML)
             //  log.debug("responseXML is \n" + stringXMLResponse(eventListener.mRequest.responseXML));
             // did the request return html? Maybe this is FBA
-            if (!eventListener.mEwsUrl.length && eventListener.mRequest.channel.contentType == 'text/html')
+            if (!eventListener.mEwsUrl.length && eventListener.mRequest.channel.contentType === 'text/html')
             {
-              log.config("autodiscover failed, returning text/html, trying FBA");
+              log.warn("autodiscover failed, returning text/html, trying FBA");
               // Let's try the FBA form with username and password fields
               const promiseFba = new Promise(resolve => {
                 EwsFBA.doFba(aUsername, aPassword, url,
                   function _doFbaCallback(aStatus)
                   {
-                    resolve(aStatus == EwsFBA.FBA_SUCCEEDED);
+                    resolve(aStatus === EwsFBA.FBA_SUCCEEDED);
                   });
               });
               const gotXml = await promiseFba;
@@ -230,7 +233,7 @@ function doAutodiscover(aEmail, aUsername, aDomain, aPassword, aSavePassword, aS
               if (gotXml)
               {
                 // try the request again
-                log.config("Retrying autodiscover after possible FBA to url " + originalUrl);
+                log.warn("Retrying autodiscover after possible FBA to url " + originalUrl);
                 url = originalUrl;
                 continue;
               }
@@ -245,18 +248,18 @@ function doAutodiscover(aEmail, aUsername, aDomain, aPassword, aSavePassword, aS
             break;
           }
           // This url did not succeed, try a new one.
-          log.debug("Try a new url");
+          log.warn("Try a new url");
           break;
         } // end of redirect loop
 
         if (eventListener.mEwsUrl.length)
         {
-          log.config('successful autodiscovery to url ' + url + ' with result ' + eventListener.mEwsUrl);
+          log.warn('successful autodiscovery to url ' + url + ' with result ' + eventListener.mEwsUrl);
           break;
         }
         if (eventListener.mRedirectEmail)
         {
-          log.config('autodiscovery to url ' + url + ' redirected to addr ' + eventListener.mRedirectEmail);
+          log.warn('autodiscovery to url ' + url + ' redirected to addr ' + eventListener.mRedirectEmail);
           break;
         }
       } catch (e) { log.warn("autodiscovery inner error " + se(e));}}
@@ -282,7 +285,7 @@ function doAutodiscover(aEmail, aUsername, aDomain, aPassword, aSavePassword, aS
     }
   }
 
-  log.config('doAutodiscover email is ' + aEmail + ' username is ' + aUsername + ' domain is ' + aDomain);
+  log.warn('doAutodiscover email is ' + aEmail + ' username is ' + aUsername + ' domain is ' + aDomain);
   // Clear HTTP authentication session in case we configure 2 accounts on the same server
   Cc['@mozilla.org/network/http-auth-manager;1'].getService(Ci.nsIHttpAuthManager).clearAll();
   var eventListener = new EventListener(aEmail, aUsername, aDomain, aPassword, aSavePassword, aServerinDomain);

@@ -25,6 +25,7 @@ XPCOMUtils.defineLazyGetter(this, "log", () => {
   return _log;
 });
 
+// noinspection ES6ConvertVarToLetConst - used as global
 var sync = {
 
     finish: function (aStatus = "", msg = "", details = "") {
@@ -78,26 +79,26 @@ var sync = {
     // folders
     folderList: async function(syncData) {
         //should we recheck options/commands? Always check, if we have no info about asversion!
-        if (syncData.accountData.getAccountProperty("asversion", "") == "" || (Date.now() - syncData.accountData.getAccountProperty("lastEasOptionsUpdate")) > 86400000 ) {
+        if (syncData.accountData.getAccountProperty("asversion", "") === "" || (Date.now() - syncData.accountData.getAccountProperty("lastEasOptionsUpdate")) > 86400000 ) {
             await eas.network.getServerOptions(syncData);
         }
 
         //only update the actual used asversion, if we are currently not connected or it has not yet been set
-        if (syncData.accountData.getAccountProperty("asversion", "") == "" || !syncData.accountData.isConnected()) {
+        if (syncData.accountData.getAccountProperty("asversion", "") === "" || !syncData.accountData.isConnected()) {
             //eval the currently in the UI selected EAS version
             let asversionselected = syncData.accountData.getAccountProperty("asversionselected");
             let allowedVersionsString = syncData.accountData.getAccountProperty("allowedEasVersions").trim();
             let allowedVersionsArray = allowedVersionsString.split(",");
 
-            if (asversionselected == "auto") {
-                if (allowedVersionsArray.includes("14.0")) syncData.accountData.setAccountProperty("asversion", "14.0");
+            if (asversionselected === "auto") {
+                if (allowedVersionsArray.includes("14.1")) syncData.accountData.setAccountProperty("asversion", "14.1");
                 else if (allowedVersionsArray.includes("2.5")) syncData.accountData.setAccountProperty("asversion", "2.5");
-                else if (allowedVersionsString == "") {
+                else if (allowedVersionsString === "") {
                     throw eas.sync.finish("error", "InvalidServerOptions");
                 } else {
                     throw eas.sync.finish("error", "nosupportedeasversion::"+allowedVersionsArray.join(", "));
                 }
-            } else if (allowedVersionsString != "" && !allowedVersionsArray.includes(asversionselected)) {
+            } else if (allowedVersionsString !== "" && !allowedVersionsArray.includes(asversionselected)) {
                 throw eas.sync.finish("error", "notsupportedeasversion::"+asversionselected+"::"+allowedVersionsArray.join(", "));
             } else {
                 //just use the value set by the user
@@ -106,7 +107,7 @@ var sync = {
         }
 
         //do we need to get a new policy key?
-        if (syncData.accountData.getAccountProperty("provision") && syncData.accountData.getAccountProperty("policykey") == "0") {
+        if (syncData.accountData.getAccountProperty("provision") && syncData.accountData.getAccountProperty("policykey") === "0") {
             await eas.network.getPolicykey(syncData);
         }
 
@@ -288,7 +289,7 @@ var sync = {
         
         //get synckey if needed
         syncData.synckey = syncData.currentFolderData.getFolderProperty("synckey");                
-        if (syncData.synckey == "") {
+        if (syncData.synckey === "") {
             await eas.network.getSynckey(syncData);
         }
 
@@ -300,7 +301,7 @@ var sync = {
         let lightningReadOnly = "";
         let error = null;
 
-        // We ned to intercept any throw error, because lightning needs a few operations after sync finished
+        // We need to intercept any throw error, because lightning needs a few operations after sync finished
         try {
             switch (syncData.type) {
                 case "Contacts": 
@@ -309,7 +310,7 @@ var sync = {
 
                 case "Calendar":
                 case "Tasks":
-                    //save current value of readOnly (or take it from the setting)
+                    // save current value of readOnly (or take it from the setting)
                     lightningReadOnly = syncData.target.calendar.getProperty("readOnly") || syncData.currentFolderData.getFolderProperty( "downloadonly");                       
                     syncData.target.calendar.setProperty("readOnly", false);
                     
@@ -368,9 +369,9 @@ var sync = {
                         wbxml.atag("GetChanges");
                         wbxml.atag("WindowSize",  eas.prefs.getIntPref("maxitems").toString());
 
-                        if (syncData.accountData.getAccountProperty("asversion") != "2.5") {
+                        if (syncData.accountData.getAccountProperty("asversion") !== "2.5") {
                             wbxml.otag("Options");
-                                if (syncData.type == "Calendar") wbxml.atag("FilterType", syncData.currentFolderData.accountData.getAccountProperty("synclimit"));
+                                if (syncData.type === "Calendar") wbxml.atag("FilterType", syncData.currentFolderData.accountData.getAccountProperty("synclimit"));
                                 wbxml.atag("Class", syncData.type);
                                 wbxml.switchpage("AirSyncBase");
                                 wbxml.otag("BodyPreference");
@@ -378,7 +379,7 @@ var sync = {
                                 wbxml.ctag();
                                 wbxml.switchpage("AirSync");
                             wbxml.ctag();
-                        } else if (syncData.type == "Calendar") { //in 2.5 we only send it to filter Calendar
+                        } else if (syncData.type === "Calendar") { //in 2.5 we only send it to filter Calendar
                             wbxml.otag("Options");
                                  wbxml.atag("FilterType", syncData.currentFolderData.accountData.getAccountProperty("synclimit"));
                             wbxml.ctag();
@@ -446,12 +447,14 @@ var sync = {
             wbxml.otag("Sync");
                 wbxml.otag("Collections");
                     wbxml.otag("Collection");
-                        if (syncData.accountData.getAccountProperty("asversion") == "2.5") wbxml.atag("Class", syncData.type);
+                        if (syncData.accountData.getAccountProperty("asversion") === "2.5") {
+                            wbxml.atag("Class", syncData.type);
+                        }
                         wbxml.atag("SyncKey", syncData.synckey);
                         wbxml.atag("CollectionId", syncData.currentFolderData.getFolderProperty("serverID"));
                         wbxml.otag("Commands");
 
-                            for (let i=0; i<changes.length; i++) if (!syncData.failedItems.includes(changes[i].itemId)) {
+                            for (let i = 0; i < changes.length; i++) if (!syncData.failedItems.includes(changes[i].itemId)) {
                                 //TbSync.dump("CHANGES",(i+1) + "/" + changes.length + " ("+changes[i].status+"," + changes[i].itemId + ")");
                                 let item = null;
                                 switch (changes[i].status) {
@@ -460,11 +463,11 @@ var sync = {
                                         item = await syncData.target.getItem(changes[i].itemId);
                                         if (item) {
                                             //filter out bad object types for this folder
-                                            if (syncData.type == "Contacts" && item.isMailList) {
+                                            if (syncData.type === "Contacts" && item.isMailList) {
                                                 // Mailing lists are not supported, this is not an error
                                                 TbSync.eventlog.add("warning", syncData.eventLogInfo, "MailingListNotSupportedItemSkipped");
                                                 syncData.target.removeItemFromChangeLog(changes[i].itemId);
-                                            } else if (syncData.type == eas.sync.getEasItemType(item)) {
+                                            } else if (syncData.type === eas.sync.getEasItemType(item)) {
                                                 //create a temp clientId, to cope with too long or invalid clientIds (for EAS)
                                                 let clientId = Date.now() + "-" + c;
                                                 addedItems[clientId] = changes[i].itemId;
@@ -535,7 +538,7 @@ wbxml.ctag();*/
                                         item = await syncData.target.getItem(changes[i].itemId);
                                         if (item) {
                                             //filter out bad object types for this folder
-                                            if (syncData.type == eas.sync.getEasItemType(item)) {
+                                            if (syncData.type === eas.sync.getEasItemType(item)) {
                                                 wbxml.otag("Change");
                                                 wbxml.atag("ServerId", changes[i].itemId);
                                                     wbxml.otag("ApplicationData");
@@ -573,7 +576,6 @@ wbxml.ctag();*/
             wbxml.ctag(); //Sync
 
             if (c > 0) { //if there was at least one actual local change, send request
-
                 //SEND REQUEST & VALIDATE RESPONSE
                 syncData.setSyncState("send.request.localchanges");
                 let response = await eas.network.sendRequest(wbxml.getBytes(), "Sync", syncData);
@@ -582,6 +584,20 @@ wbxml.ctag();*/
 
                 //get data from wbxml response
                 let wbxmlData = eas.network.getDataFromResponse(response);
+
+                let serverInfo = eas.sync.CalendarNotifications.getServerInfo(wbxmlData);
+
+                TbSync.dump('sync response = ' + JSON.stringify(wbxmlData) + ', ' + JSON.stringify(serverInfo));
+
+                for (let i = 0; i < changes.length; i++) {
+                    let tbItem = await syncData.target.getItem(changes[i].itemId);
+                    let seen = [];
+                    TbSync.dump('tbItem is ' + (tbItem instanceof TbSync.lightning.TbItem)  + ', ' + JSON.stringify(eas.sync.CalendarNotifications.decycle(tbItem)));
+                    let item = tbItem.nativeItem;
+                    TbSync.dump('item is ' + Object.keys(item).join(', '));
+
+                    eas.sync.CalendarNotifications.sendInvitations(serverInfo, item, tbItem, syncData);
+                }
 
                 //check status and manually handle error states which support softfails
                 let errorcause = eas.network.checkStatus(syncData, wbxmlData, "Sync.Collections.Collection.Status", "", true);
@@ -592,9 +608,9 @@ wbxml.ctag();*/
                     case "Sync.4": //Malformed request
                     case "Sync.6": //Invalid item
                         //some servers send a global error - to catch this, we reduce the number of items we send to the server
-                        if (sendItems.length == 1) {
+                        if (sendItems.length === 1) {
                             //the request contained only one item, so we know which one failed
-                            if (sendItems[0].type == "deleted_by_user") {
+                            if (sendItems[0].type === "deleted_by_user") {
                                 //we failed to delete an item, discard and place message in log
                                 syncData.target.removeItemFromChangeLog(sendItems[0].id);
                                 TbSync.eventlog.add("warning", syncData.eventLogInfo, "ErrorOnDelete::"+sendItems[0].id);
@@ -626,7 +642,7 @@ wbxml.ctag();*/
 
                 await TbSync.tools.sleep(10, true);
 
-                if (errorcause == "") {
+                if (errorcause === "") {
                     //PROCESS RESPONSE
                     await eas.sync.processResponses(wbxmlData, syncData, addedItems, changedItems);
 
@@ -642,11 +658,9 @@ wbxml.ctag();*/
                     //update synckey
                     eas.network.updateSynckey(syncData, wbxmlData);
                 }
-
-            } else if (e==0) { //if there was no local change and also no error (which will not happen twice) finish
-
+            } else if (e===0) {
+                //if there was no local change and also no error (which will not happen twice) finish
                 done = true;
-
             }
 
         } while (!done);
@@ -690,7 +704,7 @@ wbxml.ctag();*/
     revertLocalChanges: async function (syncData)  {
         let maxnumbertosend = eas.prefs.getIntPref("maxitems");
         syncData.progressData.reset(0, syncData.target.getItemsFromChangeLog().length);
-        if (syncData.progressData.todo == 0) {
+        if (syncData.progressData.todo === 0) {
             return;
         }
 
@@ -719,7 +733,7 @@ wbxml.ctag();*/
                             wbxml.otag("Commands");
             }
 
-            for (let i=0; i<changes.length; i++) {
+            for (let i = 0; i < changes.length; i++) {
                 let item = null;
                 let ServerId = changes[i].itemId;
                 let foundItem = await syncData.target.getItem(ServerId);
@@ -836,9 +850,7 @@ wbxml.ctag();*/
                 }
 
             } else { //if there was no more local change we need to revert, return
-
                 return;
-
             }
 
         } while (true);
@@ -891,6 +903,7 @@ wbxml.ctag();*/
                     //do NOT add, if an item with that ServerId was found
                     let newItem = eas.sync.createItem(syncData);
                     try {
+                        TbSync.dump("syncData.type=", syncData.type);
                         eas.sync[syncData.type].setThunderbirdItemFromWbxml(newItem, data, ServerId, syncData);
                         await syncData.target.addItem(newItem);
                     } catch (e) {
@@ -920,7 +933,9 @@ wbxml.ctag();*/
                                         
                     let keys = Object.keys(data);
                     //replace by smart merge
-                    if (keys.length == 1 && keys[0] == "DtStamp") TbSync.dump("DtStampOnly", keys); //ignore DtStamp updates (fix with smart merge)
+                    if (keys.length === 1 && keys[0] === "DtStamp") {
+                        TbSync.dump("DtStampOnly", keys);
+                    } //ignore DtStamp updates (fix with smart merge)
                     else {
                         
                         if (foundItem.changelogStatus !== null) {
@@ -997,7 +1012,6 @@ wbxml.ctag();*/
                             await syncData.target.modifyItem(newItem, foundItem);
                             syncData.progressData.inc();
                         }
-
                     }
                 }
 
@@ -1006,7 +1020,6 @@ wbxml.ctag();*/
                 for (let count = 0; count < upd.length; count++) {
                     let foundItem = await syncData.target.getItem(upd[count].ServerId);                    
                     if (foundItem) {
-
                         //Check status, stop sync if bad, allow soft fail
                         let errorcause = eas.network.checkStatus(syncData, upd[count],"Status","Sync.Collections.Collection.Responses.Change["+count+"].Status", true);
                         if (errorcause !== "") {
@@ -1016,7 +1029,6 @@ wbxml.ctag();*/
                             let p = changedItems.indexOf(upd[count].ServerId);
                             if (p>-1) changedItems.splice(p,1);
                         }
-
                     }
                 }
 
@@ -1088,16 +1100,13 @@ wbxml.ctag();*/
         switch (syncData.type) {
             case "Contacts":
                 return syncData.target.createNewCard();
-                break;
-            
+
             case "Tasks":
                 return syncData.target.createNewTodo();
-                break;
-            
+
             case "Calendar":
                 return syncData.target.createNewEvent();
-                break;
-            
+
             default:
                 throw "Unknown item type <" + syncData.type + ">";
         }
@@ -1157,7 +1166,7 @@ wbxml.ctag();*/
 
     setItemBody: function (item, syncData, data) {
         let asversion = syncData.accountData.getAccountProperty("asversion");
-        if (asversion == "2.5") {
+        if (asversion === "2.5") {
             if (data.Body) item.setProperty("description", eas.xmltools.checkString(data.Body));
         } else {
             if (data.Body && /* data.Body.EstimatedDataSize > 0  && */ data.Body.Data) item.setProperty("description", eas.xmltools.checkString(data.Body.Data)); //EstimatedDataSize is optional
@@ -1169,7 +1178,7 @@ wbxml.ctag();*/
         let wbxml = eas.wbxmltools.createWBXML("", syncData.type); //init wbxml with "" and not with precodes, also activate type codePage (Calendar, Tasks, Contacts etc)
 
         let description = (item.hasProperty("description")) ? item.getProperty("description") : "";
-        if (asversion == "2.5") {
+        if (asversion === "2.5") {
             wbxml.atag("Body", description);
         } else {
             wbxml.switchpage("AirSyncBase");
@@ -1218,7 +1227,7 @@ wbxml.ctag();*/
             }
             if (data.Recurrence.DayOfWeek) {
                 let DOW = data.Recurrence.DayOfWeek;
-                if (DOW == 127 && (recRule.type == "MONTHLY" || recRule.type == "YEARLY")) {
+                if (DOW === 127 && (recRule.type === "MONTHLY" || recRule.type === "YEARLY")) {
                     recRule.setComponent("BYMONTHDAY", 1, [-1]);
                 }
                 else {
@@ -1228,7 +1237,7 @@ wbxml.ctag();*/
                     }
                     if (data.Recurrence.WeekOfMonth) {
                         for (let i = 0; i < days.length; ++i) {
-                            if (data.Recurrence.WeekOfMonth == 5) {
+                            if (data.Recurrence.WeekOfMonth === 5) {
                                 days[i] = -1 * (days[i] + 8);
                             }
                             else {
@@ -1268,20 +1277,20 @@ wbxml.ctag();*/
 
             item.recurrenceInfo.insertRecurrenceItemAt(recRule, 0);
 
-            if (data.Exceptions && syncData.type == "Calendar") { // only events, tasks cannot have exceptions
+            if (data.Exceptions && syncData.type === "Calendar") { // only events, tasks cannot have exceptions
                 // Exception could be an object or an array of objects
                 let exceptions = [].concat(data.Exceptions.Exception);
                 for (let exception of exceptions) {
                     //exception.ExceptionStartTime is in UTC, but the Recurrence Object is in local timezone
                     let dateTime = TbSync.lightning.cal.createDateTime(exception.ExceptionStartTime).getInTimezone(timezone);
-                    if (data.AllDayEvent == "1") {
+                    if (data.AllDayEvent === "1") {
                         dateTime.isDate = true;
                         // Pass to replacement event unless overriden
                         if (!exception.AllDayEvent) {
                             exception.AllDayEvent = "1";
                         }
                     }
-                    if (exception.Deleted == "1") {
+                    if (exception.Deleted === "1") {
                         item.recurrenceInfo.removeOccurrenceAt(dateTime);
                     }
                     else {
@@ -1301,13 +1310,12 @@ wbxml.ctag();*/
     },
 
     getItemRecurrence: function (item, syncData, localStartDate = null) {
-        let asversion = syncData.accountData.getAccountProperty("asversion");
         let wbxml = eas.wbxmltools.createWBXML("", syncData.type); //init wbxml with "" and not with precodes, also activate type codePage (Calendar, Tasks etc)
 
-        if (item.recurrenceInfo && (syncData.type == "Calendar" || syncData.type == "Tasks")) {
+        if (item.recurrenceInfo && (syncData.type === "Calendar" || syncData.type === "Tasks")) {
             let deleted = [];
             let hasRecurrence = false;
-            let startDate = (syncData.type == "Calendar") ? item.startDate : item.entryDate;
+            let startDate = (syncData.type === "Calendar") ? item.startDate : item.entryDate;
 
             for (let recRule of item.recurrenceInfo.getRecurrenceItems({})) {
                 if (recRule.date) {
@@ -1353,31 +1361,31 @@ wbxml.ctag();*/
                         weekDays[i] = -weekDays[i] % 8;
                     }
                 }
-                if (monthDays[0] && monthDays[0] == -1) {
+                if (monthDays[0] && monthDays[0] === -1) {
                     weeks = [5];
                     weekDays = [1, 2, 3, 4, 5, 6, 7]; // 127
                     monthDays[0] = null;
                 }
                 // Type
-                if (recRule.type == "WEEKLY") {
+                if (recRule.type === "WEEKLY") {
                     type = 1;
                     if (!weekDays.length) {
                         weekDays = [startDate.weekday + 1];
                     }
                 }
-                else if (recRule.type == "MONTHLY" && weeks.length) {
+                else if (recRule.type === "MONTHLY" && weeks.length) {
                     type = 3;
                 }
-                else if (recRule.type == "MONTHLY") {
+                else if (recRule.type === "MONTHLY") {
                     type = 2;
                     if (!monthDays.length) {
                         monthDays = [startDate.day];
                     }
                 }
-                else if (recRule.type == "YEARLY" && weeks.length) {
+                else if (recRule.type === "YEARLY" && weeks.length) {
                     type = 6;
                 }
-                else if (recRule.type == "YEARLY") {
+                else if (recRule.type === "YEARLY") {
                     type = 5;
                     if (!monthDays.length) {
                         monthDays = [startDate.day];
@@ -1391,7 +1399,7 @@ wbxml.ctag();*/
                 //Tasks need a Start tag, but we cannot allow a start date different from the start of the main item (thunderbird does not support that)
                 if (localStartDate) wbxml.atag("Start", localStartDate);
 
-                // TODO: CalendarType: 14.0 and up
+                // TODO: CalendarType: 14.1 and up
                 // DayOfMonth
                 if (monthDays[0]) {
                     // TODO: Multiple days of month - multiple Recurrence tags?
@@ -1409,7 +1417,7 @@ wbxml.ctag();*/
                 //wbxml.atag("FirstDayOfWeek", recRule.weekStart); - (NS_ERROR_NOT_IMPLEMENTED) [calIRecurrenceRule.weekStart]
                 // Interval
                 wbxml.atag("Interval", recRule.interval.toString());
-                // TODO: IsLeapMonth: 14.0 and up
+                // TODO: IsLeapMonth: 14.1 and up
                 // MonthOfYear
                 if (months.length) {
                     wbxml.atag("MonthOfYear", months[0].toString());
@@ -1421,7 +1429,7 @@ wbxml.ctag();*/
                 // Until
                 else if (recRule.untilDate != null) {
                     //Events need the Until data in compact form, Tasks in the basic form
-                    wbxml.atag("Until", eas.tools.getIsoUtcString(recRule.untilDate, (syncData.type == "Tasks")));
+                    wbxml.atag("Until", eas.tools.getIsoUtcString(recRule.untilDate, (syncData.type === "Tasks")));
                 }
                 // WeekOfMonth
                 if (weeks.length) {
@@ -1430,7 +1438,7 @@ wbxml.ctag();*/
                 wbxml.ctag();
             }
 
-            if (syncData.type == "Calendar" && hasRecurrence) { //Exceptions only allowed in Calendar and only if a valid Recurrence was added
+            if (syncData.type === "Calendar" && hasRecurrence) { //Exceptions only allowed in Calendar and only if a valid Recurrence was added
                 let modifiedIds = item.recurrenceInfo.getExceptionIds({});
                 if (deleted.length || modifiedIds.length) {
                     wbxml.otag("Exceptions");

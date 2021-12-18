@@ -20,10 +20,6 @@ var manager = {
     if (this.prefWindowObj !== null) this.prefWindowObj.close();
   },
 
-
-
-
-
   openManagerWindow: function(event) {
     if (!event || !event.button) { //catches zero or undefined
       if (TbSync.enabled) {
@@ -44,7 +40,7 @@ var manager = {
     TbSync.dump("Oops", "Trying to open account manager, but init sequence not yet finished");
     let msg = TbSync.getString("OopsMessage") + "\n\n";
     let v = Services.appinfo.platformVersion; 
-    if (TbSync.prefs.getIntPref("log.userdatalevel") == 0) {
+    if (TbSync.prefs.getIntPref("log.userdatalevel") === 0) {
       if (TbSync.window.confirm(msg + TbSync.getString("UnableToTraceError"))) {
         TbSync.prefs.setIntPref("log.userdatalevel", 1);
         TbSync.window.alert(TbSync.getString("RestartThunderbirdAndTryAgain"));
@@ -69,7 +65,7 @@ var manager = {
 
   openTranslatedLink: function (url) {
     let googleCode = TbSync.getString("google.translate.code");
-    if (googleCode != "en" && googleCode != "google.translate.code") {
+    if (googleCode !== "en" && googleCode !== "google.translate.code") {
       this.openLink("https://translate.google.com/translate?hl=en&sl=en&tl="+TbSync.getString("google.translate.code")+"&u="+url);
     } else {
       this.openLink(url);
@@ -142,7 +138,7 @@ manager.FolderList = class {
    * Is called before the context menu of the folderlist is shown, allows to
    * show/hide custom menu options based on selected folder
    *
-   * @param document       [in] document object of the account settings window - element.ownerDocument - menuentry?
+   * @param window       [in] document object of the account settings window - element.ownerDocument - menuentry?
    * @param folderData         [in] FolderData of the selected folder
    */
   onContextMenuShowing(window, folderData) {
@@ -170,7 +166,6 @@ manager.FolderList = class {
    * @param folderData         [in] FolderData of the folder in the row
    */        
   getRow(document, folderData) {
-    TbSync.dump('get row for folder ' + JSON.stringify(folderData));
     //create checkBox for select state
     let itemSelCheckbox = document.createXULElement("checkbox");
     itemSelCheckbox.setAttribute("updatefield", "selectbox");
@@ -270,7 +265,6 @@ manager.FolderList = class {
     return row;
   }
 
-
   /**
    * ToggleFolder event
    */
@@ -347,23 +341,23 @@ manager.FolderList = class {
     let foldername = TbSync.providers[this.provider].StandardFolderList.getFolderDisplayName(folderData);
     let status = folderData.getFolderStatus();
     let selected = folderData.getFolderProperty("selected");
-    TbSync.dump('updateRow '+ foldername + ' status ' + status + ' selected ' + selected);
+
     // get updatefields
     let fields = {}
     for (let f of listItem.querySelectorAll("[updatefield]")) {
       fields[f.getAttribute("updatefield")] = f;
     }
-    
+
     // update fields
     fields.foldername.setAttribute("disabled", !selected);
     fields.foldername.setAttribute("style", selected ? "" : "font-style:italic");
-    if (fields.foldername.textContent != foldername) {
+    if (fields.foldername.textContent !== foldername) {
       fields.foldername.textContent = foldername;
       fields.foldername.flex = "1";
     }
-    
+
     fields.status.setAttribute("style", selected ? "" : "font-style:italic");
-    if (fields.status.textContent != status) {
+    if (fields.status.textContent !== status) {
       fields.status.textContent = status;
       fields.status.flex = "1";
     }
