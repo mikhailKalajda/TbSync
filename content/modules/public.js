@@ -639,7 +639,26 @@ var dump = function (what, aMessage) {
     TbSync.io.appendToFile("debug.log", "** " + now.toString() + " **\n[" + what + "] : " + aMessage + "\n\n");
   }
 }
-  
+
+/**
+ * Dumps top-level object properties
+ * @param {string} what  The text explanation
+ * @param {Object} aObject The object to dump
+ */
+
+var dumpObject = function (what, aObject) {
+  if (!aObject) {
+    dump(what, "null/undefined");
+  }
+  let objKeys = Object.keys(aObject);
+  let objContent = "" + aObject + ", objKeys=" + objKeys.length;
+
+  for (let i = 0; i < objKeys.length; i++) {
+    objContent = objContent + objKeys[i] + ": " + aObject[objKeys[i]] + "\n";
+  }
+
+  dump(what, objContent);
+}
 
 
 /**

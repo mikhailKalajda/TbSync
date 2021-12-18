@@ -275,6 +275,31 @@ var tools = {
         }
     },
 
+    // Convert TB date to UTC and return it as  basic or extended ISO 8601  String
+    getIcsUtcString: function(origdate, fakeUTC = false) {
+        let date = origdate.clone();
+        //floating timezone cannot be converted to UTC (cause they float) - we have to overwrite it with the local timezone
+        if (date.timezone.tzid === "floating") date.timezone = eas.defaultTimezoneInfo.timezone;
+        //to get the UTC string we could use icalString (which does not work on allDayEvents, or calculate it from nativeTime)
+        date.isDate = 0;
+        let UTC = date.getInTimezone(eas.utcTimezone);
+        if (fakeUTC) UTC = date.clone();
+
+        function pad(number) {
+            if (number < 10) {
+                return '0' + number;
+            }
+            return number;
+        }
+
+        return "" + UTC.year +
+            "" + pad(UTC.month + 1 ) +
+            "" + pad(UTC.day) +
+            "T" + pad(UTC.hour) +
+            "" + pad(UTC.minute) +
+            pad(UTC.second);
+    },
+
     getNowUTC : function() {
         return TbSync.lightning.cal.dtz.jsDateToDateTime(new Date()).getInTimezone(TbSync.lightning.cal.dtz.UTC);
     },

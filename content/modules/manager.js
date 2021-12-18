@@ -347,13 +347,13 @@ manager.FolderList = class {
     let foldername = TbSync.providers[this.provider].StandardFolderList.getFolderDisplayName(folderData);
     let status = folderData.getFolderStatus();
     let selected = folderData.getFolderProperty("selected");
-    TbSync.dump('updateRow '+ foldername + ' status ' + status + ' selected ' + selected);
+
     // get updatefields
     let fields = {}
     for (let f of listItem.querySelectorAll("[updatefield]")) {
       fields[f.getAttribute("updatefield")] = f;
     }
-    
+
     // update fields
     fields.foldername.setAttribute("disabled", !selected);
     fields.foldername.setAttribute("style", selected ? "" : "font-style:italic");
@@ -361,7 +361,7 @@ manager.FolderList = class {
       fields.foldername.textContent = foldername;
       fields.foldername.flex = "1";
     }
-    
+
     fields.status.setAttribute("style", selected ? "" : "font-style:italic");
     if (fields.status.textContent != status) {
       fields.status.textContent = status;

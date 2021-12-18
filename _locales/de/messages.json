@@ -734,7 +734,7 @@
         "message": "Verbindung zum Server fehlgeschlagen."
     },
     "status.nosupportedeasversion": {
-        "message": "Der Server unterstützt kein ActiveSync v2.5 oder v14.0 (nur ##replace.1##). TbSync kann nicht mit diesem Server arbeiten."
+        "message": "Der Server unterstützt kein ActiveSync v2.5 oder v14.1 (nur ##replace.1##). TbSync kann nicht mit diesem Server arbeiten."
     },
     "status.notsupportedeasversion": {
         "message": "Der Server unterstützt nicht die ausgewählte ActiveSync Version v##replace.1## (nur ##replace.2##)."

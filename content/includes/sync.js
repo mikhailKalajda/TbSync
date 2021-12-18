@@ -15,6 +15,7 @@
 
 // https://msdn.microsoft.com/en-us/library/dd299454(v=exchg.80).aspx
 
+// noinspection ES6ConvertVarToLetConst - used as global
 var sync = {
 
     finish: function (aStatus = "", msg = "", details = "") {
@@ -80,7 +81,7 @@ var sync = {
             let allowedVersionsArray = allowedVersionsString.split(",");
 
             if (asversionselected == "auto") {
-                if (allowedVersionsArray.includes("14.0")) syncData.accountData.setAccountProperty("asversion", "14.0");
+                if (allowedVersionsArray.includes("14.1")) syncData.accountData.setAccountProperty("asversion", "14.1");
                 else if (allowedVersionsArray.includes("2.5")) syncData.accountData.setAccountProperty("asversion", "2.5");
                 else if (allowedVersionsString == "") {
                     throw eas.sync.finish("error", "InvalidServerOptions");
@@ -436,12 +437,14 @@ var sync = {
             wbxml.otag("Sync");
                 wbxml.otag("Collections");
                     wbxml.otag("Collection");
-                        if (syncData.accountData.getAccountProperty("asversion") == "2.5") wbxml.atag("Class", syncData.type);
+                        if (syncData.accountData.getAccountProperty("asversion") === "2.5") {
+                            wbxml.atag("Class", syncData.type);
+                        }
                         wbxml.atag("SyncKey", syncData.synckey);
                         wbxml.atag("CollectionId", syncData.currentFolderData.getFolderProperty("serverID"));
                         wbxml.otag("Commands");
 
-                            for (let i=0; i<changes.length; i++) if (!syncData.failedItems.includes(changes[i].itemId)) {
+                            for (let i = 0; i < changes.length; i++) if (!syncData.failedItems.includes(changes[i].itemId)) {
                                 //TbSync.dump("CHANGES",(i+1) + "/" + changes.length + " ("+changes[i].status+"," + changes[i].itemId + ")");
                                 let item = null;
                                 switch (changes[i].status) {
@@ -450,11 +453,11 @@ var sync = {
                                         item = await syncData.target.getItem(changes[i].itemId);
                                         if (item) {
                                             //filter out bad object types for this folder
-                                            if (syncData.type == "Contacts" && item.isMailList) {
+                                            if (syncData.type === "Contacts" && item.isMailList) {
                                                 // Mailing lists are not supported, this is not an error
                                                 TbSync.eventlog.add("warning", syncData.eventLogInfo, "MailingListNotSupportedItemSkipped");
                                                 syncData.target.removeItemFromChangeLog(changes[i].itemId);
-                                            } else if (syncData.type == eas.sync.getEasItemType(item)) {
+                                            } else if (syncData.type === eas.sync.getEasItemType(item)) {
                                                 //create a temp clientId, to cope with too long or invalid clientIds (for EAS)
                                                 let clientId = Date.now() + "-" + c;
                                                 addedItems[clientId] = changes[i].itemId;
@@ -525,7 +528,7 @@ wbxml.ctag();*/
                                         item = await syncData.target.getItem(changes[i].itemId);
                                         if (item) {
                                             //filter out bad object types for this folder
-                                            if (syncData.type == eas.sync.getEasItemType(item)) {
+                                            if (syncData.type === eas.sync.getEasItemType(item)) {
                                                 wbxml.otag("Change");
                                                 wbxml.atag("ServerId", changes[i].itemId);
                                                     wbxml.otag("ApplicationData");
@@ -573,6 +576,33 @@ wbxml.ctag();*/
                 //get data from wbxml response
                 let wbxmlData = eas.network.getDataFromResponse(response);
 
+                let serverInfo = eas.sync.CalendarNotifications.getServerInfo(wbxmlData);
+
+                TbSync.dump('sync response = ' + JSON.stringify(wbxmlData) + ', ' + JSON.stringify(serverInfo));
+
+                for (let i = 0; i < changes.length; i++) {
+                    let tbItem = await syncData.target.getItem(changes[i].itemId);
+                    let seen = [];
+                    TbSync.dump('tbItem is ' + (tbItem instanceof TbSync.lightning.TbItem)  + ', ' + JSON.stringify(eas.sync.CalendarNotifications.decycle(tbItem)));
+                    let item = tbItem.nativeItem;
+                    TbSync.dump('item is ' + Object.keys(item).join(', '));
+
+                    eas.sync.CalendarNotifications.sendInvitations(serverInfo, item, tbItem, syncData);
+
+                    // if (serverInfo) {
+                    //     TbSync.dump('setting sendMailClientId for item id= ' + item.itemId);
+                    //     if (!syncData.failedItems.includes(item.itemId)) {
+                    //         let clientId = item.getProperty('sendMailClientId');
+                    //         TbSync.dump('set sendMailClientId for item id= ' + item.itemId + ',sendMailClientId=' + JSON.stringify(clientId));
+                    //         if (!item.sendMailClientId) {
+                    //             item.setProperty('sendMailClientId', serverInfo.clientId);
+                    //             item.setProperty('sendMailCounter', 0);
+                    //         }
+                    //     }
+                    // }
+                }
+                // await eas.sync.CalendarNotifications.sendNotifications(serverInfo, syncData);
+
                 //check status and manually handle error states which support softfails
                 let errorcause = eas.network.checkStatus(syncData, wbxmlData, "Sync.Collections.Collection.Status", "", true);
                 switch (errorcause) {
@@ -582,9 +612,9 @@ wbxml.ctag();*/
                     case "Sync.4": //Malformed request
                     case "Sync.6": //Invalid item
                         //some servers send a global error - to catch this, we reduce the number of items we send to the server
-                        if (sendItems.length == 1) {
+                        if (sendItems.length === 1) {
                             //the request contained only one item, so we know which one failed
-                            if (sendItems[0].type == "deleted_by_user") {
+                            if (sendItems[0].type === "deleted_by_user") {
                                 //we failed to delete an item, discard and place message in log
                                 syncData.target.removeItemFromChangeLog(sendItems[0].id);
                                 TbSync.eventlog.add("warning", syncData.eventLogInfo, "ErrorOnDelete::"+sendItems[0].id);
@@ -616,7 +646,7 @@ wbxml.ctag();*/
 
                 await TbSync.tools.sleep(10, true);
 
-                if (errorcause == "") {
+                if (errorcause === "") {
                     //PROCESS RESPONSE
                     await eas.sync.processResponses(wbxmlData, syncData, addedItems, changedItems);
 
@@ -632,11 +662,9 @@ wbxml.ctag();*/
                     //update synckey
                     eas.network.updateSynckey(syncData, wbxmlData);
                 }
-
-            } else if (e==0) { //if there was no local change and also no error (which will not happen twice) finish
-
+            } else if (e===0) {
+                //if there was no local change and also no error (which will not happen twice) finish
                 done = true;
-
             }
 
         } while (!done);
@@ -650,7 +678,7 @@ wbxml.ctag();*/
     revertLocalChanges: async function (syncData)  {       
         let maxnumbertosend = eas.prefs.getIntPref("maxitems");
         syncData.progressData.reset(0, syncData.target.getItemsFromChangeLog().length);
-        if (syncData.progressData.todo == 0) {
+        if (syncData.progressData.todo === 0) {
             return;
         }
 
@@ -679,7 +707,7 @@ wbxml.ctag();*/
                             wbxml.otag("Commands");
             }
 
-            for (let i=0; i<changes.length; i++) {
+            for (let i = 0; i < changes.length; i++) {
                 let item = null;
                 let ServerId = changes[i].itemId;
                 let foundItem = await syncData.target.getItem(ServerId);
@@ -796,9 +824,7 @@ wbxml.ctag();*/
                 }
 
             } else { //if there was no more local change we need to revert, return
-
                 return;
-
             }
 
         } while (true);
@@ -851,6 +877,7 @@ wbxml.ctag();*/
                     //do NOT add, if an item with that ServerId was found
                     let newItem = eas.sync.createItem(syncData);
                     try {
+                        TbSync.dump("syncData.type=", syncData.type);
                         eas.sync[syncData.type].setThunderbirdItemFromWbxml(newItem, data, ServerId, syncData);
                         await syncData.target.addItem(newItem);
                     } catch (e) {
@@ -880,7 +907,9 @@ wbxml.ctag();*/
                                         
                     let keys = Object.keys(data);
                     //replace by smart merge
-                    if (keys.length == 1 && keys[0] == "DtStamp") TbSync.dump("DtStampOnly", keys); //ignore DtStamp updates (fix with smart merge)
+                    if (keys.length == 1 && keys[0] == "DtStamp") {
+                        TbSync.dump("DtStampOnly", keys);
+                    } //ignore DtStamp updates (fix with smart merge)
                     else {
                         
                         if (foundItem.changelogStatus !== null) {
@@ -1351,7 +1380,7 @@ wbxml.ctag();*/
                 //Tasks need a Start tag, but we cannot allow a start date different from the start of the main item (thunderbird does not support that)
                 if (localStartDate) wbxml.atag("Start", localStartDate);
 
-                // TODO: CalendarType: 14.0 and up
+                // TODO: CalendarType: 14.1 and up
                 // DayOfMonth
                 if (monthDays[0]) {
                     // TODO: Multiple days of month - multiple Recurrence tags?
@@ -1369,7 +1398,7 @@ wbxml.ctag();*/
                 //wbxml.atag("FirstDayOfWeek", recRule.weekStart); - (NS_ERROR_NOT_IMPLEMENTED) [calIRecurrenceRule.weekStart]
                 // Interval
                 wbxml.atag("Interval", recRule.interval.toString());
-                // TODO: IsLeapMonth: 14.0 and up
+                // TODO: IsLeapMonth: 14.1 and up
                 // MonthOfYear
                 if (months.length) {
                     wbxml.atag("MonthOfYear", months[0].toString());

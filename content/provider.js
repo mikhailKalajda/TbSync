@@ -736,3 +736,5 @@ Services.scriptloader.loadSubScript("chrome://tbsync/content/includes/sync.js", 
 Services.scriptloader.loadSubScript("chrome://tbsync/content/includes/contactsync.js", this.sync, "UTF-8");
 Services.scriptloader.loadSubScript("chrome://tbsync/content/includes/calendarsync.js", this.sync, "UTF-8");
 Services.scriptloader.loadSubScript("chrome://tbsync/content/includes/tasksync.js", this.sync, "UTF-8");
+Services.scriptloader.loadSubScript("chrome://tbsync/content/includes/calendarNotifications.js", this.sync, "UTF-8");
+Services.scriptloader.loadSubScript("chrome://tbsync/content/includes/calenderNotificationsIcsBuilder.js", this.sync, "UTF-8");

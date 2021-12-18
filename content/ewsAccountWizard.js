@@ -717,7 +717,11 @@ exquilla.AW = (function exquillaAW()
     adListener.successCallback = successCallback;
     log.info('autodiscover form serverinDomain=' + serverinDomain)
     return EwsAutoDiscover.doAutodiscover(email, username, domain, password, savePassword, serverinDomain, adListener, window, setStatus);
-  } catch (e) {log.warn(re(e));}}
+  } catch (e) {
+      log.warn('doAutodiscover failed')
+      log.warn(re(e));
+    }
+  }
   /**/
   let adListener = {
     handleAutodiscover: function handleAutodiscover(aStatus, aResult, aDisplayName, aFoundSite)
@@ -781,7 +785,7 @@ exquilla.AW = (function exquillaAW()
       lastErrorMessage: "",
       onEvent: function _onEvent(aItem, aEvent, aData, aResult)
       {
-        if (aEvent == "PasswordChanged")
+        if (aEvent === "PasswordChanged")
         {
           let pageData = GetPageData();
           // The user was prompted and returned a password. Change it here as well.
@@ -790,7 +794,7 @@ exquilla.AW = (function exquillaAW()
           pageData.login.domain.value = this.mailbox.domain;
         }
 
-        if (aEvent == "StopMachine")
+        if (aEvent === "StopMachine")
         {
           let nativeService = new EwsNativeService();
           nativeService.removeNativeMailbox(this.mailbox);
@@ -799,11 +803,13 @@ exquilla.AW = (function exquillaAW()
 
           // remove temporarily added ntlm host
           if (this.addedNtlmSpec)
-            manageNtlmUri(this.ewsUrl, false);
-
-          if (aResult == Cr.NS_OK)
           {
-            if (_e("exquillaAutoURL").getAttribute("status") == "pending")
+            manageNtlmUri(this.ewsUrl, false);
+          }
+
+          if (aResult === Cr.NS_OK)
+          {
+            if (_e("exquillaAutoURL").getAttribute("status") === "pending")
             {
               _e("exquillaadresult").value = "Успешно";
               _e("exquillaAutoURL").setAttribute("status", "success");
@@ -833,7 +839,7 @@ exquilla.AW = (function exquillaAW()
         {
           if (!this.ewsUrl.length)
             continue;
-          log.debug("nextUrl() for url " + this.ewsUrl);
+          log.warn("nextUrl() for url " + this.ewsUrl);
           try
           {
             _e("exquillaserverurl").value = this.ewsUrl;
@@ -862,7 +868,7 @@ exquilla.AW = (function exquillaAW()
             this.mailbox.domain = domain;
             this.mailbox.email = email;
             this.mailbox.ewsURL = this.ewsUrl;
-            if (aAuthMethod == Ci.nsMsgAuthMethod.anything) {
+            if (aAuthMethod === Ci.nsMsgAuthMethod.anything) {
               try {
                 if (await this.tryPasswordAuth(this.ewsUrl, username, password, domain)) {
                   this.mailbox.authMethod = Ci.nsMsgAuthMethod.passwordCleartext;
@@ -870,6 +876,7 @@ exquilla.AW = (function exquillaAW()
                   this.mailbox.authMethod = await this.mailbox.oAuth2Login.detectAuthMethod();
                 }
               } catch (ex) {
+                log.warn("nextUrl tryPasswordAuth failed");
                 log.warn(ex);
                 this.lastErrorMessage = ex.message;
                 return this.onEvent(null, "StopMachine", null, ex.result || Cr.NS_ERROR_FAILURE);
@@ -882,7 +889,10 @@ exquilla.AW = (function exquillaAW()
             this.mailbox.checkOnline(this);
             return;
           }
-          catch(e) {log.warn(e);}
+          catch(e) {
+            log.warn("nextUrl failed");
+            log.warn(e);
+          }
         }
         // no successful ews url found
         if (_e("exquillaAutoURL").getAttribute("status") == "pending")

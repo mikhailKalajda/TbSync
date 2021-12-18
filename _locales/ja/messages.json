@@ -734,7 +734,7 @@
         "message": "サーバーに接続できません。"
     },
     "status.nosupportedeasversion": {
-        "message": "サーバーは ActiveSync v2.5 または v14.0 をサポートしていません (##replace.1## のみ)。TbSync は、この ActiveSync サーバーでは機能しません。"
+        "message": "サーバーは ActiveSync v2.5 または v14.1 をサポートしていません (##replace.1## のみ)。TbSync は、この ActiveSync サーバーでは機能しません。"
     },
     "status.notsupportedeasversion": {
         "message": "サーバーは選択された ActiveSync v##replace.1## をサポートしていません (##replace.2## のみ)。"

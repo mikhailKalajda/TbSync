@@ -351,17 +351,29 @@ var network = {
         TbSync.dump("Sending (EAS v"+syncData.accountData.getAccountProperty("asversion") +")", "POST " + eas.network.getEasURL(syncData.accountData) + '?Cmd=' + command + '&User=' + encodeURIComponent(connection.user) + '&DeviceType=' +deviceType + '&DeviceId=' + deviceId, true);
 
         const textEncoder = new TextEncoder();
-        let encoded = textEncoder.encode(wbxml);            
-        // console.log("wbxml: " + wbxml);
-        // console.log("byte array: " + encoded);
-        // console.log("length :" + wbxml.length + " vs " + encoded.byteLength + " vs " + encoded.length);
+        let encoded;
+
+        if (command === "SendMail") {
+            encoded = new Uint8Array(wbxml.length);
+            for (let i = 0; i < wbxml.length; i++) {
+                encoded[i] = wbxml.charCodeAt(i);
+            }
+        } else {
+            encoded = textEncoder.encode(wbxml);
+        }
+
+        // TbSync.dump("wbxml: " + wbxml);
+        // TbSync.dump("byte array: " + encoded);
+        // TbSync.dump("length :" + wbxml.length + " vs " + encoded.byteLength + " vs " + encoded.length);
         
         return new Promise(function(resolve,reject) {
             // Create request handler - API changed with TB60 to new XMKHttpRequest()
             syncData.req = new XMLHttpRequest();
             syncData.req.mozBackgroundRequest = true;
             syncData.req.open("POST", eas.network.getEasURL(syncData.accountData) + '?Cmd=' + command + '&User=' + encodeURIComponent(connection.user) + '&DeviceType=' +encodeURIComponent(deviceType) + '&DeviceId=' + deviceId, true);
-            syncData.req.overrideMimeType("text/plain");
+            if (command !== "SendMail"){
+                syncData.req.overrideMimeType("text/plain");
+            }
             syncData.req.setRequestHeader("User-Agent", userAgent);
             syncData.req.setRequestHeader("Content-Type", "application/vnd.ms-sync.wbxml");
             if (connection.password) {
@@ -372,10 +384,10 @@ var network = {
                 }
             }
 
-            if (syncData.accountData.getAccountProperty("asversion") == "2.5") {
+            if (syncData.accountData.getAccountProperty("asversion") === "2.5") {
                 syncData.req.setRequestHeader("MS-ASProtocolVersion", "2.5");
             } else {
-                syncData.req.setRequestHeader("MS-ASProtocolVersion", "14.0");
+                syncData.req.setRequestHeader("MS-ASProtocolVersion", "14.1");
             }
             syncData.req.setRequestHeader("Content-Length", encoded.length);
             if (syncData.accountData.getAccountProperty("provision")) {
@@ -407,11 +419,19 @@ var network = {
 
             syncData.req.onload = function() {
                 let response = syncData.req.responseText;
+                //TbSync.dump()
                 switch(syncData.req.status) {
 
                     case 200: //OK
                         let msg = "Receiving data <" + syncData.getSyncState().state + "> for " + syncData.accountData.getAccountProperty("accountname");
                         if (syncData.currentFolderData) msg += " (" + syncData.currentFolderData.getFolderProperty("foldername") + ")";
+
+                        let errorHeader = syncData.req.getResponseHeader("X-MS-ASError");
+
+                        if (errorHeader && errorHeader.length > 0) {
+                            TbSync.dump("X-MS-ASError:", errorHeader);
+                        }
+
                         syncData.response = eas.network.logXML(response, msg);
 
                         //What to do on error? IS this an error? Yes!
@@ -807,7 +827,7 @@ var network = {
                         
                         wbxml.atag("SyncKey", syncData.synckey);
                         wbxml.switchpage("GetItemEstimate");
-                    } else { //14.0
+                    } else { //14.1
                         wbxml.switchpage("AirSync");
                         wbxml.atag("SyncKey", syncData.synckey);
                         wbxml.switchpage("GetItemEstimate");
@@ -930,7 +950,7 @@ var network = {
                     if (accountData.getAccountProperty("asversion") == "2.5") {
                         req.setRequestHeader("MS-ASProtocolVersion", "2.5");
                     } else {
-                        req.setRequestHeader("MS-ASProtocolVersion", "14.0");
+                        req.setRequestHeader("MS-ASProtocolVersion", "14");
                     }
                     req.setRequestHeader("Content-Length", wbxml.length);
                     if (accountData.getAccountProperty("provision")) {
