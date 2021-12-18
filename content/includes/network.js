@@ -217,7 +217,7 @@ var network = {
           },
           set: function(val) {
             let tokens = this.parseAndSanitizeTokenString(this.authData.password);
-            let valueChanged = (val != tokens[oauthValue[0]])
+            let valueChanged = (val !== tokens[oauthValue[0]])
             if (valueChanged) {
               tokens[oauthValue[0]] = val;
               this.authData.updateLoginData(this.authData.user, JSON.stringify(tokens));
@@ -263,7 +263,6 @@ var network = {
                     switch (rv.errorType) {
                         case "PasswordPrompt": 
                         {
-                            
                             if (oauthData) {
                                 oauthData.accessToken = "";
                                 retry = true;                                
@@ -283,19 +282,20 @@ var network = {
                                 }
                             }
                         }
+
                         break;
 
                         case "NetworkError":
                         {
                             // Could not connect to server. Can we rerun autodiscover?
                             // Note: Autodiscover is currently not supported by OAuth
-                            if (syncData.accountData.getAccountProperty( "servertype") == "auto" && !oauthData) {
+                            if (syncData.accountData.getAccountProperty( "servertype") === "auto" && !oauthData) {
                                 let errorcode = await eas.network.updateServerConnectionViaAutodiscover(syncData);
                                 console.log("ERR: " + errorcode);
-                                if (errorcode == 200) {                       
+                                if (errorcode === 200) {
                                     // autodiscover succeeded, retry with new data
                                     retry = true;                            
-                                } else if (errorcode == 401) {
+                                } else if (errorcode === 401) {
                                     // manipulate rv to run password prompt
                                     ALLOWED_RETRIES[rv.errorType]++;
                                     rv.errorType = "PasswordPrompt";
@@ -321,7 +321,7 @@ var network = {
             }
 
             // Return to original syncstate
-            if (syncState != syncData.getSyncState().state) {
+            if (syncState !== syncData.getSyncState().state) {
                 syncData.setSyncState(syncState);
             }
             rv = await this.sendRequestPromise(wbxml, command, syncData, allowSoftFail);
@@ -351,17 +351,25 @@ var network = {
         TbSync.dump("Sending (EAS v"+syncData.accountData.getAccountProperty("asversion") +")", "POST " + eas.network.getEasURL(syncData.accountData) + '?Cmd=' + command + '&User=' + encodeURIComponent(connection.user) + '&DeviceType=' +deviceType + '&DeviceId=' + deviceId, true);
 
         const textEncoder = new TextEncoder();
-        let encoded = textEncoder.encode(wbxml);            
-        // console.log("wbxml: " + wbxml);
-        // console.log("byte array: " + encoded);
-        // console.log("length :" + wbxml.length + " vs " + encoded.byteLength + " vs " + encoded.length);
-        
+        let encoded;
+
+        if (command === "SendMail") {
+            encoded = new Uint8Array(wbxml.length);
+            for (let i = 0; i < wbxml.length; i++) {
+                encoded[i] = wbxml.charCodeAt(i);
+            }
+        } else {
+            encoded = textEncoder.encode(wbxml);
+        }
+
         return new Promise(function(resolve,reject) {
             // Create request handler - API changed with TB60 to new XMKHttpRequest()
             syncData.req = new XMLHttpRequest();
             syncData.req.mozBackgroundRequest = true;
             syncData.req.open("POST", eas.network.getEasURL(syncData.accountData) + '?Cmd=' + command + '&User=' + encodeURIComponent(connection.user) + '&DeviceType=' +encodeURIComponent(deviceType) + '&DeviceId=' + deviceId, true);
-            syncData.req.overrideMimeType("text/plain");
+            if (command !== "SendMail"){
+                syncData.req.overrideMimeType("text/plain");
+            }
             syncData.req.setRequestHeader("User-Agent", userAgent);
             syncData.req.setRequestHeader("Content-Type", "application/vnd.ms-sync.wbxml");
             if (connection.password) {
@@ -372,10 +380,10 @@ var network = {
                 }
             }
 
-            if (syncData.accountData.getAccountProperty("asversion") == "2.5") {
+            if (syncData.accountData.getAccountProperty("asversion") === "2.5") {
                 syncData.req.setRequestHeader("MS-ASProtocolVersion", "2.5");
             } else {
-                syncData.req.setRequestHeader("MS-ASProtocolVersion", "14.0");
+                syncData.req.setRequestHeader("MS-ASProtocolVersion", "14.1");
             }
             syncData.req.setRequestHeader("Content-Length", encoded.length);
             if (syncData.accountData.getAccountProperty("provision")) {
@@ -407,11 +415,18 @@ var network = {
 
             syncData.req.onload = function() {
                 let response = syncData.req.responseText;
-                switch(syncData.req.status) {
 
+                switch(syncData.req.status) {
                     case 200: //OK
                         let msg = "Receiving data <" + syncData.getSyncState().state + "> for " + syncData.accountData.getAccountProperty("accountname");
                         if (syncData.currentFolderData) msg += " (" + syncData.currentFolderData.getFolderProperty("foldername") + ")";
+
+                        let errorHeader = syncData.req.getResponseHeader("X-MS-ASError");
+
+                        if (errorHeader && errorHeader.length > 0) {
+                            TbSync.dump("X-MS-ASError:", errorHeader);
+                        }
+
                         syncData.response = eas.network.logXML(response, msg);
 
                         //What to do on error? IS this an error? Yes!
@@ -536,7 +551,7 @@ var network = {
         //path is relative to wbxmlData
         //rootpath is the absolute path and must be specified, if wbxml is not the root node and thus path is not the rootpath	    
         let status = eas.xmltools.getWbxmlDataField(wbxmlData,path);
-        let fullpath = (rootpath=="") ? path : rootpath;
+        let fullpath = (rootpath === "") ? path : rootpath;
         let elements = fullpath.split(".");
         let type = elements[0];
 
@@ -554,13 +569,13 @@ var network = {
         }
 
         //check if all is fine (not bad)
-        if (status == "1") {
+        if (status === "1") {
             return "";
         }
 
         TbSync.dump("wbxml status check", type + ": " + fullpath + " = " + status);
 
-        //handle errrors based on type
+        //handle errors based on type
         let statusType = type+"."+status;
         switch (statusType) {
             case "Sync.3": /*
@@ -656,7 +671,7 @@ var network = {
     // WBXML COMM STUFF
 
     setDeviceInformation: async function (syncData)  {
-        if (syncData.accountData.getAccountProperty("asversion") == "2.5" || !syncData.accountData.getAccountProperty("allowedEasCommands").split(",").includes("Settings")) {
+        if (syncData.accountData.getAccountProperty("asversion") === "2.5" || !syncData.accountData.getAccountProperty("allowedEasCommands").split(",").includes("Settings")) {
             return;
         }
 
@@ -685,14 +700,14 @@ var network = {
     },
 
     getPolicykey: async function (syncData)  {
-        //build WBXML to request provision
+        // build WBXML to request provision
        syncData.setSyncState("prepare.request.provision");
         let wbxml = eas.wbxmltools.createWBXML();
         wbxml.switchpage("Provision");
         wbxml.otag("Provision");
             wbxml.otag("Policies");
                 wbxml.otag("Policy");
-                    wbxml.atag("PolicyType", (syncData.accountData.getAccountProperty("asversion") == "2.5") ? "MS-WAP-Provisioning-XML" : "MS-EAS-Provisioning-WBXML" );
+                    wbxml.atag("PolicyType", (syncData.accountData.getAccountProperty("asversion") === "2.5") ? "MS-WAP-Provisioning-XML" : "MS-EAS-Provisioning-WBXML" );
                 wbxml.ctag();
             wbxml.ctag();
         wbxml.ctag();
@@ -707,9 +722,9 @@ var network = {
             let provisionStatus = eas.xmltools.getWbxmlDataField(wbxmlData, "Provision.Status");
             if (provisionStatus === false) {
                 throw eas.sync.finish("error", "wbxmlmissingfield::Provision.Status");
-            } else if (provisionStatus != "1") {
+            } else if (provisionStatus !== "1") {
                 //dump policy status as well
-                if (policyStatus) TbSync.dump("PolicyKey","Received policy status: " + policyStatus);
+                if (policyStatus) TbSync.dump("PolicyKey", "Received policy status: " + policyStatus);
                 throw eas.sync.finish("error", "provision::" + provisionStatus);
             }
 
@@ -762,7 +777,7 @@ var network = {
         wbxml.otag("Sync");
             wbxml.otag("Collections");
                 wbxml.otag("Collection");
-                    if (syncData.accountData.getAccountProperty("asversion") == "2.5") wbxml.atag("Class", syncData.type);
+                    if (syncData.accountData.getAccountProperty("asversion") === "2.5") wbxml.atag("Class", syncData.type);
                     wbxml.atag("SyncKey","0");
                     wbxml.atag("CollectionId", syncData.currentFolderData.getFolderProperty("serverID"));
                 wbxml.ctag();
@@ -796,18 +811,18 @@ var network = {
         wbxml.otag("GetItemEstimate");
             wbxml.otag("Collections");
                 wbxml.otag("Collection");
-                    if (syncData.accountData.getAccountProperty("asversion") == "2.5") { //got this order for 2.5 directly from Microsoft support
+                    if (syncData.accountData.getAccountProperty("asversion") === "2.5") { //got this order for 2.5 directly from Microsoft support
                         wbxml.atag("Class", syncData.type); //only 2.5
                         wbxml.atag("CollectionId", syncData.currentFolderData.getFolderProperty("serverID"));
                         wbxml.switchpage("AirSync");
                         // required !
                         // https://docs.microsoft.com/en-us/openspecs/exchange_server_protocols/ms-ascmd/ffbefa62-e315-40b9-9cc6-f8d74b5f65d4
-                        if (syncData.type == "Calendar") wbxml.atag("FilterType", syncData.currentFolderData.accountData.getAccountProperty("synclimit"));
+                        if (syncData.type === "Calendar") wbxml.atag("FilterType", syncData.currentFolderData.accountData.getAccountProperty("synclimit"));
                         else wbxml.atag("FilterType", "0"); // we may filter incomplete tasks
                         
                         wbxml.atag("SyncKey", syncData.synckey);
                         wbxml.switchpage("GetItemEstimate");
-                    } else { //14.0
+                    } else { //14.1
                         wbxml.switchpage("AirSync");
                         wbxml.atag("SyncKey", syncData.synckey);
                         wbxml.switchpage("GetItemEstimate");
@@ -815,7 +830,7 @@ var network = {
                         wbxml.switchpage("AirSync");
                         wbxml.otag("Options");
                             // optional
-                            if (syncData.type == "Calendar") wbxml.atag("FilterType", syncData.currentFolderData.accountData.getAccountProperty("synclimit"));
+                            if (syncData.type === "Calendar") wbxml.atag("FilterType", syncData.currentFolderData.accountData.getAccountProperty("synclimit"));
                             wbxml.atag("Class", syncData.type);
                         wbxml.ctag();
                         wbxml.switchpage("GetItemEstimate");
@@ -838,7 +853,7 @@ var network = {
         let status = eas.xmltools.getWbxmlDataField(wbxmlData, "GetItemEstimate.Response.Status");
         let estimate = eas.xmltools.getWbxmlDataField(wbxmlData, "GetItemEstimate.Response.Collection.Estimate");
 
-        if (status && status == "1") { //do not throw on error, with EAS v2.5 I get error 2 for tasks and calendars ???
+        if (status && status === "1") { //do not throw on error, with EAS v2.5 I get error 2 for tasks and calendars ???
             syncData.progressData.reset(0, estimate);
         }
     },
@@ -867,11 +882,9 @@ var network = {
         eas.network.checkStatus(syncData, wbxmlData,"Settings.Status");
     },
 
-
     // SEARCH
 
     getSearchResults: async function (accountData, currentQuery) {
-
         let _wbxml = eas.wbxmltools.createWBXML();
         _wbxml.switchpage("Search");
         _wbxml.otag("Search");
@@ -927,10 +940,10 @@ var network = {
                         }
                     }
 
-                    if (accountData.getAccountProperty("asversion") == "2.5") {
+                    if (accountData.getAccountProperty("asversion") === "2.5") {
                         req.setRequestHeader("MS-ASProtocolVersion", "2.5");
                     } else {
-                        req.setRequestHeader("MS-ASProtocolVersion", "14.0");
+                        req.setRequestHeader("MS-ASProtocolVersion", "14");
                     }
                     req.setRequestHeader("Content-Length", wbxml.length);
                     if (accountData.getAccountProperty("provision")) {
@@ -948,7 +961,7 @@ var network = {
                         reject("GAL Search Error");
                     };
 
-                    req.onload = function() {
+                    req.onload = function () {
                         let response = req.responseText;
                         
                         switch(req.status) {
@@ -1091,7 +1104,7 @@ var network = {
 
             });
 
-            if (result && result.hasOwnProperty("errorType") && result.errorType == "PasswordPrompt") {
+            if (result && result.hasOwnProperty("errorType") && result.errorType === "PasswordPrompt") {
                 if (allowedRetries > 0) {
                     if (oauthData) {
                         oauthData.accessToken = "";
@@ -1133,11 +1146,11 @@ var network = {
         let result = await eas.network.getServerConnectionViaAutodiscover(authData.user, authData.password, 30*1000);
 
         syncData.setSyncState("eval.response.autodiscover");
-        if (result.errorcode == 200) {
+        if (result.errorcode === 200) {
             //update account
             syncData.accountData.setAccountProperty("host", eas.network.stripAutodiscoverUrl(result.server)); 
             syncData.accountData.setAccountProperty("user", result.user);
-            syncData.accountData.setAccountProperty("https", (result.server.substring(0,5) == "https"));
+            syncData.accountData.setAccountProperty("https", (result.server.substring(0,5) === "https"));
         }
 
         return result.errorcode;
@@ -1190,7 +1203,7 @@ var network = {
                 break;
             }
 
-            if (responses[r].error == 403 || responses[r].error == 401) {
+            if (responses[r].error === 403 || responses[r].error === 401) {
                 //we could still find a valid server, so just store this state
                 result = {"server": "", "user": responses[r].user, "errorcode": responses[r].error, "error": TbSync.getString("status." + responses[r].error, "eas")};
             }
@@ -1218,12 +1231,12 @@ var network = {
             result = await eas.network.getServerConnectionViaAutodiscoverRequest(method, connection, password, maxtimeout);
             method = "";
 
-            if (result.error == "redirect found") {
+            if (result.error === "redirect found") {
                 TbSync.dump("EAS autodiscover URL redirect",  "\n" + connection.url + " @ " + connection.user + " => \n" + result.url + " @ " + result.user);
                 connection.url = result.url;
                 connection.user = result.user;
                 method = "HEAD";
-            } else if (result.error == "POST candidate found") {
+            } else if (result.error === "POST candidate found") {
                 method = "POST";
             }
 
@@ -1287,13 +1300,13 @@ var network = {
 
             req.onload = function() { 
                 //initiate rerun on redirects
-                if (req.responseURL != connection.url) {
+                if (req.responseURL !== connection.url) {
                     resolve({"url":req.responseURL, "error":"redirect found", "server":"", "user":connection.user});
                     return;
                 }
 
                 //initiate rerun on HEAD request without redirect (rerun and do a POST on this)
-                if (method == "HEAD") {
+                if (method === "HEAD") {
                     resolve({"url":req.responseURL, "error":"POST candidate found", "server":"", "user":connection.user});
                     return;
                 }
@@ -1331,7 +1344,7 @@ var network = {
                             let server = eas.xmltools.nodeAsArray(data.Autodiscover.Response.Action.Settings.Server);
 
                             for (let count = 0; count < server.length; count++) {
-                                if (server[count].Type == "MobileSync" && server[count].Url) {
+                                if (server[count].Type === "MobileSync" && server[count].Url) {
                                     resolve({"url":req.responseURL, "error":"", "server":server[count].Url, "user":connection.user});
                                     return;
                                 }
@@ -1345,7 +1358,7 @@ var network = {
                 }
             };
 
-            if (method == "HEAD") req.send();
+            if (method === "HEAD") req.send();
             else  req.send(xml);
 
         });

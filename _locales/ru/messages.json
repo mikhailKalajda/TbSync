@@ -734,7 +734,7 @@
         "message": "Не удалось подключиться к серверу."
     },
     "status.nosupportedeasversion": {
-        "message": "Сервер не поддерживает ActiveSync v2.5 или v14.0 (только ##replace.1##). R7 не будет работать с этим ActiveSync сервером."
+        "message": "Сервер не поддерживает ActiveSync v2.5 или v14.1 (только ##replace.1##). R7 не будет работать с этим ActiveSync сервером."
     },
     "status.notsupportedeasversion": {
         "message": "Сервер не поддерживает выбранный ActiveSync v##replace.1## (только ##replace.2##)."

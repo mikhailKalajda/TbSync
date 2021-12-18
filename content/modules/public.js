@@ -639,8 +639,12 @@ var dump = function (what, aMessage) {
     TbSync.io.appendToFile("debug.log", "** " + now.toString() + " **\n[" + what + "] : " + aMessage + "\n\n");
   }
 }
-  
 
+/**
+ * Dumps top-level object properties
+ * @param {string} what  The text explanation
+ * @param {Object} aObject The object to dump
+ */
 
 /**
  * Get a localized string.
@@ -660,7 +664,7 @@ var dump = function (what, aMessage) {
 var getString = function (key, provider) {
   let localized = null;
   
-  //spezial treatment of strings with :: like status.httperror::403
+  //special treatment of strings with :: like status.httperror::403
   let parts = key.split("::");
 
   // if a provider is given, try to get the string from the provider  

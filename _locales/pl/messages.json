@@ -734,7 +734,7 @@
         "message": "Nie można połączyć z serwerem."
     },
     "status.nosupportedeasversion": {
-        "message": "Serwer nie obsługuje ActiveSync v2.5 lub v14.0 (tylko ##replace.1##). TbSync nie będzie działać z tym serwerem ActiveSync."
+        "message": "Serwer nie obsługuje ActiveSync v2.5 lub v14.1 (tylko ##replace.1##). TbSync nie będzie działać z tym serwerem ActiveSync."
     },
     "status.notsupportedeasversion": {
         "message": "Serwer nie wspiera wybranego ActiveSync v##replace.1## (tylko ##replace.2##)."
