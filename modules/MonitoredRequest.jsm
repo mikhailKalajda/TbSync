@@ -98,7 +98,7 @@ function completionListener(event)
       this.completion.handleEvent(event);
     else
       this.completion(event);
-    if (event.type == "progress")
+    if (event.type === "progress")
       return;
   }
 
@@ -118,10 +118,12 @@ function sendNow(aMonitoredRequest)
   request.addEventListener("timeout", completionListener.bind(aMonitoredRequest), false);
   if (aMonitoredRequest.useProgress)
     request.addEventListener("progress", completionListener.bind(aMonitoredRequest), false);
-  if (Node.isInstance(aMonitoredRequest.message))
+  if (Node.isInstance(aMonitoredRequest.message)) {
     request.send(oSerializer.serializeToString(aMonitoredRequest.message));
-  else
+  }
+  else {
     request.send(aMonitoredRequest.message);
+  }
 }
 
 function MonitoredRequest()

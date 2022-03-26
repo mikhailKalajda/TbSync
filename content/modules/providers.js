@@ -50,7 +50,7 @@ var providers = {
         //load provider subscripts into TbSync
         this[provider] = {};
         Services.scriptloader.loadSubScript(js, this[provider], "UTF-8");
-        if (TbSync.apiVersion != this[provider].Base.getApiVersion()) {
+        if (TbSync.apiVersion !== this[provider].Base.getApiVersion()) {
           throw new Error("API version mismatch, TbSync@"+TbSync.apiVersion+" vs " + provider + "@" + this[provider].Base.getApiVersion());
         }
 
@@ -80,7 +80,9 @@ var providers = {
           TbSync.core.resetSyncDataObj(accountData.accountID);
           
           // set all accounts which are syncing to notsyncronized 
-          if (accountData.getAccountProperty("status") == "syncing") accountData.setAccountProperty("status", "notsyncronized");
+          if (accountData.getAccountProperty("status") === "syncing") {
+            accountData.setAccountProperty("status", "notsyncronized");
+          }
 
           // set each folder with PENDING status to ABORTED
           let folders = TbSync.db.findFolders({"status": "pending"}, {"accountID": accountData.accountID});
@@ -99,7 +101,7 @@ var providers = {
           let addressBook = allAddressBooks.getNext();
           if (addressBook instanceof Components.interfaces.nsIAbDirectory) {
             let storedProvider = TbSync.addressbook.getStringValue(addressBook, "tbSyncProvider", "");
-            if (provider == storedProvider && providerData.getFolders({"target": addressBook.UID}).length == 0) {
+            if (provider === storedProvider && providerData.getFolders({"target": addressBook.UID}).length === 0) {
               let name = addressBook.dirName;
               addressBook.dirName = TbSync.getString("target.orphaned") + ": " + name;              
               addressBook.setStringValue("tbSyncIcon", "orphaned");
@@ -108,11 +110,12 @@ var providers = {
             }
           }
         }
-        
+
         if (TbSync.lightning.isAvailable()) {
           for (let calendar of TbSync.lightning.cal.getCalendarManager().getCalendars({})) {
             let storedProvider = calendar.getProperty("tbSyncProvider");
-            if (provider == storedProvider && calendar.type == "storage" && providerData.getFolders({"target": calendar.id}).length == 0) {
+            if (provider === storedProvider && calendar.type === "storage"
+                && providerData.getFolders({"target": calendar.id}).length === 0) {
               let name = calendar.name;
               calendar.name = TbSync.getString("target.orphaned") + ": " + name;
               calendar.setProperty("disabled", true);

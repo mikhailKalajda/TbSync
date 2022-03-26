@@ -764,7 +764,7 @@ var network = {
             wbxml.otag("Provision");
                 wbxml.otag("Policies");
                     wbxml.otag("Policy");
-                        wbxml.atag("PolicyType",(syncData.accountData.getAccountProperty("asversion") == "2.5") ? "MS-WAP-Provisioning-XML" : "MS-EAS-Provisioning-WBXML" );
+                        wbxml.atag("PolicyType",(syncData.accountData.getAccountProperty("asversion") === "2.5") ? "MS-WAP-Provisioning-XML" : "MS-EAS-Provisioning-WBXML" );
                         wbxml.atag("PolicyKey", policykey);
                         wbxml.atag("Status", "1");
                     wbxml.ctag();

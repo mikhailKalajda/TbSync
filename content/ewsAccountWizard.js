@@ -335,12 +335,12 @@ exquilla.AW = (function exquillaAW()
       if (url) {
         let newUrl = url.replace("/EWS/Exchange.asmx", "/Microsoft-Server-ActiveSync");
 
-        //if no protocoll is given, prepend "https://"
-          if (newUrl.substring(0,4) != "http" || newUrl.indexOf("://") == -1) {
+        // if no protocol is given, prepend "https://"
+        if (newUrl.substring(0,4) !== "http" || newUrl.indexOf("://") === -1) {
             newUrl = "https://" + newUrl.split("://").join("/");
-          }
-          newAccountEntry.host = eas.network.stripAutodiscoverUrl(newUrl);
-          newAccountEntry.https = (newUrl.substring(0,5) == "https");
+        }
+        newAccountEntry.host = eas.network.stripAutodiscoverUrl(newUrl);
+        newAccountEntry.https = (newUrl.substring(0,5) === "https");
       }
 
       // Add the new account.
@@ -398,7 +398,7 @@ exquilla.AW = (function exquillaAW()
         }
           
         account.incomingServer.valid=true;
-        // hack to cause an account loaded notification now the server is valid
+        // noinspection SillyAssignmentJS hack to cause an account loaded notification now the server is valid
         account.incomingServer = account.incomingServer;
       }
 
@@ -430,31 +430,29 @@ exquilla.AW = (function exquillaAW()
            */
           if (destIdentity.attachSignature)
           {
-              var sigFileName = accountData.signatureFileName;
-              let sigFile = MailServices.mailSession.getDataFilesDir("messenger");
-              sigFile.append(sigFileName);
-              destIdentity.signature = sigFile;
+            let sigFileName = accountData.signatureFileName;
+            let sigFile = MailServices.mailSession.getDataFilesDir("messenger");
+            sigFile.append(sigFileName);
+            destIdentity.signature = sigFile;
           }
 
           if (accountData.smtp.hostname && !destIdentity.smtpServerKey)
           {
-              // hostname + no key => create a new SMTP server.
+            // hostname + no key => create a new SMTP server.
 
-              let smtpServer = MailServices.smtp.createServer();
-              var isDefaultSmtpServer;
-              if (!MailServices.smtp.defaultServer.hostname) {
+            let smtpServer = MailServices.smtp.createServer();
+            let isDefaultSmtpServer;
+            if (!MailServices.smtp.defaultServer.hostname) {
                 MailServices.smtp.defaultServer = smtpServer;
                 isDefaultSmtpServer = true;
-              }
+            }
 
-              copyObjectToInterface(smtpServer, accountData.smtp, false);
+            copyObjectToInterface(smtpServer, accountData.smtp, false);
 
-              // If it's the default server we created, make the identity use
-              // "Use Default" by default.
-              destIdentity.smtpServerKey =
-                (isDefaultSmtpServer) ? "" : smtpServer.key;
-           }
-
+            // If it's the default server we created, make the identity use
+            // "Use Default" by default.
+            destIdentity.smtpServerKey = (isDefaultSmtpServer) ? "" : smtpServer.key;
+          }
       } // if the account has an identity...
 
       addAccount(
@@ -470,7 +468,7 @@ exquilla.AW = (function exquillaAW()
     AccountDataToPageData = function ewsAccountDataToPageData(ispData, pageData)
     {
       oldAccountDataToPageData(ispData, pageData);
-      if (ispData.incomingServer.type == 'exquilla')
+      if (ispData.incomingServer.type === 'exquilla')
         pageData.accounttype.mailaccount.value = false;
     }
 
@@ -479,7 +477,7 @@ exquilla.AW = (function exquillaAW()
     PageDataToAccountData = function ewsPageDataToAccountData(pageData, accountData)
     { try {
       oldPageDataToAccountData(pageData, accountData);
-      if (accountData.incomingServer.type == 'exquilla')
+      if (accountData.incomingServer.type === 'exquilla')
       {
         if (!accountData.incomingServer["ServerType-exquilla"])
           accountData.incomingServer["ServerType-exquilla"] = {};
@@ -511,7 +509,7 @@ exquilla.AW = (function exquillaAW()
     let oldSetDefaultCopiesAndFoldersPrefs = setDefaultCopiesAndFoldersPrefs;
     setDefaultCopiesAndFoldersPrefs = function exquillaSetDefaultCopiesAndFoldersPrefs(identity, server, accountData)
     {
-      if (server.type == 'exquilla')
+      if (server.type === 'exquilla')
       {
         return ewsSetDefaultCopiesAndFoldersPrefs(identity, server, accountData);
       }
@@ -895,7 +893,7 @@ exquilla.AW = (function exquillaAW()
           }
         }
         // no successful ews url found
-        if (_e("exquillaAutoURL").getAttribute("status") == "pending")
+        if (_e("exquillaAutoURL").getAttribute("status") === "pending")
         {
           // all URLs failed while testing autodiscover
           _e("exquillaAutoURL").setAttribute("status", "failure");

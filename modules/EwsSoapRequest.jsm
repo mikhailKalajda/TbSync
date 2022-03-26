@@ -15,12 +15,9 @@ const EXPORTED_SYMBOLS = ["EwsSoapRequest"];
 
 const { classes: Cc, Constructor: CC, interfaces: Ci, utils: Cu, Exception: CE, results: Cr, } = Components;
 var { XPCOMUtils } = ChromeUtils.import("resource://gre/modules/XPCOMUtils.jsm");
-ChromeUtils.defineModuleGetter(this, "Utils",
-  "resource://tbsync/ewsUtils.jsm");
-ChromeUtils.defineModuleGetter(this, "Services",
-  "resource://gre/modules/Services.jsm");
-ChromeUtils.defineModuleGetter(this, "MailServices",
-  "resource:///modules/MailServices.jsm");
+ChromeUtils.defineModuleGetter(this, "Utils", "resource://tbsync/ewsUtils.jsm");
+ChromeUtils.defineModuleGetter(this, "Services", "resource://gre/modules/Services.jsm");
+ChromeUtils.defineModuleGetter(this, "MailServices", "resource:///modules/MailServices.jsm");
 ChromeUtils.defineModuleGetter(this, "OS", "resource://gre/modules/osfile.jsm");
 Cu.importGlobalProperties(["DOMParser", "Element", "XMLSerializer"]);
 var _log = null;
@@ -28,12 +25,9 @@ XPCOMUtils.defineLazyGetter(this, "log", () => {
   if (!_log) _log = Utils.configureLogging("native");
   return _log;
 });
-ChromeUtils.defineModuleGetter(this, "kOAuth2Password",
-                               "resource://tbsync/EwsOAuth2.jsm");
-ChromeUtils.defineModuleGetter(this, "EwsNativeFolder",
-                               "resource://tbsync/EwsNativeFolder.jsm");
-ChromeUtils.defineModuleGetter(this, "SoapTransport",
-                               "resource://tbsync/SoapTransport.jsm");
+ChromeUtils.defineModuleGetter(this, "kOAuth2Password", "resource://tbsync/EwsOAuth2.jsm");
+ChromeUtils.defineModuleGetter(this, "EwsNativeFolder", "resource://tbsync/EwsNativeFolder.jsm");
+ChromeUtils.defineModuleGetter(this, "SoapTransport", "resource://tbsync/SoapTransport.jsm");
 ChromeUtils.defineModuleGetter(this, "Base64", "resource://tbsync/Base64.jsm");
 
 ChromeUtils.defineModuleGetter(this, "EWStoPL", "resource://tbsync/EWStoPL.js");
@@ -94,6 +88,7 @@ const kResponseMessageType = {
   SubscribeResponseMessage: "_SubscribeResponseType",
   UnsubscribeResponseMessage: "_UnsubscribeResponseType",
   GetStreamingEventsResponseMessage: "_GetStreamingEventsResponseMessageType",
+  FreeBusyResponse: "_GetUserAvailabilityResponseType"
 }
 
 // adapted from npm sanitize-filename
@@ -230,7 +225,7 @@ function updateFromFolderElement(folder, element)
   let parentFolderId = parentFolderIdElement.getAttribute("Id");
 
   // update parent, but make sure we are not our own parent!
-  if (folder.folderId == parentFolderId) {
+  if (folder.folderId === parentFolderId) {
     log.warn("Trying to make a folder its own parent: " + folder.displayName);
   }
   else {
@@ -245,9 +240,9 @@ function updateFromFolderElement(folder, element)
     for (let extendedProperty of extendedProperties) {
       let extendedFieldURI =
         extendedProperty.getElementsByTagNameNS(nsTypes, "ExtendedFieldURI")[0];
-      if (extendedFieldURI.getAttribute("PropertyTag") == PR_ATTR_HIDDEN) {
+      if (extendedFieldURI.getAttribute("PropertyTag") === PR_ATTR_HIDDEN) {
         let hiddenString = typeValue(extendedProperty, "Value");
-        hidden == (hiddenString != "true");
+        hidden = (hiddenString !== "true");
         break;
       }
     }
@@ -267,18 +262,18 @@ function updateParentSubfolders(folder)
   if (maybeFolder)
   {
     // compare the folderIds
-    if (maybeFolder.folderId == folder.folderId) {
+    if (maybeFolder.folderId === folder.folderId) {
       return;
     }
 
     // Change of existing folderId
     folder.mailbox.removeFolderFromCache(maybeFolder.folderId);
     let maybeIndex = subfolderIds.indexOf(maybeFolder.folderId);
-    if (maybeIndex != -1)
+    if (maybeIndex !== -1)
       subfolderIds.removeAt(maybeIndex);
   }
 
-  if (subfolderIds.indexOf(folder.folderId) == -1) {
+  if (subfolderIds.indexOf(folder.folderId) === -1) {
     subfolderIds.append(folder.folderId);
   }
 }
@@ -837,7 +832,7 @@ EwsSoapRequest.prototype = {
       }
     }
 
-    let disposition = (itemName != "Message") ? "" :
+    let disposition = (itemName !== "Message") ? "" :
       ` MessageDisposition="${aMessageDisposition || 'SaveOnly'}"`;
 
     let body =
@@ -1018,7 +1013,7 @@ EwsSoapRequest.prototype = {
     if (aNativeAttachment.contentId) {
       body += `<ContentId>${_(aNativeAttachment.contentId)}</ContentId>`;
       if (this.mailbox.serverVersion &&
-          this.mailbox.serverVersion != "2007sp1")
+          this.mailbox.serverVersion !== "2007sp1")
       {
         // server supports inline
         body += `<IsInline>true</IsInline>`;
@@ -1148,6 +1143,143 @@ EwsSoapRequest.prototype = {
     this._setupSoapCall("ResolveNames", aResponse, body);
   },
 
+  /*
+  <soap:Body>
+    <GetUserAvailabilityRequest xmlns="http://schemas.microsoft.com/exchange/services/2006/messages"
+                xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types">
+      <t:TimeZone xmlns="http://schemas.microsoft.com/exchange/services/2006/types">
+        <Bias>480</Bias>
+        <StandardTime>
+          <Bias>0</Bias>
+          <Time>02:00:00</Time>
+          <DayOrder>5</DayOrder>
+          <Month>10</Month>
+          <DayOfWeek>Sunday</DayOfWeek>
+        </StandardTime>
+        <DaylightTime>
+          <Bias>-60</Bias>
+          <Time>02:00:00</Time>
+          <DayOrder>1</DayOrder>
+          <Month>4</Month>
+          <DayOfWeek>Sunday</DayOfWeek>
+        </DaylightTime>
+      </t:TimeZone>
+      <MailboxDataArray>
+        <t:MailboxData>
+          <t:Email>
+            <t:Address>user1@example.com</t:Address>
+          </t:Email>
+          <t:AttendeeType>Required</t:AttendeeType>
+          <t:ExcludeConflicts>false</t:ExcludeConflicts>
+        </t:MailboxData>
+        <t:MailboxData>
+          <t:Email>
+            <t:Address>user2@example.com</t:Address>
+          </t:Email>
+          <t:AttendeeType>Required</t:AttendeeType>
+          <t:ExcludeConflicts>false</t:ExcludeConflicts>
+        </t:MailboxData>
+      </MailboxDataArray>
+      <t:FreeBusyViewOptions>
+        <t:TimeWindow>
+          <t:StartTime>2006-10-16T00:00:00</t:StartTime>
+          <t:EndTime>2006-10-16T23:59:59</t:EndTime>
+        </t:TimeWindow>
+        <t:MergedFreeBusyIntervalInMinutes>60</t:MergedFreeBusyIntervalInMinutes>
+        <t:RequestedView>DetailedMerged</t:RequestedView>
+      </t:FreeBusyViewOptions>
+    </GetUserAvailabilityRequest>
+  </soap:Body>
+  */
+
+  getUserAvailabilityRequest(aResponse, aEmail, aStartTime, aEndTime) {
+    log.warn("getUserAvailabilityRequest()");
+    let body =
+        `<m:GetUserAvailabilityRequest Traversal="Shallow">` +
+        `<t:TimeZone>` +
+        `<Bias>180</Bias>` +
+        `<StandardTime>` +
+        `<Bias>0</Bias>` +
+        `<Time>00:00:00</Time>` +
+        `<DayOrder>1</DayOrder>` +
+        `<Month>1</Month>` +
+        `<DayOfWeek>Sunday</DayOfWeek>` +
+        `</StandardTime>` +
+        `<DaylightTime>` +
+        `<Bias>0</Bias>` +
+        `<Time>00:00:00</Time>` +
+        `<DayOrder>1</DayOrder>` +
+        `<Month>2</Month>` +
+        `<DayOfWeek>Sunday</DayOfWeek>` +
+        `</DaylightTime>` +
+        `</t:TimeZone>` +
+        `<MailboxDataArray>` +
+        `<MailboxData xmlns="http://schemas.microsoft.com/exchange/services/2006/types">` +
+        `<Email xmlns="http://schemas.microsoft.com/exchange/services/2006/types">` +
+        `<Address xmlns="http://schemas.microsoft.com/exchange/services/2006/types">${aEmail}</Address>` +
+        `<RoutingType>SMTP</RoutingType>` +
+        `</Email>` +
+        `<AttendeeType>Required</AttendeeType>` +
+        `<ExcludeConflicts>false</ExcludeConflicts>` +
+        `</MailboxData>` +
+        `<MailboxData xmlns="http://schemas.microsoft.com/exchange/services/2006/types">` +
+        `<Email xmlns="http://schemas.microsoft.com/exchange/services/2006/types">` +
+        `<Address xmlns="http://schemas.microsoft.com/exchange/services/2006/types">${aEmail}</Address>` +
+        `<RoutingType>SMTP</RoutingType>` +
+        `</Email>` +
+        `<AttendeeType>Required</AttendeeType>` +
+        `<ExcludeConflicts>false</ExcludeConflicts>` +
+        `</MailboxData>` +
+        `</MailboxDataArray>` +
+        `<t:FreeBusyViewOptions>` +
+        `<t:TimeWindow>` +
+        `<t:StartTime>${"2022-02-01T00:00:00"}</t:StartTime>` +
+        `<t:EndTime>${"2022-02-28T00:00:00"}</t:EndTime>` +
+        `</t:TimeWindow>` +
+        `</t:FreeBusyViewOptions>` +
+        `</m:GetUserAvailabilityRequest>`;
+    body = `<GetUserAvailabilityRequest
+xmlns="http://schemas.microsoft.com/exchange/services/2006/messages">
+ <TimeZone xmlns="http://schemas.microsoft.com/exchange/services/2006/types">
+ <Bias>480</Bias>
+ <StandardTime>
+ <Bias>0</Bias>
+ <Time>02:00:00</Time>
+ <DayOrder>5</DayOrder>
+ <Month>10</Month>
+ <DayOfWeek>Sunday</DayOfWeek>
+ </StandardTime>
+ <DaylightTime>
+ <Bias>-60</Bias>
+ <Time>02:00:00</Time>
+ <DayOrder>1</DayOrder>
+ <Month>4</Month>
+ <DayOfWeek>Sunday</DayOfWeek>
+ </DaylightTime>
+ </TimeZone>
+ <MailboxDataArray>
+ <MailboxData xmlns="http://schemas.microsoft.com/exchange/services/2006/types">
+ <Email>
+ <Name></Name>
+ <Address>` + aEmail + `</Address>
+ <RoutingType>SMTP</RoutingType>
+ </Email>
+ <AttendeeType>Required</AttendeeType>
+ <ExcludeConflicts>false</ExcludeConflicts>
+ </MailboxData>
+ </MailboxDataArray>
+ <FreeBusyViewOptions xmlns="http://schemas.microsoft.com/exchange/services/2006/types">
+ <TimeWindow>
+ <StartTime>` + aStartTime + `</StartTime>
+ <EndTime>` + aEndTime + `</EndTime>
+ </TimeWindow>
+ <MergedFreeBusyIntervalInMinutes>30</MergedFreeBusyIntervalInMinutes>
+  </FreeBusyViewOptions>
+ </GetUserAvailabilityRequest>`;
+    this._setupSoapCall("GetUserAvailabilityRequest", aResponse, body);
+    //  <RequestedView>Detailed</RequestedView>
+  },
+
   deleteDeletedOccurrences(aResponse, aItem, aMoveToDeletedItems) {
     throw CE("delete deleted occurances not implemented", Cr.NS_ERROR_NOT_IMPLEMENTED);
   },
@@ -1173,7 +1305,7 @@ StreamingSubscriptionRequest example from:
     </m:Subscribe>
 */
   subscribeNotifications(aResponse, aNativeFolders, aCheckAll) {
-    if (this.mailbox.serverVersion == "2007sp1")
+    if (this.mailbox.serverVersion === "2007sp1")
       throw CE("Not supported in 2007sp1", NS_ERROR_NOT_IMPLEMENTED);
 
     // We can't use `folderIdsXML()` here because that puts the `FolderIds`
@@ -1198,7 +1330,7 @@ StreamingSubscriptionRequest example from:
   },
 
   unsubscribeNotifications(aResponse, aSubscriptionId) {
-    if (this.mailbox.serverVersion == "2007sp1")
+    if (this.mailbox.serverVersion === "2007sp1")
       throw CE("Not supported in 2007sp1", NS_ERROR_NOT_IMPLEMENTED);
     let body =
       `<m:Unsubscribe>` +
@@ -1219,7 +1351,7 @@ StreamingSubscriptionRequest example from:
 */
 
   getNotifications(aResponse, aSubscriptionId, aTimeout) {
-    if (this.mailbox.serverVersion == "2007sp1")
+    if (this.mailbox.serverVersion === "2007sp1")
       throw CE("Not supported in 2007sp1", NS_ERROR_NOT_IMPLEMENTED);
     let body =
       `<m:GetStreamingEvents>` +
@@ -1304,7 +1436,7 @@ StreamingSubscriptionRequest example from:
       let thisItemClass = item.itemClass;
       if (!itemClass)
         itemClass = thisItemClass;
-      else if (thisItemClass != itemClass) {
+      else if (thisItemClass !== itemClass) {
         log.warn("Can't get changed for multiple items with different classes " +
                  itemClass + " , " + thisItemClass);
         continue;
@@ -1355,7 +1487,7 @@ StreamingSubscriptionRequest example from:
       }
       else {
         // Skip the body unless aGetBody set.
-        if (propertyName == "item:Body" && !aGetBody)
+        if (propertyName === "item:Body" && !aGetBody)
           continue;
         pXml += `<FieldURI FieldURI="${propertyName}"/>`;
         this._getBody = true;
@@ -1444,9 +1576,9 @@ StreamingSubscriptionRequest example from:
       }
 
       // You cannot mix classtypes.
-      if (classType == "Unknown")
+      if (classType === "Unknown")
         classType = thisClassType;
-      else if (classType != thisClassType) {
+      else if (classType !== thisClassType) {
         log.warn("you cannot mix classtypes in an update, update incomplete");
         continue;
       }
@@ -1546,6 +1678,7 @@ StreamingSubscriptionRequest example from:
   </m:ExpandDLResponse>
 </Body>
 */
+
   expandDL(aResponse, aNativeItem) {
     this._item = aNativeItem;
     let body =
@@ -1646,12 +1779,12 @@ StreamingSubscriptionRequest example from:
       try {
         password = this.mailbox.password;
       } catch (e) {}
-      if (!password && authMethod == Ci.nsMsgAuthMethod.passwordCleartext) {
+      if (!password && authMethod === Ci.nsMsgAuthMethod.passwordCleartext) {
         rv = Cr.NS_ERROR_NOT_INITIALIZED;
         this._error("Password missing", "PasswordMissing", "");
         break;
       }
-      if (authMethod == Ci.nsMsgAuthMethod.OAuth2 || authMethod == kOAuth2Password) {
+      if (authMethod === Ci.nsMsgAuthMethod.OAuth2 || authMethod === kOAuth2Password) {
         try {
           // May open a window and wait for user to login, i.e. may block for minutes.
           accessToken = await this.mailbox.oAuth2Login.getAccessToken();
@@ -1665,7 +1798,7 @@ StreamingSubscriptionRequest example from:
 
       // Set a custom useragent
       let useragent = Services.prefs.getCharPref("extensions.exquilla.useragent");
-      if (!useragent && !(useragent == "default"))
+      if (!useragent && !(useragent === "default"))
         soapCall.useragent = useragent;
 
       let completion = soapCall.asyncInvoke(this, username, password, domain, accessToken);
@@ -1673,7 +1806,7 @@ StreamingSubscriptionRequest example from:
       rv = Cr.NS_OK;
     } while (false);
 
-    if (rv != Cr.NS_OK) {
+    if (rv !== Cr.NS_OK) {
       log.info("soap request invocation failed");
       if (this.ewsResponse)
       {
@@ -1707,12 +1840,12 @@ StreamingSubscriptionRequest example from:
 
         // Find the initial "<"
         let beginTag = this._partialProgress.indexOf("<");
-        if (beginTag == -1)
+        if (beginTag === -1)
           break;
 
         // Get the tag name
         let nextGT = this._partialProgress.indexOf(">", beginTag + 1);
-        if (nextGT == -1)
+        if (nextGT === -1)
           break;
         let nextSpace = this._partialProgress.indexOf(" ", beginTag + 1);
         let endTag = Math.min(nextSpace, nextGT);
@@ -1721,7 +1854,7 @@ StreamingSubscriptionRequest example from:
         let closeTag = "</" + this._partialProgress.substring(beginTag + 1, endTag) + ">";
         log.debug("Looking for closeTag " + closeTag);
         let endElement = this._partialProgress.indexOf(closeTag, beginTag + 1);
-        if (endElement == -1)
+        if (endElement === -1)
           break;
 
         // We found a complete element, let the dom parser handle.
@@ -1748,7 +1881,7 @@ StreamingSubscriptionRequest example from:
           let responseMessage = streamingResponsePL.getPropertyListAt(i);
           if (responseMessage) {
             let responseClass = responseMessage.getAString("$attributes/ResponseClass");
-            if (responseClass != "Success") {
+            if (responseClass !== "Success") {
               log.config("response error getting notifications");
               if (this.ewsResponse) {
                 this.ewsResponse.onNotify(this, null, Cr.NS_ERROR_FAILURE);
@@ -1790,11 +1923,11 @@ StreamingSubscriptionRequest example from:
       return;
     }
 
-    if (aStatus != Cr.NS_OK)
+    if (aStatus !== Cr.NS_OK)
       log.debug("handleResponse with error " + aStatus);
     // Logging of the response
     try {
-      if ( (aStatus != Cr.NS_ERROR_ABORT) &&
+      if ( (aStatus !== Cr.NS_ERROR_ABORT) &&
             aResponse && this.mailbox.soapLogFile) {
         if (aResponse.body)
           this.logElement("SOAP response body", aResponse.body);
@@ -1810,11 +1943,11 @@ StreamingSubscriptionRequest example from:
 
     // Error response logging.
     let haveFault = false;
-    let errorReturn = (aStatus == Cr.NS_OK) ? Cr.NS_ERROR_FAILURE : aStatus;
+    let errorReturn = (aStatus === Cr.NS_OK) ? Cr.NS_ERROR_FAILURE : aStatus;
     let htmlStatus = aResponse ? aResponse.htmlStatus : 0;
 
     do { // break when done checking faults
-      if (aStatus == Cr.NS_ERROR_ABORT) {
+      if (aStatus === Cr.NS_ERROR_ABORT) {
         this._error("Abort", "Abort", "Request aborted");
         haveFault = true;
         break;
@@ -1843,9 +1976,9 @@ StreamingSubscriptionRequest example from:
         break;
       }
 
-      if (htmlStatus == 401 &&
-          (this.mailbox.authMethod == Ci.nsMsgAuthMethod.OAuth2 ||
-           this.mailbox.authMethod == kOAuth2Password) &&
+      if (htmlStatus === 401 &&
+          (this.mailbox.authMethod === Ci.nsMsgAuthMethod.OAuth2 ||
+           this.mailbox.authMethod === kOAuth2Password) &&
           !this._retriedOAuth) {
         // The OAuth2 access token is no longer valid.
         try {
@@ -1876,7 +2009,7 @@ StreamingSubscriptionRequest example from:
         break;
       }
 
-      if (aStatus != Cr.NS_OK && aStatus != Cr.NS_ERROR_NET_TIMEOUT) {
+      if (aStatus !== Cr.NS_OK && aStatus !== Cr.NS_ERROR_NET_TIMEOUT) {
         this._error("Error status in handleResponse", "ResponseErrorStatus",
                     "Error status in handleResponse");
         haveFault = true;
@@ -1888,7 +2021,7 @@ StreamingSubscriptionRequest example from:
       if (aCall.useProgress)
         break;
       let bodyElement = aResponse.body;
-      if (this.doError == 1) {
+      if (this.doError === 1) {
         bodyElement = null;
         log.warn("Doing soap request test for simulated missing body");
       }
@@ -1930,17 +2063,17 @@ StreamingSubscriptionRequest example from:
         let responseLocalName = response.localName;
         log.debug("responseLocalName: " + responseLocalName +
                   ", responseClass: " + responseClass);
-        if (responseClass == "Error") {
+        if (responseClass === "Error") {
           // Certain error response codes are not processed as errors, or will be handled in
           // the type-specific handler.
           let responseCodes = response.getElementsByTagNameNS(nsMessages, "ResponseCode");
           let responseCode = (responseCodes && responseCodes[0]) ?
             responseCodes[0].textContent : "";
           log.debug("responseCode is " + responseCode);
-          if (responseCode != "ErrorNameResolutionNoResults" &&
-              responseCode != "ErrorNameResolutionMultipleResults" &&
-              responseCode != "ErrorItemNotFound" && 
-              responseCode != "ErrorFolderExists")
+          if (responseCode !== "ErrorNameResolutionNoResults" &&
+              responseCode !== "ErrorNameResolutionMultipleResults" &&
+              responseCode !== "ErrorItemNotFound" &&
+              responseCode !== "ErrorFolderExists")
           {
             haveFault = true;
             // We expect an error information in the response
@@ -1976,7 +2109,7 @@ StreamingSubscriptionRequest example from:
     } while (false);
 
     // don't bother showing dom if html completely failed, like offline
-    if (haveFault && htmlStatus && aStatus != Cr.NS_ERROR_ABORT && aStatus != Cr.NS_ERROR_NET_TIMEOUT) {
+    if (haveFault && htmlStatus && aStatus !== Cr.NS_ERROR_ABORT && aStatus !== Cr.NS_ERROR_NET_TIMEOUT) {
       showDOMElements(aCall, aResponse);
     }
     if (this.ewsResponse) {
@@ -2012,7 +2145,7 @@ StreamingSubscriptionRequest example from:
   _FindFolderResponseType(response)
   {
     let isOk = true;
-    if (this.requestName == "DiscoverSubfolders") {
+    if (this.requestName === "DiscoverSubfolders") {
       let rootFolderElement =
         response.getElementsByTagNameNS(nsMessages, "RootFolder")[0];
       // Note that IncludesLastItemInRange is processed in the machine
@@ -2043,19 +2176,19 @@ StreamingSubscriptionRequest example from:
   _ResponseMessageType(response)
   {
     let isOk = false;
-    if (this.requestName == "DeleteFolder") {
+    if (this.requestName === "DeleteFolder") {
       this.mailbox.removeFolderFromCache(this._nativeFolder.folderId);
       this.mailbox.updateSubfolderIds();
       isOk = true;
     }
-    else if (this.requestName == "DeleteFolders") {
+    else if (this.requestName === "DeleteFolders") {
       let folderId = this._ids.getAt(this._nextFolderIndex++);
       this.mailbox.removeFolderFromCache(folderId);
       this.mailbox.updateSubfolderIds();
       isOk = true;
     }
-    else if (this.requestName == "SendItem" ||
-             this.requestName == "DeleteItems") {
+    else if (this.requestName === "SendItem" ||
+             this.requestName === "DeleteItems") {
       isOk = true;
     }
     else {
@@ -2071,11 +2204,11 @@ StreamingSubscriptionRequest example from:
     // If the folder exists, we need to inform the caller so that it
     // can decide whether to proceed.
     let responseClass = response.getAttribute("ResponseClass");
-    if (responseClass == "Error") {
+    if (responseClass === "Error") {
       let responseCodes = response.getElementsByTagNameNS(nsMessages, "ResponseCode");
       let responseCode = (responseCodes && responseCodes[0]) ?
         responseCodes[0].textContent : "";
-      if (responseCode == "ErrorFolderExists")
+      if (responseCode === "ErrorFolderExists")
         throw CE("Folder exists", Cr.NS_ERROR_FILE_ALREADY_EXISTS);
       else
         throw CE("FoldeInfoResponse error: " + responseCode);
@@ -2088,7 +2221,7 @@ StreamingSubscriptionRequest example from:
     for (let folderElement of foldersElement.children) { // <t:Folder>
       let nativeFolder;
       let parentFolderId;
-      if (this.requestName == "MoveFolders") {
+      if (this.requestName === "MoveFolders") {
         // this._nativeFolder is the parent!
         parentFolderId = this._nativeFolder.folderId;
         nativeFolder =
@@ -2102,29 +2235,29 @@ StreamingSubscriptionRequest example from:
       let folderIdElement =
         folderElement.getElementsByTagNameNS(nsTypes, "FolderId")[0];
       let folderId = folderIdElement.getAttribute("Id");
-      if (folderId != nativeFolder.folderId) {
+      if (folderId !== nativeFolder.folderId) {
         this.mailbox.setNativeFolderId(nativeFolder, folderId);
       }
 
       nativeFolder.changeKey = folderIdElement.getAttribute("ChangeKey");
 
-      if (this.requestName == "GetOnline") {
+      if (this.requestName === "GetOnline") {
         this.mailbox.rootFolderId = folderId;
         continue;
       }
-      else if(this.requestName == "GetFolder" ||
-              this.requestName == "GetFolders") {
+      else if(this.requestName === "GetFolder" ||
+              this.requestName === "GetFolders") {
         // update all folder properties
         updateFromFolderElement(nativeFolder, folderElement);
         nativeFolder.verifiedOnline = true;
       }
-      else if (this.requestName == "CreateFolder" ||
-               this.requestName == "CreateFolders") {
+      else if (this.requestName === "CreateFolder" ||
+               this.requestName === "CreateFolders") {
 
         // No specific response needed.
         nativeFolder.verifiedOnline = true;
       }
-      else if (this.requestName == "MoveFolders") {
+      else if (this.requestName === "MoveFolders") {
         nativeFolder.parentFolderId = parentFolderId;
       }
       else {
@@ -2147,7 +2280,7 @@ StreamingSubscriptionRequest example from:
     let folder = this._nativeFolder;
     folder.syncState = safeContent(response, nsMessages, "SyncState");
     let includesLast = safeContent(response, nsMessages, "IncludesLastItemInRange");
-    folder.syncItemsPending = (includesLast == "false");
+    folder.syncItemsPending = (includesLast === "false");
 
     // After a successful sync, we no longer need the folder's new list
     folder.newItems = null; // since we always create a blank one when we ask
@@ -2180,18 +2313,18 @@ StreamingSubscriptionRequest example from:
       let properties = changedItem.properties;
 
       // Now that we have the info, process the changes
-      if (changeType == "Create") {
+      if (changeType === "Create") {
         // Because we can create items with incomplete metadata, on at least
         //  the create we will read the properties from the server
         changedItem.needsProperties = true;
         changedItem.newOnServer = true;
       }
-      else if (changeType == "Delete") {
+      else if (changeType === "Delete") {
         changedItem.raiseFlags(changedItem.DeletedOnServerBit);
         changedItem.clearFlags(changedItem.AllLocally);
         changedItem.needsProperties = false;
       }
-      else if (changeType == "Update") {
+      else if (changeType === "Update") {
         // I thought that I could skip updates if we already supposedly had the
         //  properties, for example if we did a local change. But tests revealed a
         //  risk that these changes are only available in the cached copy, and
@@ -2207,11 +2340,11 @@ StreamingSubscriptionRequest example from:
         changedItem.needsProperties = true;
         changedItem.updatedOnServer = true;
       }
-      else if (changeType == "ReadFlagChange") {
+      else if (changeType === "ReadFlagChange") {
         // For reasons I do not understand, the changekey on readflagchange operations is always "CQAAAA=="
         //changedItem->SetChangeKey(changeKey);
         let isReadText = itemElement.getElementsByTagNameNS(nsTypes, "IsRead")[0].textContent;
-        let newIsRead = isReadText == "true";
+        let newIsRead = isReadText === "true";
         let oldIsRead = properties && properties.getBoolean("IsRead");
         // xxx todo: don'r reread item for a simple isRead change
         if (!properties || (newIsRead !== oldIsRead)) {
@@ -2228,7 +2361,7 @@ StreamingSubscriptionRequest example from:
         isOk = false;
       }
 
-      if (changeType != "Delete") {
+      if (changeType !== "Delete") {
         if (!properties || !properties.length) {
           // changedItem has no existing properties
           changedItem.needsProperties = true;
@@ -2255,16 +2388,16 @@ StreamingSubscriptionRequest example from:
     let isOk = true;
     let responseClass = response.getAttribute("ResponseClass");
     let responseCode = "";
-    if (responseClass == "Error") {
+    if (responseClass === "Error") {
       let responseCodes = response.getElementsByTagNameNS(nsMessages, "ResponseCode");
       responseCode = (responseCodes && responseCodes[0]) ?
                       responseCodes[0].textContent : "";
       log.debug("_ItemInfoResponseType responseCode is " + responseCode);
 
       // Error handlers for different types, else return error
-      if (this.requestName == "GetChangedItemProperties") {
+      if (this.requestName === "GetChangedItemProperties") {
         let nativeItem = this._items.shift();
-        if (responseCode == "ErrorItemNotFound") {
+        if (responseCode === "ErrorItemNotFound") {
           nativeItem.raiseFlags(nativeItem.DeletedOnServerBit);
           return true;
         }
@@ -2279,20 +2412,20 @@ StreamingSubscriptionRequest example from:
         let itemId = itemIdElement.getAttribute("Id");
         let changeKey = itemIdElement.getAttribute("ChangeKey");
 
-        if (this.requestName == "GetItemBodies") {
+        if (this.requestName === "GetItemBodies") {
           let nativeItem = this.mailbox.getItem(itemId);
           let bodyElement = itemElement.getElementsByTagNameNS(nsTypes, "Body")[0];
           nativeItem.body = bodyElement.textContent;
 
           let bodyType = bodyElement.getAttribute("BodyType");
-          if (bodyType == "HTML") {
+          if (bodyType === "HTML") {
             nativeItem.flags |= nativeItem.BodyIsHtml;
           }
           else {
             nativeItem.flags &= ~nativeItem.BodyIsHtml;
           }
         }
-        else if (this.requestName == "GetItemsMimeContent") {
+        else if (this.requestName === "GetItemsMimeContent") {
           let nativeItem = this.mailbox.getItem(itemId);
           let mimeContentElement =
             itemElement.getElementsByTagNameNS(nsTypes, "MimeContent")[0];
@@ -2302,7 +2435,7 @@ StreamingSubscriptionRequest example from:
           nativeItem.mimeContent = atobUTF(mimeContentEncoded);
           nativeItem.mimeCharacterSet = mimeContentElement.getAttribute("CharacterSet");
         }
-        else if (this.requestName == "CreateItem") {
+        else if (this.requestName === "CreateItem") {
           let nativeItem = this._nativeItem;
           // This is a new native item id
           if (nativeItem.itemId) {
@@ -2318,7 +2451,7 @@ StreamingSubscriptionRequest example from:
                                 nativeItem.NewLocally);
           this.mailbox.ensureItemCached(nativeItem);
         }
-        else if (this.requestName == "CopyItems") {
+        else if (this.requestName === "CopyItems") {
           // XXX todo - we should not be storing this in the folder since
           // it is a request-specific object. Multiple requests could clobber
           // this!
@@ -2355,9 +2488,9 @@ StreamingSubscriptionRequest example from:
           if (this._isMove)
             oldItem.raiseFlags(oldItem.DeletedOnServerBit);
         }
-        else if (this.requestName == "GetChangedItemProperties") {
+        else if (this.requestName === "GetChangedItemProperties") {
           let nativeItem = this._items.shift();
-          if (nativeItem.itemId != itemId) {
+          if (nativeItem.itemId !== itemId) {
             log.warn("saved item has different itemId than response");
             nativeItem = this.mailbox.getItem(itemId);
           }
@@ -2370,12 +2503,11 @@ StreamingSubscriptionRequest example from:
           let hasBody = false;
           if (this._getBody)
           {
-            let body = Item_PL.getAString("Body");
-            nativeItem.body = body;
+            nativeItem.body = Item_PL.getAString("Body");
             hasBody = true;
             let flags = nativeItem.flags;
             let bodyType = Item_PL.getAString("Body/$attributes/BodyType");
-            if (bodyType == "HTML")
+            if (bodyType === "HTML")
               flags |= nativeItem.BodyIsHtml;
             else
               flags &= ~nativeItem.BodyIsHtml;
@@ -2406,18 +2538,18 @@ StreamingSubscriptionRequest example from:
           // but I do it in tests.
           let oldItemClass = nativeItem.itemClass;
           let itemClass = Item_PL.getAString("ItemClass");
-          if (itemClass && (itemClass != oldItemClass))
+          if (itemClass && (itemClass !== oldItemClass))
           {
             nativeItem.itemClass = itemClass;
             log.warn("Item class changed, we don't really handle this: " + itemClass);
           }
         }
 
-        else if (this.requestName == "SaveManyUpdates" ||
-                 this.requestName == "SaveUpdates") {
+        else if (this.requestName === "SaveManyUpdates" ||
+                 this.requestName === "SaveUpdates") {
           let item = this._items.queryElementAt(this._nextIdIndex++, Ci.nsISupports).wrappedJSObject;
           if ( (item.flags & item.HasTempId) ||
-               !(item.itemId == itemId)) {
+               !(item.itemId === itemId)) {
             this.mailbox.changeItemId(item, itemId);
           }
           item.changeKey = changeKey;
@@ -2428,7 +2560,7 @@ StreamingSubscriptionRequest example from:
           // Scan through the updates, removing all elements except "DeletedOccurrences"
           for (let jp1 = updatesPL.length; jp1 > 0; jp1--) {
             let name = updatesPL.getNameAt(jp1 - 1);
-            if (name != "DeletedOccurrences")
+            if (name !== "DeletedOccurrences")
               updatesPL.removeElementAt(jp1 - 1);
           }
         }
@@ -2463,14 +2595,14 @@ StreamingSubscriptionRequest example from:
         switch (this.requestName) {
           case "GetAttachment": {
             // Make sure that the attachmentID is as expected
-            if (attachmentId != nativeAttachment.attachmentId) {
+            if (attachmentId !== nativeAttachment.attachmentId) {
               throw CE("Attachment Id did not match expected");
             }
             let contentEncoded = "";
             let saveName = nativeAttachment.name || "NamelessAttachment";
             saveName = sanitizeFilename(saveName);
             let isEmail = false;
-            if (attachmentElement.localName == "FileAttachment") {
+            if (attachmentElement.localName === "FileAttachment") {
               // process as file
               log.debug("Processing attachment " + nativeAttachment.name +
                         " as file with content");
@@ -2525,7 +2657,7 @@ StreamingSubscriptionRequest example from:
               uuidName = uuidName.substr(1, uuidName.length - 2);
               // locate the extension of the original name
               let lastDotIndex = saveName.lastIndexOf(".");
-              let extension = lastDotIndex == -1 ? "" : saveName.substr(lastDotIndex);
+              let extension = lastDotIndex === -1 ? "" : saveName.substr(lastDotIndex);
               saveName = uuidName + extension;
               file = this.mailbox.attachmentsDirectory;
               file.append(saveName);
@@ -2601,8 +2733,7 @@ StreamingSubscriptionRequest example from:
 
   _ExpandDLResponseType(response)
   {
-    let dlExpansionPL = EWStoPL.domToVariant(response).getPropertyList("DLExpansion");
-    this._item.dlExpansion = dlExpansionPL;
+    this._item.dlExpansion = EWStoPL.domToVariant(response).getPropertyList("DLExpansion");
     return true;
   },
 
@@ -2627,6 +2758,15 @@ StreamingSubscriptionRequest example from:
     return true;
   },
 
+  _GetUserAvailabilityResponseType(response)
+  {
+    log.warn(JSON.stringify(response));
+    // Currently the processing of info for this is done by the caller.
+    this.result = EWStoPL.domToVariant(response);
+    log.warn(JSON.stringify(this.result));
+    return true;
+  },
+
   // Prepare for a soap call.
   _setupSoapCall(aRequestName, aResponse, aBody)
   {
@@ -2637,9 +2777,9 @@ StreamingSubscriptionRequest example from:
 
     this.soapCall = new SoapCall();
     this.soapCall.transportURI = this.mailbox.ewsURL;
-    if (aRequestName == "GetOnline")
+    if (aRequestName === "GetOnline")
       this.soapCall.noParse = true;
-    if (aRequestName == "GetNotifications") {
+    if (aRequestName === "GetNotifications") {
       this.soapCall.useProgress = true;
       this.soapCall.noParse = true;
     }
@@ -2724,7 +2864,7 @@ function stripText(aElement, aName, aNamespace)
       // we'll replace the child of this item, if it is text, with dummy text
       for (let child = node.firstChild; child; child = child.nextSibling)
       {
-        if (child.nodeType == child.TEXT_NODE || child.nodeType == child.CDATA_SECTION_NODE)
+        if (child.nodeType === child.TEXT_NODE || child.nodeType === child.CDATA_SECTION_NODE)
           child.data = "...hidden...";
       }
     }

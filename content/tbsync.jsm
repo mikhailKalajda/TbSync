@@ -12,14 +12,13 @@ var EXPORTED_SYMBOLS = ["TbSync"];
 
 var { Services } = ChromeUtils.import("resource://gre/modules/Services.jsm");
 var { FileUtils } = ChromeUtils.import("resource://gre/modules/FileUtils.jsm");
-var { OS }  =ChromeUtils.import("resource://gre/modules/osfile.jsm");
+var { OS } = ChromeUtils.import("resource://gre/modules/osfile.jsm");
 var { AddonManager } = ChromeUtils.import("resource://gre/modules/AddonManager.jsm");
 var { NetUtil } = ChromeUtils.import("resource://gre/modules/NetUtil.jsm");
 var { MailServices } = ChromeUtils.import("resource:///modules/MailServices.jsm");
 var { OverlayManager } = ChromeUtils.import("chrome://tbsync/content/OverlayManager.jsm");
 
 var TbSync = {
-
   enabled: false,
   shutdown: false,
   

@@ -313,6 +313,8 @@ var Calendar = {
 
         //Order of tags taken from https://msdn.microsoft.com/en-us/library/dn338917(v=exchg.80).aspx
 
+        let offsetMinute = 0;
+
         //timezone
         if (!isException) {
             let easTZ = new eas.tools.TimeZoneDataStructure();
@@ -357,6 +359,8 @@ var Calendar = {
             if (TbSync.prefs.getIntPref("log.userdatalevel") > 2) {
                 TbSync.dump("Send TZ", item.title + easTZ.toString());
             }
+
+            offsetMinute = easTZ.utcOffset;
         }
 
         //AllDayEvent (for simplicity, we always send a value)
@@ -383,7 +387,9 @@ var Calendar = {
         wbxml.atag("DtStamp", item.stampTime ? eas.tools.getIsoUtcString(item.stampTime) : eas.tools.dateToBasicISOString(nowDate));
 
         //EndTime in UTC
-        wbxml.atag("EndTime", item.endDate ? eas.tools.getIsoUtcString(item.endDate) : eas.tools.dateToBasicISOString(nowDate));
+        let endDate = (item.endDate ? item.endDate : nowDate).clone();
+        endDate.minute += offsetMinute;
+        wbxml.atag("EndTime", eas.tools.getIsoUtcString(endDate));
 
         //Location
         wbxml.atag("Location", (item.hasProperty("location")) ? item.getProperty("location") : "");
@@ -415,7 +421,10 @@ var Calendar = {
         wbxml.atag("Subject", (item.title) ? item.title : "");
 
         //StartTime in UTC
-        wbxml.atag("StartTime", item.startDate ? eas.tools.getIsoUtcString(item.startDate) : eas.tools.dateToBasicISOString(nowDate));
+        let startDate = item.startDate.clone();
+        startDate.minute += offsetMinute;
+        let startTimeIsoUtc = item.startDate ? eas.tools.getIsoUtcString(startDate) : eas.tools.dateToBasicISOString(nowDate);
+        wbxml.atag("StartTime", startTimeIsoUtc);
 
         //UID (limit to 300)
         //each TB event has an ID, which is used as EAS serverId - however there is a second UID in the ApplicationData

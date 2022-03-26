@@ -31,6 +31,7 @@ ChromeUtils.defineModuleGetter(this, "PropertyList",
 ChromeUtils.defineModuleGetter(this, "StringArray",
                                "resource://tbsync/StringArray.jsm");
 ChromeUtils.defineModuleGetter(this, "OS", "resource://gre/modules/osfile.jsm");
+
 Cu.importGlobalProperties(["Element", "XMLSerializer"]);
 
 let versionComparator = Cc["@mozilla.org/xpcom/version-comparator;1"]
@@ -219,25 +220,25 @@ function domWindow()
 // debug utilities
 function dumpXMLResponse(aElement) {
   try {
-  var serializer = new XMLSerializer();
-  let element;
-  if (aElement.nodeType == aElement.DOCUMENT_NODE)
-    element = aElement.documentElement;
-  else
-    element = aElement;
-  if (!Element.isInstance(element)) {
-    dump(se("element is not a DOM Element\n"));
-    return;
-  }
-  //var prettyText = XML(serializer.serializeToString(element)).toXMLString();
-  var prettyText = serializer.serializeToString(element);
-  dump(prettyText);
-  dump('\n');
+    let serializer = new XMLSerializer();
+    let element;
+    if (aElement.nodeType === aElement.DOCUMENT_NODE)
+      element = aElement.documentElement;
+    else
+      element = aElement;
+    if (!Element.isInstance(element)) {
+      dump(se("element is not a DOM Element\n"));
+      return;
+    }
+    //var prettyText = XML(serializer.serializeToString(element)).toXMLString();
+    let prettyText = serializer.serializeToString(element);
+    dump(prettyText);
+    dump('\n');
   } catch (e)
   {
     dump(e + '\n');
     dl('element is ' + element);
-    if (element.nodeType == element.DOCUMENT_NODE)
+    if (element.nodeType === element.DOCUMENT_NODE)
       dl('documentElement is ' + element.documentElement.nodeName);
     dl('nodeName: <' + element.nodeName + '>');
     let nodeList = element.childNodes;
@@ -248,15 +249,15 @@ function dumpXMLResponse(aElement) {
 
 function stringXMLResponse(aElement) {
   try {
-  var serializer = new XMLSerializer();
-  let element;
-  if (aElement.nodeType == aElement.DOCUMENT_NODE)
-    element = aElement.documentElement;
-  else
-    element = aElement;
-  // No more E4X :(
-  // return XML(serializer.serializeToString(element)).toXMLString();
-  return serializer.serializeToString(element);
+    let serializer = new XMLSerializer();
+    let element;
+    if (aElement.nodeType === aElement.DOCUMENT_NODE)
+      element = aElement.documentElement;
+    else
+      element = aElement;
+    // No more E4X :(
+    // return XML(serializer.serializeToString(element)).toXMLString();
+    return serializer.serializeToString(element);
   } catch (e) {return 'could not stringify DOM element'}
 }
 
@@ -366,20 +367,20 @@ function manageNtlmUri(aSpec, aAdd)
   const pref = "network.automatic-ntlm-auth.trusted-uris";
   let hosts = Services.prefs.getCharPref(pref).split(",");
   // Don't allow an empty array entry
-  if ( (hosts.length == 1) && !hosts[0].length)
+  if ( (hosts.length === 1) && !hosts[0].length)
     hosts = [];
   let changed = false;
   let existingIndex = hosts.indexOf(host.toLowerCase());
 
   // add new entries
-  if (existingIndex == -1 && aAdd)
+  if (existingIndex === -1 && aAdd)
   {
     hosts.push(host.toLowerCase());
     changed = true;
   }
 
   // remove existing entry
-  if (existingIndex != -1 && !aAdd)
+  if (existingIndex !== -1 && !aAdd)
   {
     hosts.splice(existingIndex, 1);
     changed = true;
@@ -448,7 +449,7 @@ AsyncDriver.prototype =
         }
       }
       catch (ex) {
-        if (ex != StopIteration) {
+        if (ex !== StopIteration) {
           re(ex, 'R7 plugin generator exception');
           curGenerator.next();
         }
@@ -478,7 +479,7 @@ MachineListener.prototype =
 {
   onEvent: function onEvent(aItem, aEvent, aData, result)
   {
-    if (aEvent == "StopMachine")
+    if (aEvent === "StopMachine")
       this.asyncDriver.nextStep({aItem: aItem, aEvent: aEvent, aData: aData, result: result});
   },
 };
@@ -554,15 +555,15 @@ function getQueryVariable(variable, spec) {
   // adapted from http://stackoverflow.com/questions/2090551/parse-query-string-in-javascript
   // by Tarik http://stackoverflow.com/users/44852/tarik
   let start = spec.indexOf("?");
-  if (start == -1)
+  if (start === -1)
     start = spec.indexOf("&");
-  if (start == -1)
+  if (start === -1)
     return null;
   let query = spec.substring(start + 1);
   let vars = query.split("&");
   for (let q of vars) {
     let pair = q.split("=");
-    if (decodeURIComponent(pair[0]) == variable)
+    if (decodeURIComponent(pair[0]) === variable)
       return decodeURIComponent(pair[1]);
   }
   return null;
@@ -582,14 +583,14 @@ function parseMessageURI(uri)
 {
   let querySeparator = uri.indexOf("?");
   // allow malformed uri with missing ?
-  if (querySeparator == -1)
+  if (querySeparator === -1)
     querySeparator = uri.indexOf("&");
-  let queryStr = (querySeparator != -1) ? uri.substr(querySeparator + 1) : "";
+  let queryStr = (querySeparator !== -1) ? uri.substr(querySeparator + 1) : "";
 
   let keySeparator = uri.indexOf("#");
-  let pathSeparator = (keySeparator == -1) ? querySeparator : keySeparator;
+  let pathSeparator = (keySeparator === -1) ? querySeparator : keySeparator;
 
-  let folderURI = (pathSeparator == -1) ?
+  let folderURI = (pathSeparator === -1) ?
                     uri : uri.substring(0, pathSeparator);
 
   // cut out the -message part of the protocol
@@ -597,8 +598,8 @@ function parseMessageURI(uri)
 
   // locate the ref part of the URL
   let keyStr = "";
-  if (keySeparator != -1) {
-    let keyEnd = (querySeparator == -1) ? uri.length : querySeparator;
+  if (keySeparator !== -1) {
+    let keyEnd = (querySeparator === -1) ? uri.length : querySeparator;
     keyStr = uri.substring(keySeparator + 1, keyEnd);
   }
   else
@@ -684,7 +685,7 @@ function extendDisplayName(aDisplayName, aNativeFolder)
     let parentDisplayName = "";
 
     // Has to work for GAL as well as normal contact folders
-    if (!parentFolder || dfolderId == "msgfolderroot")
+    if (!parentFolder || dfolderId === "msgfolderroot")
     {
       // To distinguish folders when there are multiple accounts, we will represent the
       //  root folder by the email address
@@ -704,7 +705,7 @@ function extendDisplayName(aDisplayName, aNativeFolder)
       parentDisplayName += "/";
     parentDisplayName += path;
     path = parentDisplayName;
-    if (dfolderId == "msgfolderroot")
+    if (dfolderId === "msgfolderroot")
       break;
     currentFolder = parentFolder;
   }
@@ -888,7 +889,6 @@ function getExistingFolder(aFolderURI) {
 }
 Utils.getExistingFolder = getExistingFolder;
 
-
 // See NS_MsgStripRE, strips Re-like characters from front of subject
 function stripRe(aString) {
   let result = aString;
@@ -897,7 +897,7 @@ function stripRe(aString) {
   let localizedRe = "";
   const PREF_STRING = 32;
   try {
-    if (Services.prefs.getPrefType("mailnews.localizedRe") == PREF_STRING) {
+    if (Services.prefs.getPrefType("mailnews.localizedRe") === PREF_STRING) {
       localizedRe = Services.prefs
                             .getComplexValue("mailnews.localizedRe", Ci.nsIPrefLocalizedString)
                             .data;
@@ -924,7 +924,7 @@ function stripRe(aString) {
     for (let re of checkStrings) {
       if (result.startsWith(re)) {
         // Skip for Re: (with colon)
-        if (result[re.length] == ":") {
+        if (result[re.length] === ":") {
           // skip over re
           result = result.substring(re.length + 1)
                          .trimLeft();
@@ -933,7 +933,7 @@ function stripRe(aString) {
           break;
         }
         // Skip for Re[n]:
-        if (result[re.length] == "[") {
+        if (result[re.length] === "[") {
           let closeIndex = result.indexOf("]:")
           if (closeIndex < 0 || isNaN(result.substring(re.length + 1, closeIndex)))
             continue; // not a valid strip

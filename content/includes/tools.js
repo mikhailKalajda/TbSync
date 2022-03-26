@@ -450,6 +450,18 @@ var tools = {
             return obj;
         }
 
+        if (!timezone.icalComponent)
+        {
+            const date = new Date();
+            let obj = {}
+            obj.id = "floating";
+            obj.offset = date.getTimezoneOffset();
+            obj.abbreviation = "local";
+            obj.displayname = "Локальное время";
+            TbSync.dump('Default local timezone is ' + JSON.stringify(obj));
+            return obj;
+        }
+
         //we could parse the icalstring by ourself, but I wanted to use ICAL.parse - TODO try catch
         let info = TbSync.lightning.ICAL.parse("BEGIN:VCALENDAR\r\n" + timezone.icalComponent.toString() + "\r\nEND:VCALENDAR");
         let comp = new TbSync.lightning.ICAL.Component(info);
@@ -506,10 +518,10 @@ var tools = {
                 let rules = {};
                 for (let i = 0; i< parts.length; i++) {
                     let sub = parts[i].split("=");
-                    if (sub.length == 2) rules[sub[0]] = sub[1];
+                    if (sub.length === 2) rules[sub[0]] = sub[1];
                 }
                 
-                if (rules.FREQ == "YEARLY" && rules.BYDAY && rules.BYMONTH && rules.BYDAY.length > 2) {
+                if (rules.FREQ === "YEARLY" && rules.BYDAY && rules.BYMONTH && rules.BYDAY.length > 2) {
                     obj.switchdate = {};
                     obj.switchdate.month = parseInt(rules.BYMONTH);
 

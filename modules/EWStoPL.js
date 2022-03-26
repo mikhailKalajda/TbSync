@@ -539,6 +539,49 @@ function itemToDistListXML(item, isCreate)
   return xml;
 }
 
+function getValueByPath(aData, aPath) {
+  if (!aData || !aData._names || !aData._values) {
+    return aData;
+  }
+
+  if (!aPath || !aPath.length ||aPath.length === 0) {
+    return aData;
+  }
+
+  let key = aPath.shift();
+  let index = aData._names.indexOf(key);
+
+  if (index < 0) {
+    return undefined;
+  }
+
+  return getValueByPath(aData._values[index], aPath);
+}
+
+function getValuesByPath(aData, aPath) {
+  if (!aData || !aData._names || !aData._values) {
+    return aData;
+  }
+
+  if (!aPath || !aPath.length ||aPath.length === 0) {
+    return aData;
+  }
+
+  let newPath = aPath.map((x) => x);
+
+  let key = newPath.shift();
+  let result = [];
+  let index = aData._names.indexOf(key);
+
+  while (index >= 0) {
+    result.push(getValuesByPath(aData._values[index], newPath))
+
+    index = aData._names.indexOf(key, index + 1);
+  }
+
+  return result;
+}
+
 // exports
 EWStoPL.plToIdAttributes = plToIdAttributes;
 EWStoPL.folderToPL = folderToPL;
@@ -549,6 +592,8 @@ EWStoPL.itemToContactXML = itemToContactXML;
 EWStoPL.itemToDistListXML = itemToDistListXML;
 EWStoPL.domToVariant = domToVariant;
 EWStoPL.plToXML = plToXML;
+EWStoPL.getValueByPath = getValueByPath;
+EWStoPL.getValuesByPath = getValuesByPath;
 
 /* Note item
 

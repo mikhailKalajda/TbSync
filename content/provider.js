@@ -25,7 +25,6 @@ eas.defaultTimezoneInfo = null;
 eas.defaultTimezone = null;
 eas.utcTimezone = null;
 
-
 /**
  * Implementing the TbSync interface for external provider extensions.
  */
@@ -60,8 +59,8 @@ var Base = class {
                 //get timezone info of default timezone (old cal. without dtz are depricated)
                 eas.defaultTimezone = (TbSync.lightning.cal.dtz && TbSync.lightning.cal.dtz.defaultTimezone) ? TbSync.lightning.cal.dtz.defaultTimezone : TbSync.lightning.cal.calendarDefaultTimezone();
                 eas.utcTimezone = (TbSync.lightning.cal.dtz && TbSync.lightning.cal.dtz.UTC) ? TbSync.lightning.cal.dtz.UTC : TbSync.lightning.cal.UTC();
-                if (eas.defaultTimezone && eas.defaultTimezone.icalComponent) {
-                    TbSync.eventlog.add("info", eventLogInfo, "Default timezone has been found.");                    
+                if (eas.defaultTimezone) {
+                    TbSync.eventlog.add("info", eventLogInfo, "Default timezone has been found.");
                 } else {
                     TbSync.eventlog.add("info", eventLogInfo, "Default timezone is not defined, using UTC!");
                     eas.defaultTimezone = eas.utcTimezone;
@@ -90,8 +89,12 @@ var Base = class {
                     let zoneType = lData[1].toString().trim();
                     let ianaZoneName = lData[2].toString().trim();
                     
-                    if (zoneType == "001") eas.windowsToIanaTimezoneMap[windowsZoneName] = ianaZoneName;
-                    if (ianaZoneName == eas.defaultTimezoneInfo.std.id) eas.defaultTimezoneInfo.std.windowsZoneName = windowsZoneName;
+                    if (zoneType === "001") {
+                        eas.windowsToIanaTimezoneMap[windowsZoneName] = ianaZoneName;
+                    }
+                    if (ianaZoneName === eas.defaultTimezoneInfo.std.id) {
+                        eas.defaultTimezoneInfo.std.windowsZoneName = windowsZoneName;
+                    }
 
                     // build the revers map as well, which is many-to-one, grap iana aliases from the csvData and from the aliasData
                     // 1. multiple iana zones map to the same windows zone
@@ -116,7 +119,6 @@ var Base = class {
                     }
                 }
 
-                
                 //If an EAS calendar is currently NOT associated with an email identity, try to associate, 
                 //but do not change any explicitly set association
                 // - A) find email identity and accociate (which sets organizer to that user identity)
@@ -126,6 +128,7 @@ var Base = class {
                 let folders = providerData.getFolders({"selected": true, "type": ["8","13"]});
                 for (let folder of folders) {
                     let calendar = TbSync.lightning.cal.getCalendarManager().getCalendarById(folder.getFolderProperty("target"));
+
                     if (calendar && calendar.getProperty("imip.identity.key") == "") {
                         //is there an email identity for this eas account?
                         let authData = eas.network.getAuthData(folder.accountData);
@@ -565,7 +568,7 @@ var TargetData_calendar = class extends TbSync.lightning.AdvancedTargetData {
     // the lightning implementation only allows to search for items via UID.
     // Like the addressbook target, the calendar target item element has a
     // primaryKey getter/setter which - however - only works on the UID.
-    
+
     // enable or disable changelog
     get logUserChanges() {
         return true;
@@ -576,7 +579,7 @@ var TargetData_calendar = class extends TbSync.lightning.AdvancedTargetData {
             case "onCalendarPropertyChanged":
                 //Services.console.logStringMessage("["+ aTopic + "] " + tbCalendar.calendar.name + " : " + aPropertyName);
                 break;
-            
+
             case "onCalendarDeleted":
             case "onCalendarPropertyDeleted":
                 //Services.console.logStringMessage("["+ aTopic + "] " +tbCalendar.calendar.name);
@@ -618,7 +621,7 @@ var TargetData_calendar = class extends TbSync.lightning.AdvancedTargetData {
                 newCalendar.setProperty("capabilities.events.supported", true);
                 break;
             case "7": //todo
-            case "15":        
+            case "15":
                 newCalendar.setProperty("capabilities.tasks.supported", true);
                 newCalendar.setProperty("capabilities.events.supported", false);
                 break;
@@ -631,14 +634,14 @@ var TargetData_calendar = class extends TbSync.lightning.AdvancedTargetData {
 
         let authData = eas.network.getAuthData(this.folderData.accountData);
 
-        //is there an email identity we can associate this calendar to? 
+        //is there an email identity we can associate this calendar to?
         //getIdentityKey returns "" if none found, which removes any association
         let key = eas.tools.getIdentityKey(authData.user);
         newCalendar.setProperty("fallbackOrganizerName", newCalendar.getProperty("organizerCN"));
         newCalendar.setProperty("imip.identity.key", key);
         if (key === "") {
             //there is no matching email identity - use current default value as best guess and remove association
-            //use current best guess 
+            //use current best guess
             newCalendar.setProperty("organizerCN", newCalendar.getProperty("fallbackOrganizerName"));
             newCalendar.setProperty("organizerId", TbSync.lightning.cal.email.prependMailTo(authData.user));
         }

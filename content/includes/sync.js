@@ -591,12 +591,12 @@ wbxml.ctag();*/
 
                 for (let i = 0; i < changes.length; i++) {
                     let tbItem = await syncData.target.getItem(changes[i].itemId);
-                    let seen = [];
-                    TbSync.dump('tbItem is ' + (tbItem instanceof TbSync.lightning.TbItem)  + ', ' + JSON.stringify(eas.sync.CalendarNotifications.decycle(tbItem)));
-                    let item = tbItem.nativeItem;
-                    TbSync.dump('item is ' + Object.keys(item).join(', '));
 
-                    eas.sync.CalendarNotifications.sendInvitations(serverInfo, item, tbItem, syncData);
+                    if (tbItem) {
+                        let item = tbItem.nativeItem;
+
+                        eas.sync.CalendarNotifications.sendInvitations(serverInfo, item, tbItem, syncData);
+                    }
                 }
 
                 //check status and manually handle error states which support softfails

@@ -724,7 +724,7 @@ EwsNativeMailbox.prototype = {
       return;
     }
     if (aRequest) {
-      if (aRequest.requestName == "GetOnline")
+      if (aRequest.requestName === "GetOnline")
         this._requestQueue.unshift(aRequest);
       else
         this._requestQueue.push(aRequest);

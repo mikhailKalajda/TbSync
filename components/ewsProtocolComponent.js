@@ -13,6 +13,8 @@
 
 const { classes: Cc, Constructor: CC, interfaces: Ci, utils: Cu, Exception: CE, results: Cr, } = Components;
 var { XPCOMUtils } = ChromeUtils.import("resource://gre/modules/XPCOMUtils.jsm");
+var { TbSync } = ChromeUtils.import("chrome://tbsync/content/tbsync.jsm");
+
 ChromeUtils.defineModuleGetter(this, "Utils",
   "resource://tbsync/ewsUtils.jsm");
 ChromeUtils.defineModuleGetter(this, "Services",

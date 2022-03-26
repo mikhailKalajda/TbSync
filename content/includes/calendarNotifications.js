@@ -37,6 +37,11 @@ var CalendarNotifications = {
 
     sendToAttendee: async function(item, tbItem, attendeeName, attendeeEmail, clientId, syncData)
     {
+        if (!item.organizer) {
+            TbSync.dump('sendToAttendee organizer is not set');
+            return;
+        }
+
         let ics = eas.sync.icsBuilder.build(item, attendeeName, attendeeEmail);
 
         TbSync.dump('ICS=' + ics);

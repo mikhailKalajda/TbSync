@@ -124,7 +124,7 @@ SoapTransport.prototype =
 
   asyncCall: function _asyncCall(aCall, aListener, aResponse)
   { try {
-    log.config('asyncCall uri ' + aCall.transportURI + ' user ' + this.mUser + ' domain ' + this.mDomain);
+    log.warn('asyncCall uri ' + aCall.transportURI + ' user ' + this.mUser + ' domain ' + this.mDomain);
     // we do not support an action URI
     //if (aCall.actionURI.length)
     //  throw Cr.NS_ERROR_NOT_IMPLEMENTED;
@@ -147,7 +147,7 @@ SoapTransport.prototype =
       let userdomain = this.mDomain && this.mDomain.length ?
                            this.mDomain + "\\" + this.mUser :
                            this.mUser;
-      if (uri.scheme != 'file') { // used in testing
+      if (uri.scheme !== 'file') { // used in testing
         if (Ci.nsIURIMutator) { // tb 60
           uri = uri.mutate().setUsername(encodeURIComponent(userdomain))
                             .setPassword(encodeURIComponent(this.mPassword))
@@ -179,10 +179,10 @@ SoapTransport.prototype =
     request.channel.notificationCallbacks = this;
     // should we bypass basic authentication for this server?
     if (bypassBasic[aCall.transportURI] ||
-        request.channel.URI.scheme != "https" ||
+        request.channel.URI.scheme !== "https" ||
         gTB31orLater)
       this.authCount++;
-    if (this.authCount == 0)
+    if (this.authCount === 0)
     {
       // try basic authentication
       request.channel.loadFlags = Ci.nsIChannel.LOAD_ANONYMOUS | // don't send authorization

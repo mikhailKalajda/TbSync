@@ -84,7 +84,7 @@ EwsUrl.prototype = {
   // nsIMsgMailNewsUrl overrides
   // Note that these overrides do not work post-gecko58, but in gecko59
   // equivalent funtionality was added ins JaAccount.
-  IsUrlType(aType) { return aType == this._urlType;},
+  IsUrlType(aType) { return aType === this._urlType;},
 
   get server() {
     if (!this.folder)
@@ -104,7 +104,7 @@ EwsUrl.prototype = {
   get isAttachment() {
     // We look to see if the URL has an attachment query
     let query = this.QueryInterface(Ci.nsIURL).query;
-    return (query && query.indexOf(ATTACHMENT_QUERY) != -1);
+    return (query && query.indexOf(ATTACHMENT_QUERY) !== -1);
   },
 
   /// Attachment sequence number, that is the nth attachment for the item.
@@ -127,7 +127,7 @@ EwsUrl.prototype = {
       if (query && query[0]) {
         // The first attachment is 2, so subtract 2.
         result = parseInt(query[0], 10);
-        if (result !== NaN) {
+        if (!isNaN(result)) {
           result -= 2;
         }
       }

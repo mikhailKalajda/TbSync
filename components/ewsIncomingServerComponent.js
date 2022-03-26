@@ -522,7 +522,7 @@ EwsIncomingServer.prototype = {
   performExpandAsync(aMsgWindow, aUrlListener) {
     log.config("msqEwsIncomingServer::PerformExpandAsync");
 
-    if (this.unavailable != this.AVAILABLE)
+    if (this.unavailable !== this.AVAILABLE)
     {
       log.config("checking online with unavailable = " + this.unavailable);
       // only one check allowed active, else just queue the listener
@@ -536,6 +536,7 @@ EwsIncomingServer.prototype = {
       ewsCheckOnlineListener(this);
       return;
     }
+
 
     // We shall redo folder discovery when the server is expanded.
     log.config("discovering mailbox folders");

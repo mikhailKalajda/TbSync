@@ -7,7 +7,7 @@
  */
  
  "use strict";
-  
+
 var lightning = {
 
   lightningInitDone : false,
@@ -23,6 +23,7 @@ var lightning = {
         var { ICAL } = ChromeUtils.import("resource://calendar/modules/ical.js");
         TbSync.lightning.cal = cal;
         TbSync.lightning.ICAL = ICAL;
+
         return true;
       } else {
         TbSync.dump("Check4Lightning","calICalendar not found");
@@ -42,7 +43,7 @@ var lightning = {
       TbSync.dump("Check4Lightning", lightning.version);
       
       // Lightning version should match TB version
-      if (Services.appinfo.version != lightning.version) {
+      if (Services.appinfo.version !== lightning.version) {
         TbSync.dump("Check4Lightning", "This may be a wrong Lightning version, expected <"+Services.appinfo.version+">, but found <"+lightning.version+">");
       }
       
@@ -55,12 +56,20 @@ var lightning = {
 
         //indicate, that we have initialized 
         this.lightningInitDone = true;
-        TbSync.dump("Check4Lightning","Done");                            
+        TbSync.dump("Check4Lightning","Done");
+
+        let fbService = TbSync.lightning.cal.getFreeBusyService();
+        let { EwsFreeBusy } = ChromeUtils.import("chrome://tbsync/content/EwsFreeBusy.jsm");
+        TbSync.dump("FreeBusy=" + EwsFreeBusy +", " + typeof EwsFreeBusy);
+        let fbProvider = new EwsFreeBusy();
+        TbSync.dump('fbService=' + fbService + ', fbProvider=' + fbProvider);
+        fbService.addProvider(fbProvider);
+
+        TbSync.dump("Check4Lightning","FreeBusy Done");
       } else {
         TbSync.dump("Check4Lightning","Failed!");
       }
     }
-
   },
 
   unload: async function () {
@@ -79,10 +88,6 @@ var lightning = {
     }
   },
 
-
-
-
-  
   // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
   // * AdvancedTargetData, an extended TargetData implementation, providers
   // * can use this as their own TargetData by extending it and just
@@ -104,7 +109,7 @@ var lightning = {
       let target = this._folderData.getFolderProperty("target");
       let calendar = calManager.getCalendarById(target);
       
-      return calendar ? true : false;
+      return !!calendar;
     }
 
     // Returns the target obj, which TbSync should return as the target. It can
@@ -125,7 +130,7 @@ var lightning = {
           throw new Error("notargets");
       }
 
-      if (!this._targetObj || this._targetObj.id != calendar.id)
+      if (!this._targetObj || this._targetObj.id !== calendar.id)
         this._targetObj = new TbSync.lightning.TbCalendar(calendar, this._folderData);
 
       return this._targetObj;
@@ -153,7 +158,6 @@ var lightning = {
       TbSync.db.clearChangeLog(target);
       this._folderData.resetFolderProperty("target");             
     }
-
 
     /**
      * Disconnects the target in the local storage from this TargetData, but
@@ -223,7 +227,6 @@ var lightning = {
       }
     }
 
-    
     // * * * * * * * * * * * * * * * * *
     // * AdvancedTargetData extension  * 
     // * * * * * * * * * * * * * * * * *
@@ -280,14 +283,9 @@ var lightning = {
       newCalendar.id = TbSync.lightning.cal.getUUID();
       newCalendar.name = newname;
       return newCalendar
-    }      
-    
+    }
   },
 
-
-
-
-  
   // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
   // * TbItem and TbCalendar Classes
   // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -302,7 +300,7 @@ var lightning = {
 
       this._tbCalendar = TbCalendar;
       this._item = item;
-      
+
       this._isTodo = (item instanceof Ci.calITodo);
       this._isEvent = (item instanceof Ci.calIEvent);
     }
@@ -319,10 +317,6 @@ var lightning = {
       return this._isEvent;
     }
 
-
-
-
-    
     get nativeItem() {
       return this._item;
     }
@@ -385,7 +379,6 @@ var lightning = {
     }
   },
 
-
   TbCalendar : class {
     constructor(calendar, folderData) {
       this._calendar = calendar;
@@ -425,9 +418,6 @@ var lightning = {
       return new TbSync.lightning.TbItem(this, todo);
     }
 
-    
-    
-    
     async addItem(tbItem, pretagChangelogWithByServerEntry = true) {
       if (this.primaryKeyField && !tbItem.getProperty(this.primaryKeyField)) {
         tbItem.setProperty(this.primaryKeyField, this._folderData.targetData.generatePrimaryKey());
@@ -460,24 +450,20 @@ var lightning = {
     // searchId is interpreted as the primaryKeyField, which is the UID for this target
     async getItem (searchId) {
       let item = await this._promisifyCalendar.getItem(searchId); 
-      if (item.length == 1) return new TbSync.lightning.TbItem(this, item[0]);
+      if (item.length === 1) return new TbSync.lightning.TbItem(this, item[0]);
       if (item.length > 1) throw "Oops: getItem returned <"+item.length+"> elements!";
       return null;
     }
 
     async getItemFromProperty(property, value) {
-      if (property == "UID") return await this.getItem(value);
+      if (property === "UID") return await this.getItem(value);
       else throw ("TbSync.lightning.getItemFromProperty: Currently onle the UID property can be used to search for items.");
     }
 
     async getAllItems () {
       return await this._promisifyCalendar.getAllItems(); 
     }
-      
-  
-  
-  
-  
+
     getAddedItemsFromChangeLog(maxitems = 0) {             
       return TbSync.db.getItemsFromChangeLog(this.calendar.id, maxitems, "added_by_user").map(item => item.itemId);
     }
@@ -502,11 +488,7 @@ var lightning = {
       TbSync.db.clearChangeLog(this.calendar.id);
     }
   },
-  
 
-
-
-  
   // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
   // * Internal Functions
   // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -518,7 +500,7 @@ var lightning = {
   
   getFolderFromCalendarUID: function(calUID) {
     let folders = TbSync.db.findFolders({"target": calUID});
-    if (folders.length == 1) {
+    if (folders.length === 1) {
       let accountData = new TbSync.AccountData(folders[0].accountID);
       return new TbSync.FolderData(accountData, folders[0].folderID);
     }
@@ -527,7 +509,7 @@ var lightning = {
   
   getFolderFromCalendarURL: function(calURL) {
     let folders = TbSync.db.findFolders({"url": calURL});
-    if (folders.length == 1) {
+    if (folders.length === 1) {
       let accountData = new TbSync.AccountData(folders[0].accountID);
       return new TbSync.FolderData(accountData, folders[0].folderID);
     }
@@ -566,7 +548,7 @@ var lightning = {
           }
         } 
 
-        if (itemStatus == "deleted_by_user")  {
+        if (itemStatus === "deleted_by_user")  {
           // deleted ?  user moved item out and back in -> modified
           tbItem.changelogStatus = "modified_by_user";
         } else {
@@ -580,7 +562,7 @@ var lightning = {
 
     onModifyItem : function (aNewItem, aOldItem) {
       //check, if it is a pure modification within the same calendar
-      if (!(aNewItem && aNewItem.calendar && aOldItem && aOldItem.calendar && aNewItem.calendar.id == aOldItem.calendar.id))
+      if (!(aNewItem && aNewItem.calendar && aOldItem && aOldItem.calendar && aNewItem.calendar.id === aOldItem.calendar.id))
         return;
 
       let folderData = TbSync.lightning.getFolderFromCalendarUID(aNewItem.calendar.id);                    
@@ -606,7 +588,7 @@ var lightning = {
           }
         } 
 
-        if (itemStatus != "added_by_user") {
+        if (itemStatus !== "added_by_user") {
           //added_by_user -> it is a local unprocessed add do not re-add it to changelog
           tbNewItem.changelogStatus = "modified_by_user";
         }
@@ -642,7 +624,7 @@ var lightning = {
           }
         } 
 
-        if (itemStatus == "added_by_user") {
+        if (itemStatus === "added_by_user") {
           //a local add, which has not yet been processed (synced) is deleted -> remove all traces
           tbItem.changelogStatus = "";
         } else {
@@ -724,11 +706,11 @@ var lightning = {
 
         // If the user switches "offline support", the calendar is deleted and recreated. Thus,
         // we wait a bit and check, if the calendar is back again and ignore the delete event.
-        if (aCalendar.type == "caldav") {
+        if (aCalendar.type === "caldav") {
           await TbSync.tools.sleep(1500);
           let calManager = TbSync.lightning.cal.getCalendarManager();          
           for (let calendar of calManager.getCalendars({})) {
-            if (calendar.uri.spec == aCalendar.uri.spec) {
+            if (calendar.uri.spec === aCalendar.uri.spec) {
               // update the target
               folderData.setFolderProperty("target", calendar.id)
               return;
@@ -764,7 +746,7 @@ var lightning = {
 
     //check if  there is a known/cached name, and use that as starting point to generate unique name for new calendar 
     let cachedName = folderData.getFolderProperty("targetName");                         
-    let newname = cachedName == "" ? folderData.accountData.getAccountProperty("accountname") + " (" + folderData.getFolderProperty("foldername") + ")" : cachedName;
+    let newname = cachedName === "" ? folderData.accountData.getAccountProperty("accountname") + " (" + folderData.getFolderProperty("foldername") + ")" : cachedName;
 
     //check if there is a cached or preloaded color - if not, chose one
     if (!folderData.getFolderProperty("targetColor")) {

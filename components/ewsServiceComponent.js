@@ -66,7 +66,7 @@ function prepareEwsUrl(aSrcMsgURI,   // string spec
   if (queryStr) {
     // add a number?
     folderURI += "?" + queryStr;
-    if (queryStr.indexOf("number=") == -1)
+    if (queryStr.indexOf("number=") === -1)
       folderURI += "&number=" + key;
   }
   else {
@@ -92,7 +92,7 @@ function prepareEwsUrl(aSrcMsgURI,   // string spec
   let skinkFolder = fls.getFolderForURL(folderURIBase);
   uri.folder = skinkFolder;
 
-  if (key != -1)
+  if (key !== -1)
   {
     let ewsFolder = safeGetJS(skinkFolder);
     let itemId = ewsFolder.idFromKey(key);

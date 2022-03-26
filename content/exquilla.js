@@ -102,8 +102,6 @@ var exquilla = Object.create(
                             .getBranch("extensions.exquilla.mail.account.");
 
     let children = exAccountBranch.getChildList("", {});
-    var testEx = new Error();
-    testEx.code = "startup";
 
     function showAccounts(text) {
       log.debug("Accounts at " + text + ": " + rootBranch.getCharPref("mail.accountmanager.accounts"));
@@ -117,9 +115,9 @@ var exquilla = Object.create(
       for (let server of newServers)
       { try {
           log.debug("Checking new server " + server);
-          if ( (aHostname == rootBranch.getCharPref("mail.server." + server + ".hostname") ) &&
-               (aUsername == rootBranch.getCharPref("mail.server." + server + ".userName") ) &&
-               ("exquilla" == rootBranch.getCharPref("mail.server." + server + ".type") ) )
+          if ( (aHostname === rootBranch.getCharPref("mail.server." + server + ".hostname") ) &&
+               (aUsername === rootBranch.getCharPref("mail.server." + server + ".userName") ) &&
+               ("exquilla" === rootBranch.getCharPref("mail.server." + server + ".type") ) )
             return true;
         } catch (e) {}
       }
@@ -130,9 +128,9 @@ var exquilla = Object.create(
       { try {
           let server = rootBranch.getCharPref("mail.account." + accountKey + ".server");
 
-          if ( (aHostname == rootBranch.getCharPref("mail.server." + server + ".hostname") ) &&
-               (aUsername == rootBranch.getCharPref("mail.server." + server + ".userName") ) &&
-               ("exquilla" == rootBranch.getCharPref("mail.server." + server + ".type") ) )
+          if ( (aHostname === rootBranch.getCharPref("mail.server." + server + ".hostname") ) &&
+               (aUsername === rootBranch.getCharPref("mail.server." + server + ".userName") ) &&
+               ("exquilla" === rootBranch.getCharPref("mail.server." + server + ".type") ) )
           {
             let account = MailServices.accounts.getAccount(accountKey);
             if (account && safeGetJS(account.incomingServer, "EwsIncomingServer"))
@@ -162,7 +160,7 @@ var exquilla = Object.create(
           serverType = rootBranch.getCharPref('mail.server.' + serverKey + '.type');
         } catch (e) {}
         log.debug("Checking server of type " + serverType);
-        if (serverType != 'exquilla' && serverType != 'exquillax')
+        if (serverType !== 'exquilla' && serverType !== 'exquillax')
         {
           log.config("Deleting backup account info for non-exquilla account " + accountKey);
           try {
@@ -200,7 +198,7 @@ var exquilla = Object.create(
 
         // reset the account type so that it will really load for test accounts
         log.debug("Server to load has type " + serverType);
-        if (serverType == "exquillax")
+        if (serverType === "exquillax")
           rootBranch.setCharPref('mail.server.' + serverKey + '.type', "exquilla");
 
         if (!account)
@@ -278,7 +276,7 @@ var exquilla = Object.create(
         let account = MailServices.accounts.getAccount(accountKey);
         // look for a server and check if it exists and is ews
         let server = account.incomingServer;
-        if (server.type != 'exquilla') continue;
+        if (server.type !== 'exquilla') continue;
         log.config("Found ews server with accountKey " + accountKey);
         /*
         if (!server.getBoolValue("postExquilla17"))
@@ -326,7 +324,6 @@ var exquilla = Object.create(
       log.warn("Fixing invalid directory created by an earlier version of R7 with name " + directory.leafName);
 
       try {
-
         // Cleanup missing sbd for any subdirectories
         let validFile = directory.clone();
         validFile.leafName = directory.leafName + ".sbd";
@@ -434,7 +431,7 @@ var exquilla = Object.create(
       if (gFolderDisplay._nonViewFolder instanceof Ci.nsIMsgFolder)
       {
         let server = gFolderDisplay._nonViewFolder.server;
-        if (server.type == 'exquilla')
+        if (server.type === 'exquilla')
           server.performExpand(msgWindow);
       }
     }
@@ -447,9 +444,7 @@ var exquilla = Object.create(
         function ewsUsesMail(a)
         {
           let ewsServer = safeGetJS(a.incomingServer, "EwsIncomingServer");
-          if (ewsServer && !ewsServer.useMail)
-            return false;
-          return true;
+          return !(ewsServer && !ewsServer.useMail);
         });
     }
     if (gFolderTreeView._treeElement) {
@@ -551,7 +546,7 @@ var exquilla = Object.create(
              ewsService.SaveMessageToDisk(messageURI, tempfile, false,
                                           urlListener, outURI, false, null);
              let urlResult = await urlListener.promise;
-             if (urlResult.result != Cr.NS_OK)
+             if (urlResult.result !== Cr.NS_OK)
              {
                log.error("failed to create temp message file copy for fcc");
                continue;
@@ -561,7 +556,7 @@ var exquilla = Object.create(
           ewsFolder.nativeMailbox.sendItem(itemToSend, doServerFcc, fccNativeFolderId, machineListener);
           machineResult = await machineListener.promise;
 
-          if (machineResult.result == Cr.NS_OK)
+          if (machineResult.result === Cr.NS_OK)
           {
             let messages = Cc["@mozilla.org/array;1"].createInstance(Ci.nsIMutableArray);
             messages.appendElement(message, false);
@@ -574,7 +569,7 @@ var exquilla = Object.create(
               tempfile = tempfile.clone(); // Otherwise the size seems to be zero
               MailServices.copy.CopyFileMessage(tempfile, dstFolder, null, false, Ci.nsMsgFolderFlags.Read, "", copyServiceListener, null);
               let copyResult = await copyServiceListener.promise;
-              if (copyResult.result != Cr.NS_OK)
+              if (copyResult.result !== Cr.NS_OK)
                 log.error("Failed to copy message to fcc folder, status is " + copyResult.result);
               tempfile.remove(false);
             }
@@ -645,7 +640,7 @@ var exquilla = Object.create(
 
       // Now see what our gloda folder information has to say about the folder.
       let glodaFolder = exquilla.GlodaDatastore._mapFolder(aMsgFolder);
-      return glodaFolder.indexingPriority != glodaFolder.kIndexingNeverPriority;
+      return glodaFolder.indexingPriority !== glodaFolder.kIndexingNeverPriority;
     }
 
     // dbview ApplyCommandToIndices has an explicit check for IMAP folder type that
@@ -723,7 +718,7 @@ var exquilla = Object.create(
 
   function observe(aSubject, aTopic, aData)
   {
-    if (aTopic == "nsPref:changed")
+    if (aTopic === "nsPref:changed")
     {
       // Our goal is to keep a copy of any ews accounts in our extension preferences,
       // to allow us to reload any accounts that disappear when the user disables
@@ -739,7 +734,7 @@ var exquilla = Object.create(
       // save changes
       copyPref(rootBranch, exBranch, aData);
     }
-    else if (aTopic == "mail-tabs-session-restored")
+    else if (aTopic === "mail-tabs-session-restored")
     {
       log.debug('observed mail-tabs-session-restored');
       exquilla.EwsAbService.loadEwsServers();
@@ -750,7 +745,7 @@ var exquilla = Object.create(
   function itemEvent(aFolder, aEvent, aData)
   {
     let ewsFolder = safeGetJS(aFolder);
-    if ( (aEvent != "FolderReindexTriggered") || !ewsFolder)
+    if ( (aEvent !== "FolderReindexTriggered") || !ewsFolder)
       return;
     let nativeMailbox = ewsFolder.nativeMailbox;
     let nativeFolder = nativeMailbox.getNativeFolderFromCache(ewsFolder.folderId);
@@ -781,7 +776,7 @@ var exquilla = Object.create(
         if (jsDirectory)
         {
           // only add root contacts folder for now
-          if ( (jsDirectory.distinguishedFolderId == 'contacts'))
+          if ( (jsDirectory.distinguishedFolderId === 'contacts'))
           {
             directory instanceof Ci.nsIAbDirectory;
             let id = 'exquilla.addToAb.' + directory.URI;
@@ -829,23 +824,23 @@ var exquilla = Object.create(
 
     // get first and last name from the display name
     let commaIndex = displayName.indexOf(',');
-    if (commaIndex != -1) // Looks like last, first
+    if (commaIndex !== -1) // Looks like last, first
     {
       lastName = displayName.substring(0, commaIndex);
       firstName = displayName(commaIndex + 1);
       // strip leading spaces
-      while (firstName.charAt(0) == ' ')
+      while (firstName.charAt(0) === ' ')
         firstName = firstName.substring(1);
     }
     else // maybe first last?
     {
       let spaceIndex = displayName.indexOf(' ');
-      if (spaceIndex != -1)
+      if (spaceIndex !== -1)
       {
         firstName = displayName.substring(0, spaceIndex);
         lastName = displayName.substring(spaceIndex + 1);
         // strip leading spaces
-        while (lastName.charAt(0) == ' ')
+        while (lastName.charAt(0) === ' ')
           lastName = lastName.substring(1);
       }
     }
@@ -866,7 +861,7 @@ var exquilla = Object.create(
       // should be a root ews folder
       if (!(folder instanceof Ci.nsIMsgFolder) ||
           !(folder.isServer) ||
-          !(folder.server.type == 'exquilla'))
+          !(folder.server.type === 'exquilla'))
       {
         return;
       }
@@ -881,7 +876,7 @@ var exquilla = Object.create(
           var tbSyncAccountData = accounts.data[accounts.IDs[i]];
           log.info('TbSync account info is ' + JSON.stringify(tbSyncAccountData));
           log.info('host is ' + tbSyncAccountData.host + '/' + folder.hostname + ', user is ' + tbSyncAccountData.user + '/' + folder.username);
-          if (tbSyncAccountData.host == folder.hostname && tbSyncAccountData.user == folder.username)
+          if (tbSyncAccountData.host === folder.hostname && tbSyncAccountData.user === folder.username)
           {
             log.info('deleting account ' + accounts.IDs[i])
             TbSync.db.removeAccount(accounts.IDs[i]);
@@ -908,7 +903,7 @@ var exquilla = Object.create(
         for (let calendar of calendars)
         {
           //dl('calendar spec is ' + calendar.uri.spec);
-          if (calendar.uri.spec.indexOf(serverURI) != -1)
+          if (calendar.uri.spec.indexOf(serverURI) !== -1)
           {
             //dl('removing calendar');
             calendarManager.unregisterCalendar(calendar);

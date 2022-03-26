@@ -103,7 +103,12 @@ EwsCompose.prototype = {
 
   SendMsg(msgType, identity, accountKey, msgWindow, progress)
   {
-    log.info("SendMsg called");
+    log.info("SendMsg called " + msgType + ', identity' + identity + ', ' + accountKey + new Error().stack);
+
+    if (!identity.email) {
+      throw new Error("No email");
+    }
+
     this.sendMsgToServer(msgType, identity, accountKey);
     },
 

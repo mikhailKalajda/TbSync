@@ -74,7 +74,7 @@ var db = {
           let settings = {};
           settings.status = "disabled";
           settings.provider = d.provider;
-          settings.https = (d.https == "1");
+          settings.https = (d.https === "1");
           
           switch (d.provider) {
             case "dav":
@@ -82,8 +82,8 @@ var db = {
               settings.cardDavHost = d.host2 ? d.host2 : "";
               settings.serviceprovider = d.serviceprovider;
               settings.user = d.user;
-              settings.syncGroups = (d.syncGroups == "1");
-              settings.useCalendarCache = (d.useCache == "1");
+              settings.syncGroups = (d.syncGroups === "1");
+              settings.useCalendarCache = (d.useCache === "1");
             break;
             
             case "eas":
@@ -96,9 +96,9 @@ var db = {
               settings.user = d.user;
               settings.servertype = d.servertype;
               settings.seperator = d.seperator;
-              settings.provision = (d.provision == "1");
-              settings.displayoverride = (d.displayoverride == "1");
-              if (d.hasOwnProperty("galautocomplete")) settings.galautocomplete = (d.galautocomplete == "1");
+              settings.provision = (d.provision === "1");
+              settings.displayoverride = (d.displayoverride === "1");
+              if (d.hasOwnProperty("galautocomplete")) settings.galautocomplete = (d.galautocomplete === "1");
             break;
           }
           
@@ -124,7 +124,6 @@ var db = {
       }
     }
   },
-  
 
   saveFile: function (f) {
     if (this.loaded) {
@@ -136,7 +135,7 @@ var db = {
 
   writeAsync: async function (f) {
     // if this file was not found/read on load, do not write default content to prevent clearing of data in case of read-errors
-    if (!this.files[f].found && JSON.stringify(this[f]) == this.files[f].default) {
+    if (!this.files[f].found && JSON.stringify(this[f]) === this.files[f].default) {
       return;
     }
     
@@ -146,8 +145,6 @@ var db = {
     await OS.File.makeDir(TbSync.io.storageDirectory);
     await OS.File.writeAtomic(filepath, json, {tmpPath: filepath + ".tmp"});
   },
-
-
 
   // simple convenience wrapper
   saveAccounts: function () {
@@ -162,19 +159,17 @@ var db = {
     this.saveFile("changelog");
   },
 
-  
-
   // CHANGELOG FUNCTIONS
   getItemStatusFromChangeLog: function (parentId, itemId) {   
     for (let i=0; i<this.changelog.length; i++) {
-      if (this.changelog[i].parentId == parentId && this.changelog[i].itemId == itemId) return this.changelog[i].status;
+      if (this.changelog[i].parentId === parentId && this.changelog[i].itemId === itemId) return this.changelog[i].status;
     }
     return null;
   },
 
   getItemDataFromChangeLog: function (parentId, itemId) {   
     for (let i=0; i<this.changelog.length; i++) {
-      if (this.changelog[i].parentId == parentId && this.changelog[i].itemId == itemId) return this.changelog[i];
+      if (this.changelog[i].parentId === parentId && this.changelog[i].itemId === itemId) return this.changelog[i];
     }
     return null;
   },
@@ -195,7 +190,7 @@ var db = {
 
   removeItemFromChangeLog: function (parentId, itemId, moveToEnd = false) {
     for (let i=this.changelog.length-1; i>-1; i-- ) {
-      if (this.changelog[i].parentId == parentId && this.changelog[i].itemId == itemId) {
+      if (this.changelog[i].parentId === parentId && this.changelog[i].itemId === itemId) {
         let row = this.changelog.splice(i,1);
         if (moveToEnd) this.changelog.push(row[0]);
         this.saveChangelog();
@@ -206,7 +201,7 @@ var db = {
 
   removeAllItemsFromChangeLogWithStatus: function (parentId, status) {
     for (let i=this.changelog.length-1; i>-1; i-- ) {
-      if (this.changelog[i].parentId == parentId && this.changelog[i].status == status) {
+      if (this.changelog[i].parentId === parentId && this.changelog[i].status === status) {
         let row = this.changelog.splice(i,1);
       }
     }
@@ -226,18 +221,13 @@ var db = {
   },
 
   getItemsFromChangeLog: function (parentId, maxnumbertosend, status = null) {        
-    //maxnumbertosend = 0 will return all results
+    // maxnumbertosend = 0 will return all results
     let log = [];
-    let counts = 0;
-    for (let i=0; i<this.changelog.length && (log.length < maxnumbertosend || maxnumbertosend == 0); i++) {
-      if (this.changelog[i].parentId == parentId && (status === null || this.changelog[i].status.indexOf(status) != -1)) log.push(this.changelog[i]);
+    for (let i = 0; i < this.changelog.length && (log.length < maxnumbertosend || maxnumbertosend === 0); i++) {
+      if (this.changelog[i].parentId === parentId && (status === null || this.changelog[i].status.indexOf(status) !== -1)) log.push(this.changelog[i]);
     }
     return log;
   },
-
-
-
-
 
   // ACCOUNT FUNCTIONS
 
@@ -254,7 +244,7 @@ var db = {
 
   removeAccount: function (accountID) {
     //check if accountID is known
-    if (this.accounts.data.hasOwnProperty(accountID) == false ) {
+    if (this.accounts.data.hasOwnProperty(accountID) === false ) {
       throw "Unknown accountID!" + "\nThrown by db.removeAccount("+accountID+ ")";
     } else {
       delete (this.accounts.data[accountID]);
@@ -274,7 +264,7 @@ var db = {
 
   getAccount: function (accountID) {
     //check if accountID is known
-    if (this.accounts.data.hasOwnProperty(accountID) == false ) {
+    if (this.accounts.data.hasOwnProperty(accountID) === false ) {
       throw "Unknown accountID!" + "\nThrown by db.getAccount("+accountID+ ")";
     } else {
       return this.accounts.data[accountID];
@@ -332,9 +322,6 @@ var db = {
     }
     this.saveAccounts();
   },
-
-
-
 
   // FOLDER FUNCTIONS
 

@@ -76,7 +76,7 @@ EwsNativeMachine.prototype = {
         if (aListener) aListener.onEvent(this, "StartMachine", null, Cr.NS_OK);
         result = await promiseInitial(aMailbox, aListener);
 
-        if (result.status == Cr.NS_OK && aInnerTask) {
+        if (result.status === Cr.NS_OK && aInnerTask) {
           result = await aInnerTask();
         }
       } catch (e) {
@@ -122,7 +122,7 @@ EwsNativeMachine.prototype = {
           result = await PromiseUtils.promiseAutodiscover(aMailbox.email.length ? aMailbox.email : aMailbox.username,
             aMailbox.username, aMailbox.domain, aMailbox.password, false, '', domWindow(), null);
 
-          if (result.status == Cr.NS_OK && result.foundSite)
+          if (result.status === Cr.NS_OK && result.foundSite)
           {
             // test each possible ews url to see if it is valid
             let urls = [ result.ewsUrl, result.internalEwsUrl, result.ewsOWAGuessedUrl ];
@@ -137,13 +137,13 @@ EwsNativeMachine.prototype = {
               result = await promiseCheckOnline(aMailbox, aListener);
 
               log.debug('discoverFoldersMachine checkOnline url ' + url + ' result is ' + result.status);
-              if (result.status == Cr.NS_OK)
+              if (result.status === Cr.NS_OK)
               {
                 log.debug("using ewsUrl from autodiscover: " + url);
                 break;
               }
             }
-            if (result.status != Cr.NS_OK)
+            if (result.status !== Cr.NS_OK)
             {
               log.info("autodiscover could not find a valid ews url");
               aMailbox.ewsURL = oldUrl;
@@ -160,7 +160,7 @@ EwsNativeMachine.prototype = {
         result = await promiseGetDistinguishedIds(aMailbox, aListener);
 
         log.debug('discoverFoldersMachine getDistinguishedIds result is ' + result.status);
-        if (result.status != Cr.NS_OK)
+        if (result.status !== Cr.NS_OK)
           break;
         let rootFolder = aMailbox.getDistinguishedNativeFolder("msgfolderroot");
         result = await promiseDiscoverSubfolders(aMailbox, rootFolder, aListener);
@@ -170,7 +170,7 @@ EwsNativeMachine.prototype = {
     }
     catch(e) {
       this.machineErrorResponse(aListener, "taskDiscoverFoldersError", null, se(e));
-      if (result.status == Cr.NS_OK) result.status = Cr.NS_ERROR_FAILURE;
+      if (result.status === Cr.NS_OK) result.status = Cr.NS_ERROR_FAILURE;
     }
     finally {
       if (aListener) aListener.onEvent(null, "StopMachine", null, result.status);
@@ -215,7 +215,7 @@ EwsNativeMachine.prototype = {
       log.debug("taskInvalidType");
       let result = {status: Cr.NS_ERROR_FAILURE};
       try {
-        if (aClass == 0)
+        if (aClass === 0)
         {
           try {
             // This represents an unexpected, unhandled error of the machine js.
@@ -226,17 +226,17 @@ EwsNativeMachine.prototype = {
             this.machineErrorResponse(aListener, "InvalidType0MachineError", null, se(e));
           }
         }
-        else if (aClass == 1)
+        else if (aClass === 1)
         {
           // Throw an error in the inner task
           try {
             result = await promiseCheckOnline(aMailbox, aListener);
-            if (result.status != Cr.NS_OK)
+            if (result.status !== Cr.NS_OK)
               throw CE("Failure return from checkOnline", result.status);
             result = await taskInvalid(aMailbox, aListener);
           }
           catch (e) {
-            if (result.status == Cr.NS_OK)
+            if (result.status === Cr.NS_OK)
               result.status = Cr.NS_ERROR_FAILURE;
             this.machineErrorResponse(aListener, "InvalidType1MachineError", null, se(e));
           }
@@ -317,7 +317,7 @@ EwsNativeMachine.prototype = {
           aMailbox.queueRequest(request);
           result = await soapResponse.promise;
 
-          if (result.status == Cr.NS_OK)
+          if (result.status === Cr.NS_OK)
           {
             // persist the body in the datastore
             let dsListener = new PromiseUtils.DatastoreListener();
@@ -325,7 +325,7 @@ EwsNativeMachine.prototype = {
             result = await dsListener.promise;
           }
 
-          if (result.status == Cr.NS_OK)
+          if (result.status === Cr.NS_OK)
           {
             // persist the item flags in the datastore
             let dsListener = new PromiseUtils.DatastoreListener();
@@ -362,7 +362,7 @@ EwsNativeMachine.prototype = {
           request.getAttachment(soapResponse, aAttachment);
           aMailbox.queueRequest(request);
           result = await soapResponse.promise;
-          if (result.status != Cr.NS_OK)
+          if (result.status !== Cr.NS_OK)
             break;
 
           // persist the attachment
@@ -412,10 +412,10 @@ EwsNativeMachine.prototype = {
           aMailbox.queueRequest(request);
           result = await soapResponse.promise;
 
-          if (result.status != Cr.NS_OK)
+          if (result.status !== Cr.NS_OK)
             break;
 
-          let copyBodies = (oldItems.length == newItems.length);
+          let copyBodies = (oldItems.length === newItems.length);
           if (!copyBodies)
             log.warn("Not copying new item bodies since old and new lengths differ");
           for (let i = 0; i < newItems.length; i++)
@@ -426,7 +426,7 @@ EwsNativeMachine.prototype = {
             aMailbox.datastore.putItem(item, dsListener);
             result = await dsListener.promise;
 
-            if (result.status != Cr.NS_OK)
+            if (result.status !== Cr.NS_OK)
               log.error("failed to persist new item");
 
             // request.copyItems does not copy bodies, it sets resync for
@@ -451,7 +451,7 @@ EwsNativeMachine.prototype = {
               let dsListener = new PromiseUtils.DatastoreListener();
               aMailbox.datastore.putBody(item, dsListener);
               result = await dsListener.promise;
-              if (result.status != Cr.NS_OK)
+              if (result.status !== Cr.NS_OK)
                 log.info("Failed to persist item body");
             }
           }
@@ -469,14 +469,14 @@ EwsNativeMachine.prototype = {
               aMailbox.datastore.deleteBody(oldItem, dsListener);
               result = await dsListener.promise;
 
-              if (result.status != Cr.NS_OK)
+              if (result.status !== Cr.NS_OK)
                 log.info("Failed to delete item body in datastore");
 
               dsListener = new PromiseUtils.DatastoreListener();
               aMailbox.datastore.deleteItem(oldItem, dsListener);
               result = await dsListener.promise;
 
-              if (result.status != Cr.NS_OK)
+              if (result.status !== Cr.NS_OK)
                 log.info("Failed to delete item in datastore");
               // signal that the mailbox does not need to do the delete
               oldItem.processingFlags |= oldItem.DeletedInDatastore;
@@ -517,7 +517,7 @@ EwsNativeMachine.prototype = {
             }
             let parentDId = aMailbox.getNativeFolderFromCache(folderToDelete.parentFolderId)
                                     .distinguishedFolderId;
-            if (!aMoveToDeletedItems || (parentDId == "deleteditems"))
+            if (!aMoveToDeletedItems || (parentDId === "deleteditems"))
               hardDeleteIds.append(folderId);
             else
               moveDeleteIds.append(folderId);
@@ -535,7 +535,7 @@ EwsNativeMachine.prototype = {
               request.deleteFolders(soapResponse, deleteIds, true);
               aMailbox.queueRequest(request);
               result = await soapResponse.promise;
-              if (result.status != Cr.NS_OK)
+              if (result.status !== Cr.NS_OK)
                 break;
             }
           }
@@ -552,7 +552,7 @@ EwsNativeMachine.prototype = {
               request.deleteFolders(soapResponse, deleteIds, false);
               aMailbox.queueRequest(request);
               result = await soapResponse.promise;
-              if (result.status != Cr.NS_OK)
+              if (result.status !== Cr.NS_OK)
                 break;
             }
           }
@@ -592,7 +592,7 @@ EwsNativeMachine.prototype = {
           aMailbox.queueRequest(request);
           result = await soapResponse.promise;
 
-          if (result.status != Cr.NS_OK)
+          if (result.status !== Cr.NS_OK)
           {
             log.warning('item failed to delete on server, not found?');
             break;
@@ -644,7 +644,7 @@ EwsNativeMachine.prototype = {
       aMailbox.datastore.getIdsForFolder(aFolderId, dsListener);
       result = await dsListener.promise;
 
-      if (result.status != Cr.NS_OK)
+      if (result.status !== Cr.NS_OK)
         throw CE("Failed to get mailbox ids");
       let itemIds = result.data.wrappedJSObject.StringArray;
       let changeKeys = result.item.wrappedJSObject.StringArray;
@@ -657,7 +657,7 @@ EwsNativeMachine.prototype = {
         log.debug("cached ids length is " + cachedIds.length);
       for (let i = 0; i < cachedIds.length; i++)
       {
-        if (itemIds.indexOf(cachedIds.getAt(i)) == -1)
+        if (itemIds.indexOf(cachedIds.getAt(i)) === -1)
         {
           if (!gaveWarning)
           {
@@ -721,21 +721,21 @@ EwsNativeMachine.prototype = {
             request.getItemBodies(soapResponse, items);
             aMailbox.queueRequest(request);
             result = await soapResponse.promise;
-            if (result.status != Cr.NS_OK)
+            if (result.status !== Cr.NS_OK)
               break;
 
             // persist the body in the datastore
             let dsListener = new PromiseUtils.DatastoreListener();
             aMailbox.datastore.putBody(aItem, dsListener);
             result = await dsListener.promise;
-            if (result.status != Cr.NS_OK)
+            if (result.status !== Cr.NS_OK)
               break;
 
             // persist the item flags in the datastore
             dsListener = new PromiseUtils.DatastoreListener();
             aMailbox.datastore.putItem(aItem, dsListener);
             result = await dsListener.promise;
-            if (result.status != Cr.NS_OK)
+            if (result.status !== Cr.NS_OK)
               break;
           }
 
@@ -748,7 +748,7 @@ EwsNativeMachine.prototype = {
             let listener = new PromiseUtils.MachineListener();
             aMailbox.getAttachmentContent(attachment, listener);
             result = await listener.promise;
-            if (result.status != Cr.NS_OK)
+            if (result.status !== Cr.NS_OK)
               log.warn("Failed to download attachment");
           }
         } while (false);
@@ -874,7 +874,7 @@ EwsNativeMachine.prototype = {
           let dsListener = new PromiseUtils.DatastoreListener();
           aMailbox.datastore.putItem(aItem, dsListener);
           result = await dsListener.promise;
-          if (result.status != Cr.NS_OK)
+          if (result.status !== Cr.NS_OK)
             break;
 
           let soapResponse = new PromiseSoapResponse(aListener);
@@ -886,7 +886,7 @@ EwsNativeMachine.prototype = {
           // BREAK_IF_FALSE(!mTestType.EqualsLiteral("CreateOffline"), "Testing CreateOffline");
 
           result = await soapResponse.promise;
-          if (result.status != Cr.NS_OK)
+          if (result.status !== Cr.NS_OK)
             break;
 
           // now add the attachments, if any
@@ -899,13 +899,13 @@ EwsNativeMachine.prototype = {
             request.createAttachment(soapResponse, attachment);
             aMailbox.queueRequest(request);
             result = await soapResponse.promise;
-            if (result.status != Cr.NS_OK)
+            if (result.status !== Cr.NS_OK)
             {
               log.error("Failed to save attachment");
               break;
             }
           }
-          if (result.status != Cr.NS_OK)
+          if (result.status !== Cr.NS_OK)
             break;
 
           // local updates should now be saved
@@ -949,7 +949,7 @@ EwsNativeMachine.prototype = {
           let dsListener = new PromiseUtils.DatastoreListener();
           aMailbox.datastore.putItem(item, dsListener);
           result = await dsListener.promise;
-          if (result.status != Cr.NS_OK)
+          if (result.status !== Cr.NS_OK)
             log.error("Failed to persist changed item");
 
           if (item.changeKey.length)
@@ -970,7 +970,7 @@ EwsNativeMachine.prototype = {
             request.createItem(soapResponse, item, "");
             aMailbox.queueRequest(request);
             result = await soapResponse.promise;
-            if (result.status != Cr.NS_OK)
+            if (result.status !== Cr.NS_OK)
               throw CE("failed to create item");
 
             // now add the attachments, if any
@@ -983,7 +983,7 @@ EwsNativeMachine.prototype = {
               request.createAttachment(soapResponse, attachment);
               aMailbox.queueRequest(request);
               result = await soapResponse.promise;
-              if (result.status != Cr.NS_OK)
+              if (result.status !== Cr.NS_OK)
                 throw CE("Failed to save attachment");
             }
           }
@@ -1012,21 +1012,21 @@ EwsNativeMachine.prototype = {
           try {
             request.saveManyUpdates(soapResponse, itemsToUpdate);
           } catch (e) {rv = e.result;}
-          if (rv == Cr.NS_OK)
+          if (rv === Cr.NS_OK)
           {
             aMailbox.queueRequest(request);
             result = await soapResponse.promise;
-            if (result.status == Cr.NS_ERROR_NOT_AVAILABLE)
+            if (result.status === Cr.NS_ERROR_NOT_AVAILABLE)
             {
               // We often get this as a race condition during message delete. Just note.
               log.info("item not found during update");
               rv = Cr.NS_OK;
             }
-            else if (result.status != Cr.NS_OK)
+            else if (result.status !== Cr.NS_OK)
               throw CE('Failed to save updates');
           }
           // NS_ERROR_ALREADY_INITIALIZED is an expected result, meaning nothing changed
-          else if (rv != Cr.NS_ERROR_ALREADY_INITIALIZED)
+          else if (rv !== Cr.NS_ERROR_ALREADY_INITIALIZED)
             throw CE(rv);
         }
 
@@ -1038,7 +1038,7 @@ EwsNativeMachine.prototype = {
           let dsListener = new PromiseUtils.DatastoreListener();
           aMailbox.datastore.putItem(item, dsListener);
           result = await dsListener.promise;
-          if (result.status != Cr.NS_OK)
+          if (result.status !== Cr.NS_OK)
             log.error("Failed to persist changed item");
         }
       }
@@ -1060,7 +1060,7 @@ EwsNativeMachine.prototype = {
         try {
           mergeResult = aItem.mergeChanges(aProperties);
         } catch (e) {rv = e.result;}
-        if (rv != Cr.NS_OK)
+        if (rv !== Cr.NS_OK)
           throw CE(rv);
 
         // persist the changes
@@ -1069,24 +1069,24 @@ EwsNativeMachine.prototype = {
         try {
           let dummyId = aItem.exItemId;
         } catch (e) {rv = e.result}
-        if (rv == Cr.NS_ERROR_NOT_IMPLEMENTED)
+        if (rv === Cr.NS_ERROR_NOT_IMPLEMENTED)
         {
           // This will prevent offline changes to occurrence exceptions from working!
           log.info('Not persisting pre-exchange local copy of occurrence exception');
         }
-        else if (rv != Cr.NS_OK)
+        else if (rv !== Cr.NS_OK)
           throw CE(rv);
         else // persist the item
         {
           let dsListener = new PromiseUtils.DatastoreListener();
           aMailbox.datastore.putItem(aItem, dsListener);
           result = await dsListener.promise;
-          if (result.status != Cr.NS_OK)
+          if (result.status !== Cr.NS_OK)
             log.error("Failed to persist changed item");
         }
 
         result = await promiseDeletedOccurrences(aItem, aMailbox, aListener);
-        if (result.status != Cr.NS_OK)
+        if (result.status !== Cr.NS_OK)
           log.error('Failed to deleted deleted occurrences');
 
         // now save the updates
@@ -1098,18 +1098,18 @@ EwsNativeMachine.prototype = {
         try {
           request.saveUpdates(soapResponse, aItem);
         } catch (e) {rv = e.result;}
-        if (rv == Cr.NS_OK)
+        if (rv === Cr.NS_OK)
         {
           aMailbox.queueRequest(request);
           result = await soapResponse.promise;
-          if (result.status != Cr.NS_OK)
+          if (result.status !== Cr.NS_OK)
           {
             log.error('Failed to save updates');
             throw CE('Failed to save updates');
           }
         }
         // NS_ERROR_ALREADY_INITIALIZED is an expected result, meaning nothing changed
-        else if (rv != Cr.NS_ERROR_ALREADY_INITIALIZED)
+        else if (rv !== Cr.NS_ERROR_ALREADY_INITIALIZED)
           throw CE(rv);
 
         // We have completed updates, so we need to reset the local
@@ -1121,7 +1121,7 @@ EwsNativeMachine.prototype = {
         let dsListener = new PromiseUtils.DatastoreListener();
         aMailbox.datastore.putItem(aItem, dsListener);
         result = await dsListener.promise;
-        if (result.status != Cr.NS_OK)
+        if (result.status !== Cr.NS_OK)
           log.error("Failed to persist changed item");
       }
       catch (e) {oe(result, "taskUpdateItemProperties", e);}
@@ -1175,7 +1175,7 @@ EwsNativeMachine.prototype = {
         aMailbox.queueRequest(request);
         result = await soapResponse.promise;
 
-        if (result.status == Cr.NS_OK)
+        if (result.status === Cr.NS_OK)
         {
           try {
             result.data = request.result.getPropertyLists("ResolutionSet/Resolution");
@@ -1227,7 +1227,7 @@ EwsNativeMachine.prototype = {
           aMailbox.queueRequest(request);
           result = await soapResponse.promise;
 
-          if (result.status != Cr.NS_OK)
+          if (result.status !== Cr.NS_OK)
             break;
           // for some reason the RootFolder is not returning its attributes,
           //  so parse them from the DOM result
@@ -1235,16 +1235,16 @@ EwsNativeMachine.prototype = {
                              "http://schemas.microsoft.com/exchange/services/2006/messages",
                              "RootFolder")[0];
           //let indexedPagingOffset = parseInt(rootFolder.getAttribute("IndexedPagingOffset"), 10);
-          includesLastItemInRange = rootFolder.getAttribute("IncludesLastItemInRange") == "true";
+          includesLastItemInRange = rootFolder.getAttribute("IncludesLastItemInRange") === "true";
           let items = request.result.getPropertyList("RootFolder/Items");
           for (let i = 0; items && i < items.length; i++)
           {
             //dump("item #" + i + " name is " + items.getNameAt(i) + "\n");
             let item = items.getPropertyListAt(i);
-            if ( (i == 0) && (offset != 0))
+            if ( (i === 0) && (offset !== 0))
             {
               // check for match to prevent list changes during finds
-              if (item.getAString("ItemId/$attributes/Id") == allItemsPL.getPropertyListAt(offset - 1).getAString("ItemId"))
+              if (item.getAString("ItemId/$attributes/Id") === allItemsPL.getPropertyListAt(offset - 1).getAString("ItemId"))
                 continue;
               // No match, quit with error
               log.config("Aborting getAllServerIds because item id list changed during download");
@@ -1256,11 +1256,11 @@ EwsNativeMachine.prototype = {
             itemPL.setAString("ItemId", item.getAString("ItemId/$attributes/Id"));
             itemPL.setAString("ChangeKey", item.getAString("ItemId/$attributes/ChangeKey"));
             itemPL.setAString("ItemClass", item.getAString("ItemClass"));
-            itemPL.setBoolean("IsRead", item.getAString("ExtendedProperty/Value") == "true");
+            itemPL.setBoolean("IsRead", item.getAString("ExtendedProperty/Value") === "true");
             allItemsPL.appendPropertyList("Item", itemPL);
             offset++;
           }
-          if (result.status != Cr.NS_OK)
+          if (result.status !== Cr.NS_OK)
             break;
         }
         result.item = allItemsPL;
@@ -1293,7 +1293,7 @@ EwsNativeMachine.prototype = {
           let dsListener = new PromiseUtils.DatastoreListener();
           aMailbox.datastore.getIdsForFolder("MISSING", dsListener);
           let result = await dsListener.promise;
-          if (result.status != Cr.NS_OK)
+          if (result.status !== Cr.NS_OK)
             throw new CE("Failed to get items with missing folder id", Cr.NS_ERROR_FAILURE);
           let missingFolderIds = result.data.wrappedJSObject.StringArray;
           if (missingFolderIds.length)
@@ -1315,9 +1315,9 @@ EwsNativeMachine.prototype = {
               aMailbox.queueRequest(request);
               let result = await soapResponse.promise;
 
-              if ( (result.responseCode && result.responseCode == "ErrorItemNotFound") ||
-                   (result.responseCode && result.responseCode == "ErrorInvalidIdMalformed") ||
-                   (result.responseCode && result.responseCode == "ErrorAccessDenied") ||
+              if ( (result.responseCode && result.responseCode === "ErrorItemNotFound") ||
+                   (result.responseCode && result.responseCode === "ErrorInvalidIdMalformed") ||
+                   (result.responseCode && result.responseCode === "ErrorAccessDenied") ||
                    (changedItem.flags & changedItem.DeletedOnServerBit)
               )
               {
@@ -1327,7 +1327,7 @@ EwsNativeMachine.prototype = {
                 aMailbox.datastore.deleteItem(changedItem, dsListener);
                 await dsListener.promise;
               }
-              else if (result.status == Cr.NS_OK)
+              else if (result.status === Cr.NS_OK)
               {
                 changedItem.raiseFlags(changedItem.Dirty);
                 changedItem.clearFlags(changedItem.AllLocally);
@@ -1362,7 +1362,7 @@ EwsNativeMachine.prototype = {
         aMailbox.datastore.changedOnFolder(id, dsListener);
         result = await dsListener.promise;
         // this is an irrecoverable internal error
-        if (result.status != Cr.NS_OK)
+        if (result.status !== Cr.NS_OK)
           throw CE("changedOnFolder failed", Cr.NS_ERROR_FAILURE);
         let changedLocallyIds = result.data.wrappedJSObject.StringArray;
         let dirtyIds = [];
@@ -1428,12 +1428,12 @@ EwsNativeMachine.prototype = {
               try {
                 request.saveUpdates(soapResponse, changedItem);
               } catch (e) {rv = e.result;}
-              if (rv == Cr.NS_OK)
+              if (rv === Cr.NS_OK)
               {
                 aMailbox.queueRequest(request);
                 result = await soapResponse.promise;
               }
-              else if (rv == Cr.NS_ERROR_ALREADY_INITIALIZED)
+              else if (rv === Cr.NS_ERROR_ALREADY_INITIALIZED)
               {
                 try {
                   result.status = Cr.NS_OK;
@@ -1447,7 +1447,7 @@ EwsNativeMachine.prototype = {
               if (soapResponse.responseCode && soapResponse.responseCode.length)
               {
                 log.warn("saveUpdate had a response code " + soapResponse.responseCode);
-                if (soapResponse.responseCode == "ErrorItemNotFound")
+                if (soapResponse.responseCode === "ErrorItemNotFound")
                 {
                   // Exchange does not know what this is. Just delete it from the datastore.
                   log.warn('stray item in datastore deleted with subject ' +
@@ -1478,19 +1478,19 @@ EwsNativeMachine.prototype = {
             }
           } catch (e) {
             log.warn("changedLocallyIds error " + e);
-            if (result.status == Cr.NS_OK) result.status = Cr.NS_ERROR_FAILURE;
+            if (result.status === Cr.NS_OK) result.status = Cr.NS_ERROR_FAILURE;
           } finally {
             if (deleteMe)
             {
               let dsListener = new PromiseUtils.DatastoreListener();
               aMailbox.datastore.deleteItem(changedItem, dsListener);
               let result = await dsListener.promise;
-              if (result.status != Cr.NS_OK)
+              if (result.status !== Cr.NS_OK)
                 log.debug("Failed to delete item, probably was bogus to begin with");
             }
             // todo: detect offline and handle
             // We'll handle errors by setting the item dirty
-            else if ( (result.status != Cr.NS_OK) && changedItem)
+            else if ( (result.status !== Cr.NS_OK) && changedItem)
             {
               log.debug("Changed locally id unsuccessful, mark item dirty");
               changedItem.raiseFlags(changedItem.Dirty)
@@ -1516,7 +1516,7 @@ EwsNativeMachine.prototype = {
                 let dsListener = new PromiseUtils.DatastoreListener();
                 aMailbox.datastore.putItem(changedItem, dsListener);
                 let result = await dsListener.promise;
-                if (result.status != Cr.NS_OK)
+                if (result.status !== Cr.NS_OK)
                   log.warn("failed to persist changed item");
               }
               catch (e)
@@ -1525,7 +1525,7 @@ EwsNativeMachine.prototype = {
                 continue;
               }
               let result = await promiseDeletedOccurrences(changedItem, aMailbox, aListener);
-              if (result.status != Cr.NS_OK)
+              if (result.status !== Cr.NS_OK)
                 log.warn("failed to delete DeletedOccurrences");
             }
           }
@@ -1540,7 +1540,7 @@ EwsNativeMachine.prototype = {
         request.getFolder(soapResponse, aFolder);
         aMailbox.queueRequest(request);
         result = await soapResponse.promise;
-        if (result.status != Cr.NS_OK)
+        if (result.status !== Cr.NS_OK)
           log.warn("failed to get folder properties");
         let folderId = aFolder.folderId;
         if (!folderId.length)
@@ -1560,7 +1560,7 @@ EwsNativeMachine.prototype = {
           dsListener = new PromiseUtils.DatastoreListener();
           aMailbox.datastore.getSyncState(aFolder, dsListener);
           result = await dsListener.promise;
-          if (result.status != Cr.NS_OK)
+          if (result.status !== Cr.NS_OK)
             throw CE("Failed to get sync state from datastore");
           syncState = result.data.QueryInterface(Ci.nsISupportsString).data;
           //log.debug('syncState is ' + syncState);
@@ -1576,11 +1576,11 @@ EwsNativeMachine.prototype = {
           // ask the server for a list of changed item ids relative to he current syncState
           result = await promiseChangedItems(aFolder, syncState, itemsPerSync);
 
-          if (result.status != Cr.NS_OK)
+          if (result.status !== Cr.NS_OK)
           {
             log.warn("syncFolderItemsProperties failed with responseCode " + result.responseCode);
             // handle known errors
-            if (result.responseCode == "ErrorInvalidSyncStateData")
+            if (result.responseCode === "ErrorInvalidSyncStateData")
             {
               // sync state is corrupt. Reset and try again
               if (syncState.length)
@@ -1599,7 +1599,7 @@ EwsNativeMachine.prototype = {
           {
             let itemId = items.queryElementAt(i, Ci.nsISupports).wrappedJSObject.itemId;
             let foundIndex = dirtyIds.indexOf(itemId);
-            if (foundIndex != -1)
+            if (foundIndex !== -1)
               dirtyIds.splice(foundIndex, 1);
           }
           for (let dirtyId of dirtyIds)
@@ -1635,7 +1635,7 @@ EwsNativeMachine.prototype = {
                 itemsDeathGrip.appendElement(changedItem, false);
 
                 // Special testing
-                if (aMailbox.testType == "ForceFailedItem")
+                if (aMailbox.testType === "ForceFailedItem")
                 {
                   log.warn("Simulating invalid item id for testing");
                   changedItem.itemId = "IamInvalidId";
@@ -1732,7 +1732,7 @@ EwsNativeMachine.prototype = {
                 // we must use a single class for a get
                 if (batchClass.length)
                 {
-                  if (changedItem.itemClass != batchClass)
+                  if (changedItem.itemClass !== batchClass)
                     break; // done with batch
                 }
                 else
@@ -1744,7 +1744,7 @@ EwsNativeMachine.prototype = {
 
               if (getChangedIds.length) // is there anything to get?
                 batchIdLists.push(getChangedIds);
-              if (currentItemIndex == nextItemToGet) { // did we fail to process a new item?
+              if (currentItemIndex === nextItemToGet) { // did we fail to process a new item?
                 log.error("Stopped loop!");
                 break;
               }
@@ -1766,18 +1766,18 @@ EwsNativeMachine.prototype = {
                   let request = new EwsSoapRequest();
                   request.mailbox = aMailbox;
                   // simulate random missing bodies, see https://exquilla.zendesk.com/tickets/11
-                  if ( (aMailbox.testType == "ForceMissingBody") ||
-                       ((aMailbox.testType == "FakeMissingBody") && (Math.random() < 0.1)) )
+                  if ( (aMailbox.testType === "ForceMissingBody") ||
+                       ((aMailbox.testType === "FakeMissingBody") && (Math.random() < 0.1)) )
                   {
                     log.warn("Simulating missing body for testing");
                     request.doError = 1;
-                    if (aMailbox.testType == "ForceMissingBody")
+                    if (aMailbox.testType === "ForceMissingBody")
                       aMailbox.testType = "ForceFailedClass";
                   }
                   request.getChangedItemProperties(soapResponse, aFolder, localIds, getBodies);
                   aMailbox.queueRequest(request);
                   result = await soapResponse.promise;
-                  if (result.status != Cr.NS_OK)
+                  if (result.status !== Cr.NS_OK)
                     log.warn("getChangedItemProperties failed");
                 }
                 catch (e) {
@@ -1787,7 +1787,7 @@ EwsNativeMachine.prototype = {
                 }
                 finally {
                   log.debug("nativeMachine getChangedItemProperties result = " + result.status);
-                  if (result.status != Cr.NS_OK)
+                  if (result.status !== Cr.NS_OK)
                   {
                     // Something went wrong, so set the whole batch dirty
                     //  (Unless already dirty and online, treat that as deleted)
@@ -1800,8 +1800,8 @@ EwsNativeMachine.prototype = {
 
                         if (aMailbox.isOnline && (dirtyItem.flags & dirtyItem.Dirty))
                         {
-                          if (soapResponse.responseCode == "ErrorInvalidPropertyRequest" &&
-                              dirtyItem.itemClass != "IPM.Item")
+                          if (soapResponse.responseCode === "ErrorInvalidPropertyRequest" &&
+                              dirtyItem.itemClass !== "IPM.Item")
                           {
                             log.info("ErrorInvalidPropertyRequest, so try again as a simple item");
                             dirtyItem.itemClass = "IPM.Item";
@@ -1812,7 +1812,7 @@ EwsNativeMachine.prototype = {
                             items.appendElement(dirtyItem, false); // get it this time around
                             // ignore errors
                           }
-                          else if (soapResponse.responseCode == "ErrorInvalidChangeKey" && dirtyItem.changeKey.length)
+                          else if (soapResponse.responseCode === "ErrorInvalidChangeKey" && dirtyItem.changeKey.length)
                           {
                             log.info("ErrorInvalidChangeKey, so try again with blank change key");
                             dirtyItem.changeKey = "";
@@ -1878,7 +1878,7 @@ EwsNativeMachine.prototype = {
           let dsListener = new PromiseUtils.DatastoreListener();
           aMailbox.datastore.setSyncState(aFolder, syncState, dsListener);
           result = await dsListener.promise;
-          if (result.status != Cr.NS_OK)
+          if (result.status !== Cr.NS_OK)
             log.warn("Failed to persist folder sync state");
           itemsPending = aFolder.syncItemsPending;
         }
@@ -1904,7 +1904,7 @@ EwsNativeMachine.prototype = {
   // local functions
   dereference: function _dereference() {
     let myIndex = gActiveMachines.indexOf(this);
-    if (myIndex != -1)
+    if (myIndex !== -1)
       gActiveMachines.splice(myIndex, 1);
   },
 
@@ -1922,7 +1922,7 @@ EwsNativeMachine.prototype = {
   machineErrorResponse: function _machineErrorResponse(aListener, aResponseError, aResponseCode, aMessageText)
   {
     let responseCode = aResponseCode || aResponseError;
-    if (responseCode == "ErrorItemNotFound")
+    if (responseCode === "ErrorItemNotFound")
     {
       log.info("SOAP error ErrorItemNotFound but not reporting");
       return;
@@ -1937,7 +1937,7 @@ EwsNativeMachine.prototype = {
 
 function oe(result, name, e)
 {
-  if ((result.status == undefined) || (result.status == Cr.NS_OK))
+  if ((result.status === undefined) || (result.status === Cr.NS_OK))
     result.status = Cr.NS_ERROR_FAILURE;
   if (!result.responseCode)
     result.responseCode = name + "Error";
@@ -1979,14 +1979,14 @@ PromiseSoapResponse.prototype.errorResponse =
 function _errorResponse(aRequest, aResponseError, aResponseCode, aMessageText)
 {
   this.responseCode = aResponseCode;
-  if (aResponseCode == "ErrorItemNotFound")
+  if (aResponseCode === "ErrorItemNotFound")
   {
     log.debug("SOAP error ErrorItemNotFound but not reporting");
     return;
   }
 
   // I think that the aResponseError is bogus here, but I leave it to be safe
-  if (aResponseError == "PasswordMissing" || aResponseCode == "HtmlStatus401" || aResponseCode == "PasswordMissing")
+  if (aResponseError === "PasswordMissing" || aResponseCode === "HtmlStatus401" || aResponseCode === "PasswordMissing")
   {
     log.warn("Password problem, prompting for user name and password");
     let isOK = false;
@@ -2043,7 +2043,7 @@ async function promiseCheckOnline(aMailbox, aListener)
       if (rerun)
         log.config("Rerunning checkOnline since password was changed by user");
     } while (rerun);
-    if (result.status == Cr.NS_OK) {
+    if (result.status === Cr.NS_OK) {
       // Check and fix the mailbox version
       // xmlns:h="http://schemas.microsoft.com/exchange/services/2006/types"
       // xmlns:s="http://schemas.xmlsoap.org/soap/envelope/"
@@ -2058,10 +2058,10 @@ async function promiseCheckOnline(aMailbox, aListener)
         let serverVersion = "2007sp1";
         // We support Exchange2007SP1 and Exchange2010SP1
         if ( (majorVersion > 14) ||
-              (majorVersion == 14 && minorVersion > 0))
+              (majorVersion === 14 && minorVersion > 0))
           serverVersion = "2010sp1";
         log.config("Using schema for server version " + serverVersion);
-        if (serverVersion != aMailbox.serverVersion) {
+        if (serverVersion !== aMailbox.serverVersion) {
           log.config("Reloading schema with modified version");
           aMailbox.loadSchema(serverVersion);
         }
@@ -2077,7 +2077,7 @@ async function promiseCheckOnline(aMailbox, aListener)
       }
     }
     // We'll try autodiscover once
-    if (result.status != Cr.NS_OK && !aMailbox.didAutodiscover)
+    if (result.status !== Cr.NS_OK && !aMailbox.didAutodiscover)
     {
       log.config("trying autodiscover on mailbox since checkOnline failed");
       aMailbox.didAutodiscover = true;
@@ -2088,7 +2088,7 @@ async function promiseCheckOnline(aMailbox, aListener)
   }
   catch (e) {oe(result, "taskCheckOnline", e);}
   finally {
-    aMailbox.isOnline = (result.status == Cr.NS_OK);
+    aMailbox.isOnline = (result.status === Cr.NS_OK);
     return (result);
   }
 }
@@ -2104,19 +2104,19 @@ async function promiseInitial(aMailbox, aListener)
         result = await promiseCheckOnline(aMailbox, aListener);
       }
 
-      if (result.status != Cr.NS_OK)
+      if (result.status !== Cr.NS_OK)
         break;
 
       if (aMailbox.needFolderDiscovery)
       {
         log.config("mailbox needs Folder Discovery");
         result = await promiseGetDistinguishedIds(aMailbox, aListener);
-        if (result.status != Cr.NS_OK)
+        if (result.status !== Cr.NS_OK)
           break;
 
         let nativeRootFolder = aMailbox.getDistinguishedNativeFolder("msgfolderroot");
         result = await promiseDiscoverSubfolders(aMailbox, nativeRootFolder, aListener);
-        if (result.status != Cr.NS_OK)
+        if (result.status !== Cr.NS_OK)
           break;
       }
       // If we get here (even doing nothing) then all is OK
@@ -2145,7 +2145,7 @@ async function promiseGetDistinguishedIds(aMailbox, aListener)
     result = await soapResponse.promise;
 
     log.debug('taskGetDistinguishedIds result.status is  ' + result.status);
-    if (result.status == Cr.NS_ERROR_NOT_AVAILABLE)
+    if (result.status === Cr.NS_ERROR_NOT_AVAILABLE)
     {
       log.warn("One or more distinguished folders missing but continuing");
       result.status = Cr.NS_OK;
@@ -2155,7 +2155,7 @@ async function promiseGetDistinguishedIds(aMailbox, aListener)
   catch (e) {oe(result, "taskGetDistinguishedIds", e);}
   finally {
     log.debug("taskGetDistinguishedIds finally with status " + result.status);
-    if (result.status == Cr.NS_OK)
+    if (result.status === Cr.NS_OK)
       aMailbox.needFolderDiscovery = false;
     return (result);
   }
@@ -2202,21 +2202,21 @@ async function promiseAutodiscoverUrl(aMailbox, aEventListener)
         result = await promiseCheckOnline(aMailbox, aEventListener);
 
         log.config('promiseAutodiscoverUrl checkOnline result is ' + result.status);
-        if (result.status == Cr.NS_OK)
+        if (result.status === Cr.NS_OK)
         {
           log.debug("using ewsUrl from autodiscover");
           break;
         }
       }
-      if (result.status != Cr.NS_OK)
+      if (result.status !== Cr.NS_OK)
       {
         log.info("autodiscover could not find a valid ews url");
         aMailbox.ewsURL = oldUrl;
       }
     }
   }
-  catch (e) {oe(result, "taskAutodiscoverUrl", e);}
-  finally   {return (result);}
+  catch (e) { oe(result, "taskAutodiscoverUrl", e); }
+  finally   { return (result); }
 }
 
 async function promiseDiscoverSubfolders(aMailbox, aFolder, aListener)
@@ -2250,7 +2250,7 @@ async function promiseDiscoverSubfolders(aMailbox, aFolder, aListener)
       aMailbox.queueRequest(request);
       result = await soapResponse.promise;
 
-      if (result.status != Cr.NS_OK)
+      if (result.status !== Cr.NS_OK)
       {
         // Discover failed, so we are not going to take any action. Reverse
         // clearing verifiedOnline, and fail.
@@ -2275,7 +2275,7 @@ async function promiseDiscoverSubfolders(aMailbox, aFolder, aListener)
                  .getElementsByTagNameNS(
                    "http://schemas.microsoft.com/exchange/services/2006/messages",
                    "RootFolder")[0];
-        lastItem = !(rootFolderElement.getAttribute("IncludesLastItemInRange") == "false");
+        lastItem = !(rootFolderElement.getAttribute("IncludesLastItemInRange") === "false");
       }
     }
 
@@ -2306,14 +2306,14 @@ async function promiseProcessItem(aChangedItem, aGetAttachments, aListener, aIte
     let isDeleted = aChangedItem.flags & (aChangedItem.DeletedBit | aChangedItem.DeletedOnServerBit);
 
     // Test failure, simulate errors on the second item
-    if (mailbox.testType == "FailInMachineReporting")
+    if (mailbox.testType === "FailInMachineReporting")
     {
       mailbox.testType = "";
       throw("Simulated indexToReport failure");
     }
 
     // If this item is a distribution list, we also have to get its expansion
-    if (itemClass.indexOf("IPM.DistList") == 0)
+    if (itemClass.indexOf("IPM.DistList") === 0)
     {
       let soapResponse = new PromiseSoapResponse(aListener);
       let request = new EwsSoapRequest();
@@ -2321,12 +2321,12 @@ async function promiseProcessItem(aChangedItem, aGetAttachments, aListener, aIte
       request.expandDL(soapResponse, aChangedItem);
       mailbox.queueRequest(request);
       result = await soapResponse.promise;
-      if (result.status != Cr.NS_OK)
+      if (result.status !== Cr.NS_OK)
         log.warn("expandDL failed");
     }
 
-    if ( (itemClass.indexOf("IPM.Appointment") == 0) ||
-         (itemClass.indexOf("IPM.Task") == 0) )
+    if ( (itemClass.indexOf("IPM.Appointment") === 0) ||
+         (itemClass.indexOf("IPM.Task") === 0) )
     {
       do
       {
@@ -2337,7 +2337,7 @@ async function promiseProcessItem(aChangedItem, aGetAttachments, aListener, aIte
         }
         // If this is a recurring master, then we must also get occurrence items
         let calendarItemType = properties.getAString("CalendarItemType");
-        if (calendarItemType != "RecurringMaster")
+        if (calendarItemType !== "RecurringMaster")
           break;
         // get occurrences
         let modifiedOccurrences = properties.getPropertyList("ModifiedOccurrences");
@@ -2383,14 +2383,14 @@ async function promiseProcessItem(aChangedItem, aGetAttachments, aListener, aIte
           request.getChangedItemProperties(soapResponse, folder, getChangedIds, false);
           mailbox.queueRequest(request);
           result = await soapResponse.promise;
-          if (result.status != Cr.NS_OK)
+          if (result.status !== Cr.NS_OK)
             log.warn("syncFolderItemsProperties failed");
           else
           {
             let dsListener = new PromiseUtils.DatastoreListener();
             mailbox.datastore.putItem(occurrenceItem, dsListener);
             result = await dsListener.promise;
-            if (result.status != Cr.NS_OK)
+            if (result.status !== Cr.NS_OK)
               log.warn("Could not persist occurrence item");
           }
         }
@@ -2398,7 +2398,7 @@ async function promiseProcessItem(aChangedItem, aGetAttachments, aListener, aIte
     } // if appointment or task
 
     // persist the expansion list
-    if (itemClass.indexOf("IPM.DistList") == 0)
+    if (itemClass.indexOf("IPM.DistList") === 0)
     {
       let dsListener = new PromiseUtils.DatastoreListener();
       if (isDeleted)
@@ -2406,7 +2406,7 @@ async function promiseProcessItem(aChangedItem, aGetAttachments, aListener, aIte
       else
         mailbox.datastore.putDlExpansion(aChangedItem, dsListener);
       result = await dsListener.promise;
-      if (result.status != Cr.NS_OK)
+      if (result.status !== Cr.NS_OK)
         log.warn("datastore error in DLExpansion");
     }
 
@@ -2420,7 +2420,7 @@ async function promiseProcessItem(aChangedItem, aGetAttachments, aListener, aIte
           let listener = new PromiseUtils.MachineListener();
           mailbox.getAttachmentContent(attachment, listener);
           let result = await listener.promise;
-          if (result.status != Cr.NS_OK)
+          if (result.status !== Cr.NS_OK)
             log.warn("Failed to download attachment");
         } catch (e) {log.warn("Failed to download attachment");}
       }
@@ -2463,14 +2463,14 @@ async function promiseProcessItem(aChangedItem, aGetAttachments, aListener, aIte
           mailbox.datastore.putBody(aChangedItem, dsListener);
           result = await dsListener.promise;
         }
-        if (result.status != Cr.NS_OK)
+        if (result.status !== Cr.NS_OK)
           log.warn("Could not persist changed item body");
         if (aChangedItem.flags & aChangedItem.Dirty)
           aChangedItem.clearFlags(aChangedItem.Dirty);
         let dsListener = new PromiseUtils.DatastoreListener();
         mailbox.datastore.putItem(aChangedItem, dsListener);
         result = await dsListener.promise;
-        if (result.status != Cr.NS_OK)
+        if (result.status !== Cr.NS_OK)
           log.warn("Could not persist changed item");
       }
     }
@@ -2486,17 +2486,10 @@ function taskInvalid(aMailbox, aMachine)
   throw new CE("taskInvalidError", Cr.NS_ERROR_FAILURE);
 }
 
-/**
- * Detect whether a value is a generator.
- */
-function isGenerator(aValue) {
-  return Object.prototype.toString.call(aValue) == "[object Generator]";
-}
-
 // Report errors from an array of results
 function warnErrors(aResults, aMessage) {
   for (let result of aResults) {
-    if (result.status != Cr.NS_OK) {
+    if (result.status !== Cr.NS_OK) {
       log.warn(aMessage);
       return result;
     }
