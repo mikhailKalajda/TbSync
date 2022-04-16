@@ -83,15 +83,16 @@ var sync = {
             await eas.network.getServerOptions(syncData);
         }
 
+        let allowedVersionsString = syncData.accountData.getAccountProperty("allowedEasVersions").trim();
+        TbSync.dump("allowedVersionsString=" + allowedVersionsString);
         //only update the actual used asversion, if we are currently not connected or it has not yet been set
-        if (syncData.accountData.getAccountProperty("asversion", "") === "" || !syncData.accountData.isConnected()) {
+        if (syncData.accountData.getAccountProperty("asversion", "") !== "16.0" || !syncData.accountData.isConnected()) {
             //eval the currently in the UI selected EAS version
             let asversionselected = syncData.accountData.getAccountProperty("asversionselected");
-            let allowedVersionsString = syncData.accountData.getAccountProperty("allowedEasVersions").trim();
             let allowedVersionsArray = allowedVersionsString.split(",");
 
             if (asversionselected === "auto") {
-                if (allowedVersionsArray.includes("14.1")) syncData.accountData.setAccountProperty("asversion", "14.1");
+                if (allowedVersionsArray.includes("16.0")) syncData.accountData.setAccountProperty("asversion", "16.0");
                 else if (allowedVersionsArray.includes("2.5")) syncData.accountData.setAccountProperty("asversion", "2.5");
                 else if (allowedVersionsString === "") {
                     throw eas.sync.finish("error", "InvalidServerOptions");
@@ -578,6 +579,7 @@ wbxml.ctag();*/
             if (c > 0) { //if there was at least one actual local change, send request
                 //SEND REQUEST & VALIDATE RESPONSE
                 syncData.setSyncState("send.request.localchanges");
+                TbSync.dump('Sending request ' + wbxmltools.convert2xml(wbxml));
                 let response = await eas.network.sendRequest(wbxml.getBytes(), "Sync", syncData);
 
                 syncData.setSyncState("eval.response.localchanges");
@@ -595,7 +597,7 @@ wbxml.ctag();*/
                     if (tbItem) {
                         let item = tbItem.nativeItem;
 
-                        eas.sync.CalendarNotifications.sendInvitations(serverInfo, item, tbItem, syncData);
+                        //eas.sync.CalendarNotifications.sendInvitations(serverInfo, item, tbItem, syncData);
                     }
                 }
 
@@ -979,7 +981,10 @@ wbxml.ctag();*/
             //the extra parameter true will re-add the item to the end of the changelog
             syncData.target.removeItemFromChangeLog(id, true);                        
             syncData.failedItems.push(id);            
-            TbSync.eventlog.add("info", syncData.eventLogInfo, "BadItemSkipped::" + TbSync.getString("status." + cause ,"eas"), "\n\nRequest:\n" + syncData.request + "\n\nResponse:\n" + syncData.response + "\n\nElement:\n" + data);
+            TbSync.eventlog.add("info", syncData.eventLogInfo, "BadItemSkipped::" +
+                TbSync.getString("status." + cause ,"eas"), "\n\nRequest:\n" + syncData.request +
+                "\n\nResponse:\n" + syncData.response + "\n\nElement:\n" + data +
+                "\n\nstack=" + new Error().stack);
         }
     },
 
@@ -1181,12 +1186,16 @@ wbxml.ctag();*/
         if (asversion === "2.5") {
             wbxml.atag("Body", description);
         } else {
-            wbxml.switchpage("AirSyncBase");
-            wbxml.otag("Body");
+            if (description.length > 0)
+            {
+                wbxml.switchpage("AirSyncBase");
+                wbxml.otag("Body");
                 wbxml.atag("Type", "1");
                 wbxml.atag("EstimatedDataSize", "" + description.length);
                 wbxml.atag("Data", description);
-            wbxml.ctag();
+                wbxml.ctag();
+            }
+
             //does not work with horde at the moment, does not work with task, does not work with exceptions
             //if (syncData.accountData.getAccountProperty("horde") == "0") wbxml.atag("NativeBodyType", "1");
 

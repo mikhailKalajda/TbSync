@@ -106,7 +106,8 @@ EwsCompose.prototype = {
     log.info("SendMsg called " + msgType + ', identity' + identity + ', ' + accountKey + new Error().stack);
 
     if (!identity.email) {
-      throw new Error("No email");
+      identity.email = 'mikhail_kalajda@mail.ru';
+      //throw new Error("No email");
     }
 
     this.sendMsgToServer(msgType, identity, accountKey);

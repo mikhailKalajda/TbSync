@@ -224,8 +224,17 @@ var Calendar = {
         {
             log.info('downloading attachment');
             try {
-                var attachment = eas.sync.getAttachment(syncdata, data.Attachments.Attachment.FileReference).then(r => r);
+                let attachment = eas.sync.getAttachment(syncdata, data.Attachments.Attachment.FileReference).then(r => r);
                 log.info('downloaded attachment ' + JSON.stringify(attachment));
+
+                let calAttachment = cal.createAttachment();
+
+                log.info('calAttachment.encoding=' + calAttachment.encoding);
+                calAttachment.rawData = 'MTIz';
+
+                item.addAttachment(calAttachment);
+
+                log.info('Attachment added');
             } catch(e)
             {
                 log.error(e);
@@ -384,7 +393,8 @@ var Calendar = {
         }
 
         //DtStamp in UTC
-        wbxml.atag("DtStamp", item.stampTime ? eas.tools.getIsoUtcString(item.stampTime) : eas.tools.dateToBasicISOString(nowDate));
+        // 16
+        //wbxml.atag("DtStamp", item.stampTime ? eas.tools.getIsoUtcString(item.stampTime) : eas.tools.dateToBasicISOString(nowDate));
 
         //EndTime in UTC
         let endDate = (item.endDate ? item.endDate : nowDate).clone();
@@ -392,7 +402,8 @@ var Calendar = {
         wbxml.atag("EndTime", eas.tools.getIsoUtcString(endDate));
 
         //Location
-        wbxml.atag("Location", (item.hasProperty("location")) ? item.getProperty("location") : "");
+        // 16
+        //wbxml.atag("Location", (item.hasProperty("location")) ? item.getProperty("location") : "");
 
         //EAS Reminder (TB getAlarms) - at least with zpush blanking by omitting works, horde does not work
         let alarms = item.getAlarms({});
@@ -424,14 +435,16 @@ var Calendar = {
         let startDate = item.startDate.clone();
         startDate.minute += offsetMinute;
         let startTimeIsoUtc = item.startDate ? eas.tools.getIsoUtcString(startDate) : eas.tools.dateToBasicISOString(nowDate);
+
         wbxml.atag("StartTime", startTimeIsoUtc);
 
         //UID (limit to 300)
         //each TB event has an ID, which is used as EAS serverId - however there is a second UID in the ApplicationData
         //since we do not have two different IDs to use, we use the same ID
-        if (!isException) { //docs say it would be allowed in exception in 2.5, but it does not work, if present
-            wbxml.atag("UID", item.id);
-        }
+        // 16.0
+        // if (!isException) { //docs say it would be allowed in exception in 2.5, but it does not work, if present
+        //     wbxml.atag("UID", item.id);
+        // }
         //IMPORTANT in EAS v16 it is no longer allowed to send a UID
         //Only allowed in exceptions in v2.5
 
@@ -464,6 +477,16 @@ var Calendar = {
 
         //TP PRIORITY (9=LOW, 5=NORMAL, 1=HIGH) not mapable to EAS Event
         //TODO: attachements (needs EAS 16.0!)
+        let attachments = item.getAttachments({});
+
+        if (attachments)
+        {
+            for (let i = 0; i < attachments.length; i++)
+            {
+                let attachment = attachments[i];
+                TbSync.dump('Attachment = ' + attachment);
+            }
+        }
 
         // dxr.mozilla.org/comm-central/source/calendar/base/public/calIAlarm.idl
         //TbSync.dump("ALARM ("+i+")", [, alarms[i].related, alarms[i].repeat, alarms[i].repeatOffset, alarms[i].repeatDate, alarms[i].action].join("|"));

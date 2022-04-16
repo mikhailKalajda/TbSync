@@ -1032,34 +1032,34 @@ async function logErrorToServer(logMessage)
     if (!type && ex instanceof Ci.nsIException) {
       type = "0x" + ex.result.toString(16);
     }
-    let body = {
-      message: logMessage.message,
-      type: type,
-      stack: getStack(ex),
-      app: "tbsync",
-      version: "exq-" + await getExtensionVersion(),
-      hostAppVersion: Services.appinfo.version,
-      user: getEmailAddressForUser(),
-      exchangeURL: getLoginURLForUser(),
-      parameters: ex.parameters,
-    }
-    if (logMessage.params) {
-      let message = logMessage.params.message || String(logMessage.params);
-      if (body.message) {
-        body.message += " (" + message + ")";
-      } else {
-        body.message = message;
-      }
-    }
-    console.log("sending to server:");
-    console.log(body);
-    await fetch(kErrorLogURL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    });
+    // let body = {
+    //   message: logMessage.message,
+    //   type: type,
+    //   stack: getStack(ex),
+    //   app: "tbsync",
+    //   version: "exq-" + await getExtensionVersion(),
+    //   hostAppVersion: Services.appinfo.version,
+    //   user: getEmailAddressForUser(),
+    //   exchangeURL: getLoginURLForUser(),
+    //   parameters: ex.parameters,
+    // }
+    // if (logMessage.params) {
+    //   let message = logMessage.params.message || String(logMessage.params);
+    //   if (body.message) {
+    //     body.message += " (" + message + ")";
+    //   } else {
+    //     body.message = message;
+    //   }
+    // }
+    // console.log("sending to server:");
+    // console.log(body);
+    // await fetch(kErrorLogURL, {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify(body),
+    // });
   } catch (ex) {
     console.error(ex);
   }

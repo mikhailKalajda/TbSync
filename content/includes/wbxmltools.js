@@ -46,8 +46,7 @@ var wbxmltools = {
             noLoop--;
             let data = wbxml.substr(num, 1).charCodeAt(0);
             let token = data & 0x3F; //removes content bit(6) and attribute bit(7)
-            let tokenHasContent = ((data & 0x40) != 0); //checks if content bit is set
-
+            let tokenHasContent = ((data & 0x40) !== 0); //checks if content bit is set
 
             if (data === 195) {
                 TbSync.dump("Opaque document-type-specific data");
@@ -126,7 +125,10 @@ var wbxmltools = {
             }
             num = num + 1;
         }
-        return (xml == "") ? "" : '<?xml version="1.0"?>' + xml;
+
+        TbSync.dump('Conver2Xml xml=' + xml);
+
+        return (xml === "") ? "" : '<?xml version="1.0"?>' + xml;
     },
 
     isUnknownToken: function (codepage, token) {
