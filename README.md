@@ -10,7 +10,7 @@
 [TbSync](https://addons.thunderbird.net/addon/tbsync/) is a central user interface to manage cloud accounts and to synchronize their contact, task and calendar information with [Thunderbird](https://www.thunderbird.net/). Its main objective is to simplify the setup process for such accounts. The following providers (protocols) are currently supported:
 * CalDAV & CardDAV, via [DAV-4-TbSync](https://github.com/jobisoft/DAV-4-TbSync) 
 [[compatibility list (DAV)](https://github.com/jobisoft/DAV-4-TbSync/wiki/Compatibility-list-(DAV))]
-* Exchange ActiveSync (EAS v2.5 & v14.1), via [EAS-4-TbSync](https://github.com/jobisoft/EAS-4-TbSync) 
+* Exchange ActiveSync (EAS v2.5 & v16.0), via [EAS-4-TbSync](https://github.com/jobisoft/EAS-4-TbSync) 
 [[compatibility list (EAS)](https://github.com/jobisoft/EAS-4-TbSync/wiki/Compatibility-list-(EAS))]
 
 Further details can be found in the [wiki](https://github.com/jobisoft/TbSync/wiki) of the TbSync project and in the [how-to-get-started guide](https://github.com/jobisoft/TbSync/wiki/How-to-get-started).

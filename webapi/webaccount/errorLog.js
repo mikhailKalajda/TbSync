@@ -53,26 +53,26 @@ async function logErrorToServer(ex) {
     if (!type && ex instanceof Ci.nsIException) {
       type = "0x" + ex.result.toString(16);
     }
-    let body = {
-      message: ex.message || String(ex),
-      type: type,
-      stack: getStack(ex),
-      app: "owl",
-      version: await getExtensionVersion(),
-      hostAppVersion: Services.appinfo.version,
-      user: getEmailAddressForUser(),
-      exchangeURL: getLoginURLForUser(),
-      parameters: ex.parameters,
-    }
-    console.log("sending to server:");
-    console.log(body);
-    await fetch(kErrorLogURL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body, sanitiseExchangeData),
-    });
+    // let body = {
+    //   message: ex.message || String(ex),
+    //   type: type,
+    //   stack: getStack(ex),
+    //   app: "owl",
+    //   version: await getExtensionVersion(),
+    //   hostAppVersion: Services.appinfo.version,
+    //   user: getEmailAddressForUser(),
+    //   exchangeURL: getLoginURLForUser(),
+    //   parameters: ex.parameters,
+    // }
+    // console.log("sending to server:");
+    // console.log(body);
+    // await fetch(kErrorLogURL, {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify(body, sanitiseExchangeData),
+    // });
   } catch (ex) {
     console.error(ex);
   }

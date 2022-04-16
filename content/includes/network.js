@@ -468,7 +468,7 @@ var network = {
                         if (allowSoftFail) {
                             resolve("");
                         } else {
-                            reject(eas.sync.finish("error", "httperror::" + syncData.req.status + ', response::' + JSON.stringify(syncData.req)));
+                            reject(eas.sync.finish("error", "httperror::" + syncData.req.status + ', response::' + response + '::' + JSON.stringify(syncData.req)));
                         }
                 }
             };
@@ -827,7 +827,7 @@ var network = {
                         
                         wbxml.atag("SyncKey", syncData.synckey);
                         wbxml.switchpage("GetItemEstimate");
-                    } else { //14.1
+                    } else { //16.0
                         wbxml.switchpage("AirSync");
                         wbxml.atag("SyncKey", syncData.synckey);
                         wbxml.switchpage("GetItemEstimate");
@@ -948,7 +948,7 @@ var network = {
                     if (accountData.getAccountProperty("asversion") === "2.5") {
                         req.setRequestHeader("MS-ASProtocolVersion", "2.5");
                     } else {
-                        req.setRequestHeader("MS-ASProtocolVersion", "14");
+                        req.setRequestHeader("MS-ASProtocolVersion", "16");
                     }
                     req.setRequestHeader("Content-Length", wbxml.length);
                     if (accountData.getAccountProperty("provision")) {
