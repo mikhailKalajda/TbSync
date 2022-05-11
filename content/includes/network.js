@@ -827,7 +827,7 @@ var network = {
                         
                         wbxml.atag("SyncKey", syncData.synckey);
                         wbxml.switchpage("GetItemEstimate");
-                    } else { //14.1
+                    } else { //14.0
                         wbxml.switchpage("AirSync");
                         wbxml.atag("SyncKey", syncData.synckey);
                         wbxml.switchpage("GetItemEstimate");

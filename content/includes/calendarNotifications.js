@@ -37,9 +37,12 @@ var CalendarNotifications = {
 
     sendToAttendee: async function(item, tbItem, attendeeName, attendeeEmail, clientId, syncData)
     {
-        if (!item.organizer) {
-            TbSync.dump('sendToAttendee organizer is not set');
-            return;
+        let organizer = "mailto:r7user1@ad.r7-demo.ru";
+
+        if (item.organizer) {
+            organizer = item.organizer.id;
+            //TbSync.dump('sendToAttendee organizer is not set');
+            //return;
         }
 
         let ics = eas.sync.icsBuilder.build(item, attendeeName, attendeeEmail);
@@ -47,7 +50,7 @@ var CalendarNotifications = {
         TbSync.dump('ICS=' + ics);
 
         let mimeContent = `MIME-Version: 1.0
-From: ${cal.email.removeMailTo(item.organizer.id)}
+From: ${cal.email.removeMailTo(organizer)}
 Subject: ${(item.title) ? item.title : ""}
 Thread-Topic: ${(item.title) ? item.title : ""}
 To: ${attendeeEmail}

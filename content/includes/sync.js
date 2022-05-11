@@ -91,7 +91,7 @@ var sync = {
             let allowedVersionsArray = allowedVersionsString.split(",");
 
             if (asversionselected === "auto") {
-                if (allowedVersionsArray.includes("14.1")) syncData.accountData.setAccountProperty("asversion", "14.1");
+                if (allowedVersionsArray.includes("14.0")) syncData.accountData.setAccountProperty("asversion", "14.0");
                 else if (allowedVersionsArray.includes("2.5")) syncData.accountData.setAccountProperty("asversion", "2.5");
                 else if (allowedVersionsString === "") {
                     throw eas.sync.finish("error", "InvalidServerOptions");
@@ -593,9 +593,13 @@ wbxml.ctag();*/
                     let tbItem = await syncData.target.getItem(changes[i].itemId);
 
                     if (tbItem) {
-                        let item = tbItem.nativeItem;
+                        try {
+                            let item = tbItem.nativeItem;
 
-                        eas.sync.CalendarNotifications.sendInvitations(serverInfo, item, tbItem, syncData);
+                            eas.sync.CalendarNotifications.sendInvitations(serverInfo, item, tbItem, syncData);
+                        } catch (e) {
+                            log.error(e);
+                        }
                     }
                 }
 

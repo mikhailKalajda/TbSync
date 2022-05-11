@@ -367,7 +367,8 @@ var Calendar = {
         wbxml.atag("AllDayEvent", (item.startDate && item.startDate.isDate && item.endDate && item.endDate.isDate) ? "1" : "0");
 
         //Body
-        wbxml.append(eas.sync.getItemBody(item, syncdata));
+        // 22
+        //wbxml.append(eas.sync.getItemBody(item, syncdata));
 
         //BusyStatus (Free, Tentative, Busy) is taken from TRANSP (busy, free, unset=tentative)
         //However if STATUS is set to TENTATIVE, overide TRANSP and set BusyStatus to TENTATIVE
@@ -384,40 +385,46 @@ var Calendar = {
         }
 
         //DtStamp in UTC
-        wbxml.atag("DtStamp", item.stampTime ? eas.tools.getIsoUtcString(item.stampTime) : eas.tools.dateToBasicISOString(nowDate));
+        // 16
+        //wbxml.atag("DtStamp", item.stampTime ? eas.tools.getIsoUtcString(item.stampTime) : eas.tools.dateToBasicISOString(nowDate));
 
         //EndTime in UTC
         let endDate = (item.endDate ? item.endDate : nowDate).clone();
         endDate.minute += offsetMinute;
+
         wbxml.atag("EndTime", eas.tools.getIsoUtcString(endDate));
 
         //Location
-        wbxml.atag("Location", (item.hasProperty("location")) ? item.getProperty("location") : "");
+        // 27
+        //wbxml.atag("Location", (item.hasProperty("location")) ? item.getProperty("location") : "");
 
         //EAS Reminder (TB getAlarms) - at least with zpush blanking by omitting works, horde does not work
-        let alarms = item.getAlarms({});
-        if (alarms.length > 0) {
+        // 23
+        // let alarms = item.getAlarms({});
+        // if (alarms.length > 0) {
 
-            let reminder = -1;
-            if (alarms[0].offset !== null) {
-                reminder = 0 - alarms[0].offset.inSeconds / 60;
-            } else if (item.startDate) {
-                let timeDiff = item.startDate.getInTimezone(eas.utcTimezone).subtractDate(alarms[0].alarmDate.getInTimezone(eas.utcTimezone));
-                reminder = timeDiff.inSeconds / 60;
-                TbSync.eventlog.add("info", syncdata, "Converting absolute alarm to relative alarm (not supported).", item.icalString);
-            }
-            if (reminder >= 0) {
-                wbxml.atag("Reminder", reminder.toString());
-            }
-            else {
-                TbSync.eventlog.add("info", syncdata, "Droping alarm after start date (not supported).", item.icalString);
-            }
-        }
+        //     let reminder = -1;
+        //     if (alarms[0].offset !== null) {
+        //         reminder = 0 - alarms[0].offset.inSeconds / 60;
+        //     } else if (item.startDate) {
+        //         let timeDiff = item.startDate.getInTimezone(eas.utcTimezone).subtractDate(alarms[0].alarmDate.getInTimezone(eas.utcTimezone));
+        //         reminder = timeDiff.inSeconds / 60;
+        //         TbSync.eventlog.add("info", syncdata, "Converting absolute alarm to relative alarm (not supported).", item.icalString);
+        //     }
+        //     if (reminder >= 0) {
+        //         wbxml.atag("Reminder", reminder.toString());
+        //     }
+        //     else {
+        //         TbSync.eventlog.add("info", syncdata, "Droping alarm after start date (not supported).", item.icalString);
+        //     }
+        // }
 
         //Sensitivity (CLASS)
-        wbxml.atag("Sensitivity", eas.sync.mapThunderbirdPropertyToEas("CLASS", "Sensitivity", item));
+        // 26
+        //wbxml.atag("Sensitivity", eas.sync.mapThunderbirdPropertyToEas("CLASS", "Sensitivity", item));
 
         //Subject (obmitting these, should remove them from the server - that does not work reliably, so we send blanks)
+
         wbxml.atag("Subject", (item.title) ? item.title : "");
 
         //StartTime in UTC
@@ -429,9 +436,10 @@ var Calendar = {
         //UID (limit to 300)
         //each TB event has an ID, which is used as EAS serverId - however there is a second UID in the ApplicationData
         //since we do not have two different IDs to use, we use the same ID
-        if (!isException) { //docs say it would be allowed in exception in 2.5, but it does not work, if present
-            wbxml.atag("UID", item.id);
-        }
+        // 16
+        // if (!isException) { //docs say it would be allowed in exception in 2.5, but it does not work, if present
+        //     wbxml.atag("UID", item.id);
+        // }
         //IMPORTANT in EAS v16 it is no longer allowed to send a UID
         //Only allowed in exceptions in v2.5
 
@@ -451,14 +459,16 @@ var Calendar = {
         this.UpdateAttendeesIn(item, wbxml, asversion, isException, syncdata);
 
         //Categories (see https://github.com/jobisoft/TbSync/pull/35#issuecomment-359286374)
-        if (!isException) {
-            wbxml.append(eas.sync.getItemCategories(item, syncdata));
-        }
+        // 24
+        // if (!isException) {
+        //     wbxml.append(eas.sync.getItemCategories(item, syncdata));
+        // }
 
         //recurrent events (implemented by Chris Allan)
-        if (!isException) {
-            wbxml.append(eas.sync.getItemRecurrence(item, syncdata));
-        }
+        // 25
+        // if (!isException) {
+        //     wbxml.append(eas.sync.getItemRecurrence(item, syncdata));
+        // }
 
         //---------------------------
 
