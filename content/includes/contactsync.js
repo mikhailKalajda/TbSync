@@ -107,9 +107,9 @@ var Contacts = {
         MMS: 'MMS'
     },
 
-    // --------------------------------------------------------------------------- //
+    // ---------------------------------------------------------------------------
     // Read WBXML and set Thunderbird item
-    // --------------------------------------------------------------------------- //
+    // ---------------------------------------------------------------------------
     setThunderbirdItemFromWbxml: function (abItem, data, id, syncdata, mode = "standard") {
         let asversion = syncdata.accountData.getAccountProperty("asversion");
         if (TbSync.prefs.getIntPref("log.userdatalevel") > 2) TbSync.dump("Processing " + mode + " contact item", id);
@@ -235,9 +235,9 @@ var Contacts = {
         }
     },
 
-    // --------------------------------------------------------------------------- //
+    // ---------------------------------------------------------------------------
     //read TB event and return its data as WBXML
-    // --------------------------------------------------------------------------- //
+    // ---------------------------------------------------------------------------
     getWbxmlFromThunderbirdItem: function (abItem, syncdata, isException = false) {
         let asversion = syncdata.accountData.getAccountProperty("asversion");
         let wbxml = eas.wbxmltools.createWBXML("", syncdata.type); //init wbxml with "" and not with precodes, and set initial codepage
@@ -283,7 +283,7 @@ var Contacts = {
         }
 
         //take care of photo
-        if (abItem.getProperty("PhotoType", "") == "file") {
+        if (abItem.getProperty("PhotoType", "") === "file") {
             wbxml.atag("Picture", abItem.getPhoto());                    
         } else {
             wbxml.atag("Picture", "");                    
@@ -311,7 +311,7 @@ var Contacts = {
 
         //take care of notes - SWITCHING TO AirSyncBase (if 2.5, we still need Contact group here!)
         let description = abItem.getProperty("Notes", "");
-        if (asversion == "2.5") {
+        if (asversion === "2.5") {
             wbxml.atag("Body", description);
         } else {
             wbxml.switchpage("AirSyncBase");

@@ -20,8 +20,7 @@ ChromeUtils.defineModuleGetter(this, "Utils",
   "resource://tbsync/ewsUtils.jsm");
 ChromeUtils.defineModuleGetter(this, "Services",
   "resource://gre/modules/Services.jsm");
-ChromeUtils.defineModuleGetter(this, "MailServices",
-  "resource:///modules/MailServices.jsm");
+ChromeUtils.defineModuleGetter(this, "MailServices",  "resource:///modules/MailServices.jsm"); //#asis
 Cu.importGlobalProperties(["DOMParser"]);
 var _log = null;
 XPCOMUtils.defineLazyGetter(this, "log", () => {
@@ -146,10 +145,10 @@ EwsNativeItem.prototype = {
   Dirty:              0x00004000, // local representation may not match server
   NeedsResync:        0x00010000, // this item needs resync and is invalid until done
 
-  /// combined set of processing flags, not persisted. Right now I am keeping
-  /// these completely separate from the flags, yet still I am trying
-  /// to not duplicate bits between the two. If needed, I could start
-  /// duplicating.
+  // combined set of processing flags, not persisted. Right now I am keeping
+  // these completely separate from the flags, yet still I am trying
+  // to not duplicate bits between the two. If needed, I could start
+  // duplicating.
   NeedsPropertiesBit: 0x00000008,
   HasBody:            0x00000020,
   // for recurring masters, do we need to get modified occurrences?
@@ -198,35 +197,35 @@ EwsNativeItem.prototype = {
   get previousId() { return this._previousId;},
   set previousId(aValue) {this._previousId = aValue;},
 
-  /// IPM class
+  // IPM class
   //attribute AString itemClass;
   get itemClass() { return this._itemClass;},
   set itemClass(aValue) {this._itemClass = aValue;},
 
-  /// change key
+  // change key
   //attribute AString changeKey;
   get changeKey() { return this._changeKey;},
   set changeKey(aValue) {this._changeKey = aValue;},
 
-  /// folder id that contains the item
+  // folder id that contains the item
   //attribute AString folderId;
   get folderId() { return this._folderId;},
   set folderId(aValue) {this._folderId = aValue;},
 
-  /// some items (like recurring item exceptions) are related to other items
+  // some items (like recurring item exceptions) are related to other items
   //attribute AString parentId;
   get parentId() { return this._parentId;},
   set parentId(aValue) {this._parentId = aValue;},
 
-  /// OriginalStart for a recurrence, used by the datastore to index the item
+  // OriginalStart for a recurrence, used by the datastore to index the item
   //attribute AString originalStart;
   get originalStart() { return this._originalStart;},
   set originalStart(aValue) {this._originalStart = aValue;},
 
-  /// item id, replaced by parentId + "?OriginalStart=" + originalStart
-  ///  when available. This is used for indexing in the datastore
-  ///  and mailbox.
-  ///
+  // item id, replaced by parentId + "?OriginalStart=" + originalStart
+  //  when available. This is used for indexing in the datastore
+  //  and mailbox.
+  //
   //  This is only used in the currently unsupported calendar, so has not been
   //  tested in JS.
   //readonly attribute AString exItemId;
@@ -266,18 +265,18 @@ EwsNativeItem.prototype = {
     return this._itemId;
   },
 
-  /// instanceIndex, usable with parentId as a replacement for itemId
+  // instanceIndex, usable with parentId as a replacement for itemId
   //attribute unsigned long instanceIndex;
   get instanceIndex() { return this._instanceIndex;},
   set instanceIndex(aValue) {this._instanceIndex = aValue;},
 
-  /// distinguished folder id that contains the item. This is a partial
-  /// implementation, created initially only for create item.
+  // distinguished folder id that contains the item. This is a partial
+  // implementation, created initially only for create item.
   //attribute AString distinguishedFolderId;
   get distinguishedFolderId() { return this._distinguishedFolderId;},
   set distinguishedFolderId(aValue) {this._distinguishedFolderId = aValue;},
 
-  /// item is newly updated on server
+  // item is newly updated on server
   //attribute boolean updatedOnServer;
   get updatedOnServer() {
     return !!(this._flags & this.UpdatedOnServerBit);
@@ -292,7 +291,7 @@ EwsNativeItem.prototype = {
       this.clearFlags(this.UpdatedOnServerBit);
   },
 
-  /// item is newly created on server
+  // item is newly created on server
   //attribute boolean newOnServer;
   get newOnServer() {
     return !!(this._flags & this.NewOnServerBit);
@@ -307,7 +306,7 @@ EwsNativeItem.prototype = {
       this.clearFlags(this.NewOnServerBit);
   },
 
-  /// item is newly deleted on server
+  // item is newly deleted on server
   //attribute boolean deletedOnServer;
   get deletedOnServer() {
     return !!(this._flags & this.DeletedOnServerBit);
@@ -322,9 +321,9 @@ EwsNativeItem.prototype = {
       this.clearFlags(this.DeletedOnServerBit);
   },
 
-  /// item change detected, needs SOAP update  This is intended for
-  ///  internal use to detect when a second SOAP call is required to
-  ///  update all properties
+  //item change detected, needs SOAP update  This is intended for
+  //  internal use to detect when a second SOAP call is required to
+  //  update all properties
   //attribute boolean needsProperties;
   get needsProperties() { return !!(this._flags & this.NeedsPropertiesBit);},
   set needsProperties(aValue) {
@@ -334,7 +333,7 @@ EwsNativeItem.prototype = {
       this.clearFlags(this.NeedsPropertiesBit);
   },
 
-  /// item is marked as deleted on the server
+  // item is marked as deleted on the server
   //attribute boolean deleted;
   get deleted() { return !!(this._flags & this.DeletedBit);},
   set deleted(aValue) {
@@ -349,12 +348,12 @@ EwsNativeItem.prototype = {
   get properties() { return this._properties;},
   set properties(aValue) {this._properties = aValue ? aValue.wrappedJSObject : null;},
 
-  /// if this is a distribution list, the expansion
+  //if this is a distribution list, the expansion
   //attribute PropertyList dlExpansion;
   get dlExpansion() { return this._dlExpansion;},
   set dlExpansion(aValue) {this._dlExpansion = aValue;},
 
-  /// storage for properties that are not part of the SOAP representation
+  // storage for properties that are not part of the SOAP representation
   //attribute PropertyList localProperties;
   get localProperties() {
     if (!this._localProperties)
@@ -363,8 +362,8 @@ EwsNativeItem.prototype = {
   },
   set localProperties(value) {this._localProperties = value;},
 
-  /// string representation of properties for storage. Setting this will
-  ///  also update the properties property list.
+  // string representation of properties for storage. Setting this will
+  //  also update the properties property list.
   //attribute AString propertiesString;
   get propertiesString() {
     if (!this._properties || this._properties.length == 0)
@@ -372,22 +371,22 @@ EwsNativeItem.prototype = {
 
     let elementName;
 
-    if (this._itemClass == "IPM.Contact")
+    if (this._itemClass === "IPM.Contact")
       elementName = "Contact";
-    else if (this._itemClass == "IPM.Note")
+    else if (this._itemClass === "IPM.Note")
       elementName = "Message";
-    else if (this._itemClass == "IPM.Appointment" ||
-             this._itemClass == "IPM.OLE.CLASS.{00061055-0000-0000-C000-000000000046}")
+    else if (this._itemClass === "IPM.Appointment" ||
+             this._itemClass === "IPM.OLE.CLASS.{00061055-0000-0000-C000-000000000046}")
       elementName = "CalendarItem";
-    else if (this._itemClass == "IPM.Task")
+    else if (this._itemClass === "IPM.Task")
       elementName = "Task";
-    else if (this._itemClass == "IPM.DistList")
+    else if (this._itemClass === "IPM.DistList")
       elementName = "DistributionList";
-    else if (this._itemClass == "IPM.Schedule.Meeting.Request")
+    else if (this._itemClass === "IPM.Schedule.Meeting.Request")
       elementName = "MeetingRequest";
-    else if (this._itemClass == "IPM.Schedule.Meeting.Canceled")
+    else if (this._itemClass === "IPM.Schedule.Meeting.Canceled")
       elementName = "MeetingCancellation";
-    else if (this._itemClass == "IPM.Schedule.Meeting.Resp")
+    else if (this._itemClass === "IPM.Schedule.Meeting.Resp")
       elementName = "MeetingResponse";
     else
       elementName = "Item";
@@ -421,9 +420,9 @@ EwsNativeItem.prototype = {
     this._properties = EWStoPL.domToVariant(parsedElement).wrappedJSObject;
   },
 
-  /// string representation of dlExpansion for storage. Setting this will
-  ///  also update the dlExpansion property list.
-  /// XXX ToDo testing of get/set dlExpansionString
+  // string representation of dlExpansion for storage. Setting this will
+  //  also update the dlExpansion property list.
+  // XXX ToDo testing of get/set dlExpansionString
   //attribute AString dlExpansionString;
   get dlExpansionString() {
     if (!this._itemClass.startsWith("IPM.DistList"))
@@ -448,7 +447,7 @@ EwsNativeItem.prototype = {
     this._dlExpansion = EWStoPL.domToVariant(parsedElement);
   },
 
-  /// native mailbox containing the item
+  // native mailbox containing the item
   //attribute EwsNativeMailbox mailbox;
   get mailbox() {
     try {
@@ -462,28 +461,28 @@ EwsNativeItem.prototype = {
     this._mailboxWeak = Cu.getWeakReference(value);
   },
 
-  /// combined set of status flags, used in storage
+  // combined set of status flags, used in storage
   //attribute unsigned long flags;
   get flags() { return this._flags;},
   set flags(aValue) {this._flags = aValue;},
 
-  /// set one or more flags
+  // set one or more flags
   //void raiseFlags(in unsigned long aFlags);
   raiseFlags(aFlags) { this._flags |= aFlags; },
 
-  /// clear one or more flags
+  // clear one or more flags
   //void clearFlags(in unsigned long aFlags);
   clearFlags(aFlags) { this._flags &= ~aFlags; },
 
-  /// combined set of processing flags, not persisted. Right now I am keeping
-  /// these completely separate from the flags, yet still I am trying
-  /// to not duplicate bits between the two. If needed, I could start
-  /// duplicating.
+  // combined set of processing flags, not persisted. Right now I am keeping
+  // these completely separate from the flags, yet still I am trying
+  // to not duplicate bits between the two. If needed, I could start
+  // duplicating.
   //attribute unsigned long processingFlags;
   get processingFlags() { return this._processingFlags;},
   set processingFlags(aValue) {this._processingFlags = aValue;},
 
-  /// message body
+  // message body
   //attribute AString body;
   get body() {
     if (this._body)
@@ -500,8 +499,8 @@ EwsNativeItem.prototype = {
       this._processingFlags &= ~this.HasBody;
   },
 
-  /// As an error check, I need to see if the body is empty. I don't want to copy
-  ///  the entire string just to do that
+  // As an error check, I need to see if the body is empty. I don't want to copy
+  // the entire string just to do that
   //readonly attribute boolean isBodyEmpty;
   get isBodyEmpty() {
     if (this._body)
@@ -512,12 +511,12 @@ EwsNativeItem.prototype = {
     return true;
   },
 
-  /// MIME version of item
+  // MIME version of item
   //attribute ACString mimeContent;
   get mimeContent() { return this._mimeContent;},
   set mimeContent(aValue) {this._mimeContent = aValue;},
 
-  /// character set for MIME item
+  // character set for MIME item
   //attribute AString mimeCharacterSet;
   get mimeCharacterSet() { return this._mimeCharacterSet;},
   set mimeCharacterSet(aValue) {this._mimeCharacterSet = aValue;},
@@ -581,13 +580,13 @@ EwsNativeItem.prototype = {
           log.error("missing property list");
           continue;
         }
-        if (aAttachmentId == attachmentPL.getAString("AttachmentId/$attributes/Id")) {
+        if (aAttachmentId === attachmentPL.getAString("AttachmentId/$attributes/Id")) {
           let attachment = new EwsNativeAttachment();
           attachment.parentItem = this;
           attachment.attachmentId = aAttachmentId;
           let type = attachmentsPL.getNameAt(index);
           //log.debug("attachment type(1) is " + type);
-          attachment.isFileAttachment = type == "FileAttachment";
+          attachment.isFileAttachment = type === "FileAttachment";
           return attachment;
         }
       }
@@ -687,7 +686,7 @@ EwsNativeItem.prototype = {
           log.error("missing property list");
           continue;
         }
-        if (attachment.attachmentId == attachmentPL.getAString("AttachmentId/$attributes/Id")) {
+        if (attachment.attachmentId === attachmentPL.getAString("AttachmentId/$attributes/Id")) {
           attachmentsPL.removeElementAt(index);
           return;
         }
@@ -713,7 +712,7 @@ EwsNativeItem.prototype = {
       throw CE("Missing properties", Cr.NS_ERROR_NOT_INITIALIZED);
     if (!this.folderId)
       throw CE("Missing folderId", Cr.NS_ERROR_NOT_INITIALIZED);
-    let nativeFolder = mailbox.getNativeFolder(this.folderId)
+    let nativeFolder = mailbox.getNativeFolder(this.folderId);
     if (!nativeFolder)
       throw CE("Missing nativeFolder", Cr.NS_ERROR_NOT_INITIALIZED);
     if (!this.itemClass)
@@ -765,7 +764,7 @@ EwsNativeItem.prototype = {
       let shorterName = propertyName.substring(pos + 1);
 
       // certain properties cannot be updated
-      if (shorterName == "RecurrenceId")
+      if (shorterName === "RecurrenceId")
         continue;
 
       // shorterName  = PhysicalAddress:Street or ExtendedProperty:0x1234
@@ -783,12 +782,12 @@ EwsNativeItem.prototype = {
       //dl('unparsed name is ' + itemPropertyNames.getAt(i));
 
           // Handle special case fields
-      if (shorterName == "DeletedOccurrences")
+      if (shorterName === "DeletedOccurrences")
       {
         throw CE("DeletedOccurrences not supported", Cr.NS_ERROR_NOT_IMPLEMENTED);
         // See the previous implementation of msqEwsNativeItem.cpp
       }
-      else if (shorterName == "ExtendedProperty")
+      else if (shorterName === "ExtendedProperty")
       {
         // get the extended property from new and old lists
         valueOld = this._getExtendedPropertyValue(subitem, this.properties);

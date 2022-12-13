@@ -38,36 +38,37 @@ exquilla.overrideAccountManager = function _overrideAccountManager()
     {
       let node = mainTreeChildren[i];
       try {
-        if (node._account && node._account.incomingServer.type == 'exquilla')
+        if (node._account && node._account.incomingServer.type === 'exquilla')
         {
           // remove unwanted panes, swap ews server for server
           let treeChildrenNode = node.getElementsByTagName("treechildren")[0];
           let nodeChildren = treeChildrenNode.childNodes;
-          let ewsServerNode = null
+          let ewsServerNode = null;
           //  scan backwards to find the ewsServerNode first
           for (let j = nodeChildren.length - 1; j >= 0; j--)
           {
             let row = nodeChildren[j];
             let pageTag = row.getAttribute('PageTag');
-            if (pageTag == 'am-exquillaserver.xhtml'/* COMPAT for TB 68 */ || pageTag == 'am-exquillaserver.xul')
+            if (pageTag === 'am-exquillaserver.xhtml'/* COMPAT for TB 68 */ || pageTag === 'am-exquillaserver.xul')
             {
               ewsServerNode = row;
             }
-            else if (pageTag == 'am-server.xhtml'/* COMPAT for TB 68 */ || pageTag == 'am-server.xul')
+            else if (pageTag === 'am-server.xhtml'/* COMPAT for TB 68 */ || pageTag === 'am-server.xul')
             {
               if (ewsServerNode)
               {
                 treeChildrenNode.replaceChild(ewsServerNode, row);
               }
             }
-            else if (pageTag == 'am-offline.xhtml' ||
-                     pageTag == 'am-offline.xul' || // COMPAT for TB 68
+            else if (pageTag === 'am-offline.xhtml' ||
+                     pageTag === 'am-offline.xul' || // COMPAT for TB 68
                      //pageTag == 'am-junk.xhtml' ||
-                     //pageTag == 'am-junk.xul' || // COMPAT for TB 68
-                     pageTag == 'am-mdn.xhtml' ||
-                     pageTag == 'am-mdn.xul' || // COMPAT for TB 68
-                     pageTag == 'am-e2e.xhtml' ||
-                     pageTag == 'am-smime.xul') // COMPAT for TB 68
+                     //pageTag == 'am-junk.xul' ||
+                     //COMPAT for TB 68
+                     pageTag === 'am-mdn.xhtml' ||
+                     pageTag === 'am-mdn.xul' || // COMPAT for TB 68
+                     pageTag === 'am-e2e.xhtml' ||
+                     pageTag === 'am-smime.xul') // COMPAT for TB 68
             {
               treeChildrenNode.removeChild(row);
             }

@@ -322,7 +322,7 @@ function httpSoapTransportCompletion(call, response, request, listener, transpor
   this.mTriedFBA = false;
   this.mRetryCount = 0;
   this.mStartTime = null; // set by MonitoredRequest as new Date()
-  //this.mXhrTimeout = null; // set by MonitoredRequest default 120000 (2 minute)
+  //this.mXhrTimeout = null; / / set by MonitoredRequest default 120000 (2 minute)
   this.mProcessedLength = 0;
 
   this.usedProgress = false; // If we get progress events, those handled the response.
@@ -612,7 +612,7 @@ httpSoapTransportCompletion.prototype =
   doHandle(evt) {
     let request = evt.target;
     let type = evt.type;
-    let done = type != "progress";
+    let done = type !== "progress";
     if (done) {
       this.mResponse.message = request.responseXML;
       this.mResponse.htmlStatus = request.status;
@@ -624,7 +624,7 @@ httpSoapTransportCompletion.prototype =
     try {
       let needReparse = this.mCall.noParse && !this.usedProgress;
       let xmlDocument = request.responseXML;
-      if (xmlDocument && xmlDocument.documentElement.tagName == "parsererror")
+      if (xmlDocument && xmlDocument.documentElement.tagName === "parsererror")
       {
         needReparse = true;
         log.warn("Error parsing response, we'll try to purge invalid XML characters and reparse");

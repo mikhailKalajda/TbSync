@@ -827,7 +827,7 @@ var localizeOnLoad = function (window, provider) {
   let eventId = "DOMOverlayLoaded_"
       + (!provider || window.location.href.startsWith("chrome://tbsync/content/manager/editAccount.") ? "" : provider + "4")
       + "r7@r7.ru";
-      eventId = "DOMOverlayLoaded_eas4r7@r7.ru"
+      eventId = "DOMOverlayLoaded_eas4r7@r7.ru";
   TbSync.dump(window.location.href + " " + eventId);
   window.document.addEventListener(eventId, () => {
     TbSync.dump("localize  editAccount started");

@@ -1,4 +1,4 @@
-var {moveCopyModule} = ChromeUtils.import("resource:///modules/activity/moveCopy.jsm");
+var {moveCopyModule} = ChromeUtils.import("resource:///modules/activity/moveCopy.jsm"); //#asis
 var kMaxMessageMime = 50 << 10; // 50KB
 var kRecent = 5 * 24 * 60 * 60; // 5 days
 var nsMsgKey_None = 0xffffffff;
@@ -464,29 +464,29 @@ async function ResyncFolder(aFolder, aMsgWindow, aStatusFeedback, aGettingNewMes
   aFolder.acquireSemaphore(aFolder);
   let database = aFolder.msgDatabase;
   let finalStatus = "";
-  /// Used to populate an nsIMsgDBHdr object from MIME source.
+  // Used to populate an nsIMsgDBHdr object from MIME source.
   let parser = Cc["@mozilla.org/messenger/messagestateparser;1"].createInstance(Ci.nsIMsgParseMailMsgState);
   parser.SetMailDB(database);
-  /// Used to convert previews from unicode to the UTF-8 that the backend wants.
+  // Used to convert previews from unicode to the UTF-8 that the backend wants.
   let conv = Cc["@mozilla.org/intl/scriptableunicodeconverter"].createInstance(Ci.nsIScriptableUnicodeConverter);
   conv.charset = "UTF-8";
-  /// An expression to detect whether a subject is a reply.
+  // An expression to detect whether a subject is a reply.
   let re = null;
-  /// The count of new messages, if we're performing biff.
+  // The count of new messages, if we're performing biff.
   let numNewUnread = 0;
-  /// An nsIMutableArray of message headers to delete.
+  // An nsIMutableArray of message headers to delete.
   let hdrs = null;
-  /// An array of existing message keys.
+  // An array of existing message keys.
   let keys = [];
-  /// An array of new message ids of large messages.
+  // An array of new message ids of large messages.
   let largeIds = [];
-  /// An array of new message ids of small messages.
+  // An array of new message ids of small messages.
   let smallIds = [];
-  /// A map of message ids to partially downloaded headers.
+  // A map of message ids to partially downloaded headers.
   let partial = {};
-  /// A map of message ids to existing partial nsIMsgDBHdr objects.
+  // A map of message ids to existing partial nsIMsgDBHdr objects.
   let oldHdrs = {};
-  /// A list of headers for background offline download.
+  // A list of headers for background offline download.
   let backgroundHdrs = [];
   // Populate the list of keys. We don't have access to an nsIMsgKeyArray
   // object but fortunately XPConnect lets us emulate it.
@@ -915,7 +915,7 @@ async function BackgroundOfflineDownload(aHdrArray, aMsgWindow)
   }
 }
 
-/// Object used by the jsaccount mechanism to create the component factory.
+// Object used by the jsaccount mechanism to create the component factory.
 var gFolderProperties = {
   baseContractID: "@mozilla.org/jacppmsgfolderdelegator;1",
   baseInterfaces: [
@@ -937,7 +937,7 @@ if (Ci.nsIRDFResource) { // COMPAT for TB 68 (bug 1527764)
   gFolderProperties.contractID = "@mozilla.org/rdf/resource-factory;1?name=";
 }
 
-/// The jsaccount folder extension object.
+// The jsaccount folder extension object.
 function Folder(aDelegator, aBaseInterfaces) {
   this.delegator = Cu.getWeakReference(aDelegator);
   this.cppBase = aDelegator.cppBase;
@@ -949,9 +949,9 @@ function Folder(aDelegator, aBaseInterfaces) {
 
 Folder.prototype = {
   _JsPrototypeToDelegate: true,
-  /// nsISupports
+  // nsISupports
   QueryInterface: ChromeUtils.generateQI(gFolderProperties.baseInterfaces),
-  /// nsIMsgFolder
+  // nsIMsgFolder
   get incomingServerType() {
     return Services.io.extractScheme(this.cppBase.URI);
   },

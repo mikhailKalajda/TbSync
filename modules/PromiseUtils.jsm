@@ -661,7 +661,7 @@ PromiseUtils.SendListener.prototype = {
 
   OnStopCopy(aStatus) {
     if (this.wrapped && this.wrapped.OnStopCopy)
-      this.wrapped.OnStopCopy(aStatus)
+      this.wrapped.OnStopCopy(aStatus);
     this._resolve(aStatus);
   },
 };

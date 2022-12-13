@@ -15,9 +15,9 @@ const { classes: Cc, Constructor: CC, interfaces: Ci, utils: Cu, Exception: CE, 
 var { XPCOMUtils } = ChromeUtils.import("resource://gre/modules/XPCOMUtils.jsm");
 ChromeUtils.defineModuleGetter(this, "JSAccountUtils", "resource://tbsync/JSAccountUtils.jsm");
 ChromeUtils.defineModuleGetter(this, "MailServices",
-  "resource:///modules/MailServices.jsm");
+  "resource:///modules/MailServices.jsm"); //#asis
 ChromeUtils.defineModuleGetter(this, "MailUtils",
-  "resource:///modules/MailUtils.jsm");
+  "resource:///modules/MailUtils.jsm"); //#asis
 ChromeUtils.defineModuleGetter(this, "Services",
   "resource://gre/modules/Services.jsm");
 

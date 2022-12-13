@@ -15,8 +15,7 @@ ChromeUtils.defineModuleGetter(this, "Utils",
   "resource://tbsync/ewsUtils.jsm");
 ChromeUtils.defineModuleGetter(this, "Services",
   "resource://gre/modules/Services.jsm");
-ChromeUtils.defineModuleGetter(this, "MailServices",
-  "resource:///modules/MailServices.jsm");
+ChromeUtils.defineModuleGetter(this, "MailServices",  "resource:///modules/MailServices.jsm"); //#asis
 ChromeUtils.defineModuleGetter(this, "OS", "resource://gre/modules/osfile.jsm");
 ChromeUtils.defineModuleGetter(this, "Preferences",
   "resource://gre/modules/Preferences.jsm");
@@ -251,7 +250,7 @@ EwsIncomingServer.prototype = {
 
     // EwsIncomingServer implementation
 
-  /// get the message body
+  // get the message body
   //nsIURI fetchMessage(in EwsNativeItem aItem,
   //                    in nsISupports aDisplayConsumer,
   //                    in nsIUrlListener aUrlListener);
@@ -302,22 +301,22 @@ EwsIncomingServer.prototype = {
   set ewsURL(a) { this.setCharValue('ewsURL', a);},
 
   // These 3 use ... attributes are only needed to work cleanly with the account wizard and manager
-  /// is the address book used with this server
+  // is the address book used with this server
   // attribute boolean useAB;
   get useAB()  { return this.getBoolValue('useAB');},
   set useAB(a) { this.setBoolValue('useAB', a);},
 
-  /// is the calendar used with this server
+  // is the calendar used with this server
   // attribute boolean useCalendar;
   get useCalendar()  { return this.getBoolValue('useCalendar');},
   set useCalendar(a) { this.setBoolValue('useCalendar', a);},
 
-  /// is the mail used with this server
+  // is the mail used with this server
   //attribute boolean useMail;
   get useMail()  { return this.getBoolValue('useMail');},
   set useMail(a) { this.setBoolValue('useMail', a);},
 
-  /// is the domain used to login to server (if any)
+  // is the domain used to login to server (if any)
   //attribute ACString domain;
   get domain()  { return this.getCharValue('domain');},
   set domain(a) { this.setCharValue('domain', a);},

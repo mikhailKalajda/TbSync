@@ -322,7 +322,7 @@ function httpSoapTransportCompletion(call, response, request, listener, transpor
   this.mTriedFBA = false;
   this.mRetryCount = 0;
   this.mStartTime = null; // set by MonitoredRequest as new Date()
-  //this.mXhrTimeout = null; // set by MonitoredRequest default 120000 (2 minute)
+  //this.mXhrTimeout = null; / / set by MonitoredRequest default 120000 (2 minute)
   this.mProcessedLength = 0;
 
   this.usedProgress = false; // If we get progress events, those handled the response.

@@ -83,8 +83,8 @@ var network = {
             token_uri : "https://login.microsoftonline.com/common/oauth2/v2.0/token",
             redirect_uri : "https://login.microsoftonline.com/common/oauth2/nativeclient",
             // changed in beta 1.14.1, according to
-            // https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-permissions-and-consent#default-and-consent
-            scope : "offline_access https://outlook.office.com/.default", //"offline_access https://outlook.office.com/EAS.AccessAsUser.All",
+            // docs.microsoft.com/en-us/azure/active-directory/develop/v2-permissions-and-consent#default-and-consent
+            scope : "offline_access https://outlook.office.com/.default", //"offline_access utlook.office.com/EAS.AccessAsUser.All",
             client_id : "2980deeb-7460-4723-864a-f9b0f10cd992",
             }
             break;
@@ -103,7 +103,7 @@ var network = {
 
     oauth.extraAuthParams = [
       // removed in beta 1.14.1, according to
-      // https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-permissions-and-consent#default-and-consent
+      // docs.microsoft.com/en-us/azure/active-directory/develop/v2-permissions-and-consent#default-and-consent
       // prompt = consent will always ask for admin consent, even if it was granted
       //["prompt", "consent"],
       ["login_hint", user],
@@ -217,7 +217,7 @@ var network = {
           },
           set: function(val) {
             let tokens = this.parseAndSanitizeTokenString(this.authData.password);
-            let valueChanged = (val !== tokens[oauthValue[0]])
+            let valueChanged = (val !== tokens[oauthValue[0]]);
             if (valueChanged) {
               tokens[oauthValue[0]] = val;
               this.authData.updateLoginData(this.authData.user, JSON.stringify(tokens));
@@ -621,7 +621,7 @@ var network = {
                 }
         }
 
-        //handle global error (https://msdn.microsoft.com/en-us/library/ee218647(v=exchg.80).aspx)
+        //handle global error (msdn.microsoft.com/en-us/library/ee218647(v=exchg.80).aspx)
         let descriptions = {};
         switch(status) {
             case "101": //invalid content
@@ -741,7 +741,7 @@ var network = {
 
                 case "2":
                     //server does not have a policy for this device: disable provisioning
-                    syncData.accountData.setAccountProperty("provision", false)
+                    syncData.accountData.setAccountProperty("provision", false);
                     syncData.accountData.resetAccountProperty("policykey");
                     throw eas.sync.finish("resyncAccount", "NoPolicyForThisDevice");
 
@@ -821,7 +821,7 @@ var network = {
                         wbxml.atag("CollectionId", syncData.currentFolderData.getFolderProperty("serverID"));
                         wbxml.switchpage("AirSync");
                         // required !
-                        // https://docs.microsoft.com/en-us/openspecs/exchange_server_protocols/ms-ascmd/ffbefa62-e315-40b9-9cc6-f8d74b5f65d4
+                        // docs.microsoft.com/en-us/openspecs/exchange_server_protocols/ms-ascmd/ffbefa62-e315-40b9-9cc6-f8d74b5f65d4
                         if (syncData.type === "Calendar") wbxml.atag("FilterType", syncData.currentFolderData.accountData.getAccountProperty("synclimit"));
                         else wbxml.atag("FilterType", "0"); // we may filter incomplete tasks
                         
@@ -898,7 +898,7 @@ var network = {
                 _wbxml.atag("Query", currentQuery);
                 _wbxml.otag("Options");
                     _wbxml.atag("Range", "0-99"); //Z-Push needs a Range
-                    //Not valid for GAL: https://msdn.microsoft.com/en-us/library/gg675461(v=exchg.80).aspx
+                    //Not valid for GALmsdn.microsoft.com/en-us/library/gg675461(v=exchg.80).aspx
                     //_wbxml.atag("DeepTraversal");
                     //_wbxml.atag("RebuildResults");
                 _wbxml.ctag();

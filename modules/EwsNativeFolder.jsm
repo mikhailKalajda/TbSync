@@ -465,7 +465,7 @@ EwsNativeFolder.prototype = {
   get syncState() { return this._syncState || "";},
   set syncState(a) { this._syncState = a || "";},
 
-  /// This is set when an online soap request confirms that this folder exists
+  // This is set when an online soap request confirms that this folder exists
   //attribute boolean verifiedOnline;
   get verifiedOnline() { return this._verifiedOnline;},
   set verifiedOnline(a) { this._verifiedOnline = a;},
@@ -514,7 +514,7 @@ EwsNativeFolder.prototype = {
   },
   set newItems(a) { this._newItems = a;},
 
-  /// folderURI provides the glue to the local folder
+  // folderURI provides the glue to the local folder
   //attribute AUTF8String folderURI;
   get folderURI() { return this._folderURI;},
   set folderURI(a) { this._folderURI = a;},
@@ -557,13 +557,13 @@ EwsNativeFolder.prototype = {
     }
   },
 
-  /// get an item by id
+  // get an item by id
   //EwsNativeItem getItem(in AString aItemId);
   getItem: function _getItem(aItemId) {
     return this.mailbox.getItem(aItemId);
   },
 
-  /// create an item (deprecated, use the mailbox method instead)
+  // create an item (deprecated, use the mailbox method instead)
   //EwsNativeItem createItem(in AString aItemId, in AString aItemClass);
   createItem: function _createItem(aItemId, aItemClass) {
     return this.mailbox.createItem(aItemId, aItemClass, this);
@@ -574,7 +574,7 @@ EwsNativeFolder.prototype = {
     let foundFolder = null;
     for (let i = 0; i < (this._subfolderIds ? this._subfolderIds.length : 0); i++) {
       let subFolder = mailbox.getNativeFolder(this._subfolderIds.getAt(i));
-      if (subFolder.displayName == aName) {
+      if (subFolder.displayName === aName) {
         foundFolder = subFolder;
         break;
       }

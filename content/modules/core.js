@@ -119,7 +119,7 @@ var core = {
         //if we have an error during folderList sync, there is no need to go on
         if (listStatusData.type != TbSync.StatusData.SUCCESS) {
           overallStatusData = listStatusData;
-          accountRerun = (listStatusData.type == TbSync.StatusData.ACCOUNT_RERUN)
+          accountRerun = (listStatusData.type == TbSync.StatusData.ACCOUNT_RERUN);
           TbSync.eventlog.add(listStatusData.type, syncData.eventLogInfo, listStatusData.message, listStatusData.details);
           continue; //jumps to the while condition check
         }

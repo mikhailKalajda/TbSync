@@ -713,10 +713,10 @@ exquilla.AW = (function exquillaAW()
       "Выполняется" + (text ? (" " + text) : "");
     }
     adListener.successCallback = successCallback;
-    log.info('autodiscover form serverinDomain=' + serverinDomain)
+    log.info('autodiscover form serverinDomain=' + serverinDomain);
     return EwsAutoDiscover.doAutodiscover(email, username, domain, password, savePassword, serverinDomain, adListener, window, setStatus);
   } catch (e) {
-      log.warn('doAutodiscover failed')
+      log.warn('doAutodiscover failed');
       log.warn(re(e));
     }
   }

@@ -48,7 +48,7 @@ function ToEWSRecipients(aHeader)
   return MailServices.headerParser.parseEncodedHeader(aHeader, "UTF-8").map(({name, email}) => ({Name: name, EmailAddress: email}));
 }
 
-/// Object used by the jsaccount mechanism to create the component factory.
+// Object used by the jsaccount mechanism to create the component factory.
 var gSendProperties = {
   baseContractID: "@mozilla.org/jacppsenddelegator;1",
   baseInterfaces: [
@@ -73,9 +73,9 @@ function Send(aDelegator, aBaseInterfaces) {
 
 Send.prototype = {
   _JsPrototypeToDelegate: true,
-  /// nsISupports
+  // nsISupports
   QueryInterface: ChromeUtils.generateQI(gSendProperties.baseInterfaces),
-  /// nsIMsgSend
+  // nsIMsgSend
   gatherMimeAttachments: function() {
     // This causes the send process to be interrupted and call us back via
     // notifyListenerOnStopSending() below.

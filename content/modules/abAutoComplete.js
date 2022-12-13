@@ -8,7 +8,6 @@
  
  "use strict";
 
-//derived from https://dxr.mozilla.org/comm-central/source/mozilla/accessible/tests/mochitest/autocomplete.js
 var abAutoComplete = {
 
   tbSyncAutoCompleteSearch : null,

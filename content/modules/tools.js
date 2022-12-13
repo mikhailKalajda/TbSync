@@ -40,7 +40,7 @@ var tools = {
     });
   },
 
-  // this is derived from: http://jonisalonen.com/2012/from-utf-16-to-utf-8-in-javascript/
+  // this is derived from: jonisalonen.com/2012/from-utf-16-to-utf-8-in-javascript/
   // javascript strings are utf16, btoa needs utf8 , so we need to encode
   toUTF8: function (str) {
     var utf8 = "";
@@ -64,7 +64,7 @@ var tools = {
         // subtracting 0x10000 and splitting the
         // 20 bits of 0x0-0xFFFFF into two halves
         charcode = 0x10000 + (((charcode & 0x3ff)<<10)
-              | (str.charCodeAt(i) & 0x3ff))
+              | (str.charCodeAt(i) & 0x3ff));
         utf8 += String.fromCharCode(0xf0 | (charcode >>18), 
               0x80 | ((charcode>>12) & 0x3f), 
               0x80 | ((charcode>>6) & 0x3f), 

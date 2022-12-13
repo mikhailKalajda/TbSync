@@ -130,7 +130,7 @@ var tbSyncEasNewAccount = {
         let password = (servertype == "auto" || servertype == "custom") ? this.elementPass.value : "";
 
         if ((servertype == "auto" || servertype == "office365") && user.split("@").length != 2) {
-            alert(TbSync.getString("autodiscover.NeedEmail","eas"))
+            alert(TbSync.getString("autodiscover.NeedEmail","eas"));
             return;
         }
 
@@ -230,10 +230,10 @@ var tbSyncEasNewAccount = {
         newAccountEntry.servertype = servertype;
 
         if (url) {
-            //if no protocoll is given, prepend "https://"
-            if (url.substring(0,4) != "http" || url.indexOf("://") == -1) url = "https://" + url.split("://").join("/");
+            // if no protocoll is given, prepend "https:/ /"
+            if (url.substring(0,4) != "http" || url.indexOf("://") == -1) url = "https://" + url.split("://").join("/"); //#asis
             newAccountEntry.host = eas.network.stripAutodiscoverUrl(url);
-            newAccountEntry.https = (url.substring(0,5) == "https");
+            newAccountEntry.https = (url.substring(0,5) === "https");
         }
 
         // Add the new account.

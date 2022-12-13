@@ -19,13 +19,13 @@ const kScriptFiles = [
   "migration.js",
 ];
 
-/// A map of webextensions to the listeners registered with the dispatcher.
+// A map of webextensions to the listeners registered with the dispatcher.
 var gDispatchListeners = new Map();
-/// A map of webextensions to additional options that affect their behaviour.
+// A map of webextensions to additional options that affect their behaviour.
 var gSchemeOptions = new Map();
-/// A set of address book UIDs known to be global address lists.
+// A set of address book UIDs known to be global address lists.
 var gAddressBooksMarkedAsReadOnly = new Set();
-/// An array of modules that need to be registered with the component manager.
+// An array of modules that need to be registered with the component manager.
 var gModules = [];
 var {ExtensionError} = ExtensionUtils;
 var gComponentRegistrar = Components.manager.QueryInterface(Ci.nsIComponentRegistrar);
@@ -315,7 +315,7 @@ function UpdateFolderTree(aServer, aFolderTree)
         try {
           msgFolder = CreateSubfolder(aServer, parentFolder, child.name); // folder.js
         } catch (ex) {
-          if (ex.result == NS_MSG_FOLDER_EXISTS && !aServer.rootFolder.hasSubFolders) {
+          if (ex.result === NS_MSG_FOLDER_EXISTS && !aServer.rootFolder.hasSubFolders) {
             // We don't appear to have any existing folders at all,
             // not even the Inbox. We want to try very hard to create
             // these initial folders, but something's stopping us.

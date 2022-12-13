@@ -45,7 +45,7 @@ var tools = {
     },
 
     getNewDeviceId: function () {
-        //taken from https://jsfiddle.net/briguy37/2MVFd/
+        //taken from jsfiddle.net/briguy37/2MVFd/
         let d = new Date().getTime();
         let uuid = 'xxxxxxxxxxxxxxxxyxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
             let r = (d + Math.random()*16)%16 | 0;
@@ -336,7 +336,7 @@ var tools = {
     guessTimezoneByStdDstOffset: function(stdOffset, dstOffset, stdName = "") {
             //get a list of all zones
             //alternativly use cal.fromRFC3339 - but this is only doing this:
-            //https://dxr.mozilla.org/comm-central/source/calendar/base/modules/calProviderUtils.jsm
+            //dxr.mozilla.org/comm-central/source/calendar/base/modules/calProviderUtils.jsm
 
             //cache timezone data on first attempt
             if (eas.cachedTimezoneData === null) {
@@ -477,7 +477,7 @@ var tools = {
             let utcOffset = zone.getFirstPropertyValue("tzoffsetto").toString();
             let o = parseInt(utcOffset.replace(":","")); //-330 =  - 3h 30min
             let h = Math.floor(o / 100); //-3 -> -180min
-            let m = o - (h*100) //-330 - -300 = -30
+            let m = o - (h*100); //-330 - -300 = -30
             obj.offset = -1*((h*60) + m);
 
             //get international abbreviation (CEST, CET, CAT ... )
@@ -499,7 +499,7 @@ var tools = {
 
                     THE switchdate PART OF THE OBJECT IS MICROSOFT SPECIFIC, EVERYTHING ELSE IS THUNDERBIRD GENERIC, I LET IT SIT HERE ANYHOW
                     
-                    https://msdn.microsoft.com/en-us/library/windows/desktop/ms725481(v=vs.85).aspx
+                    msdn.microsoft.com/en-us/library/windows/desktop/ms725481(v=vs.85).aspx
 
                     To select the correct day in the month, set the wYear member to zero, the wHour and wMinute members to
                     the transition time, the wDayOfWeek member to the appropriate weekday, and the wDay member to indicate

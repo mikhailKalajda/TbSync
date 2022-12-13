@@ -35,7 +35,8 @@ var db = {
     //DB Concept:
     //-- on application start, data is read async from json file into object
     //-- add-on only works on object
-    //-- each time data is changed, an async write job is initiated <writeDelay>ms in the future and is resceduled, if another request arrives within that time
+    //-- each time data is changed, an async write job is initiated <writeDelay>
+    // ms in the future and is resceduled, if another request arrives within that time
 
     for (let f in this.files) {
       this.files[f].write = new DeferredTask(() => this.writeAsync(f), 6000);
@@ -53,12 +54,12 @@ var db = {
     }
 
     function getNewDeviceId4Migration() {
-        //taken from https://jsfiddle.net/briguy37/2MVFd/
+        //taken from jsfiddle.net/briguy37/2MVFd/
         let d = new Date().getTime();
         let uuid = 'xxxxxxxxxxxxxxxxyxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
             let r = (d + Math.random()*16)%16 | 0;
             d = Math.floor(d/16);
-            return (c=='x' ? r : (r&0x3|0x8)).toString(16);
+            return (c==='x' ? r : (r&0x3|0x8)).toString(16);
         });
         return "MZTB" + uuid;
     }
@@ -256,8 +257,9 @@ var db = {
 
   getAccounts: function () {
     let accounts = {};
-    accounts.IDs = Object.keys(this.accounts.data).filter(accountID => TbSync.providers.loadedProviders.hasOwnProperty(this.accounts.data[accountID].provider)).sort((a, b) => a - b);
-    accounts.allIDs =  Object.keys(this.accounts.data).sort((a, b) => a - b)
+    accounts.IDs = Object.keys(this.accounts.data)
+        .filter(accountID => TbSync.providers.loadedProviders.hasOwnProperty(this.accounts.data[accountID].provider)).sort((a, b) => a - b);
+    accounts.allIDs =  Object.keys(this.accounts.data).sort((a, b) => a - b);
     accounts.data = this.accounts.data;
     return accounts;
   },

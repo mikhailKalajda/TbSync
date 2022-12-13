@@ -23,7 +23,7 @@ XPCOMUtils.defineLazyGetter(this, "log", () => {
 // noinspection ES6ConvertVarToLetConst used as export
 var Calendar = {
 
-    // --------------------------------------------------------------------------- //
+    // ---------------------------------------------------------------------------
     UpdateAttendees: function (item, data, syncdata) {
         TbSync.dump('UpdateAttendees out started');
         let itemAttendeesCount = {};
@@ -88,7 +88,7 @@ var Calendar = {
         }
     },
     // Read WBXML and set Thunderbird item
-    // --------------------------------------------------------------------------- //
+    // ---------------------------------------------------------------------------
     setThunderbirdItemFromWbxml: function (tbItem, data, id, syncdata, mode = "standard") {
         let asversion = syncdata.accountData.getAccountProperty("asversion");
         log.info('setThunderbirdItemFromWbxml v' +  asversion + ' data=' + JSON.stringify(data));
@@ -216,7 +216,7 @@ var Calendar = {
             if (!R && data.OrganizerName) syncdata.target.calendar.setProperty("fallbackOrganizerName", data.OrganizerName);
         }
 
-        if (tbStatus) item.setProperty("STATUS", tbStatus)
+        if (tbStatus) item.setProperty("STATUS", tbStatus);
         else item.deleteProperty("STATUS");
 
         //TODO: attachements (needs EAS 16.0!)
@@ -294,9 +294,9 @@ var Calendar = {
         }
     },
 
-    // --------------------------------------------------------------------------- //
+    // ---------------------------------------------------------------------------
     //read TB event and return its data as WBXML
-    // --------------------------------------------------------------------------- //
+    // ---------------------------------------------------------------------------
     getWbxmlFromThunderbirdItem: function (tbItem, syncdata, isException = false) {
         let item = tbItem instanceof TbSync.lightning.TbItem ? tbItem.nativeItem : tbItem;
 
@@ -311,7 +311,7 @@ var Calendar = {
          *  However, this does not seem to work on all fields. Furthermore, we need to include any (empty) container to blank its childs.
          */
 
-        //Order of tags taken from https://msdn.microsoft.com/en-us/library/dn338917(v=exchg.80).aspx
+        //Order of tags taken from msdn.microsoft.com/en-us/library/dn338917(v=exchg.80).aspx
 
         let offsetMinute = 0;
 
@@ -450,7 +450,7 @@ var Calendar = {
 
         this.UpdateAttendeesIn(item, wbxml, asversion, isException, syncdata);
 
-        //Categories (see https://github.com/jobisoft/TbSync/pull/35#issuecomment-359286374)
+        //Categories (see github.com/jobisoft/TbSync/pull/35#issuecomment-359286374)
         if (!isException) {
             wbxml.append(eas.sync.getItemCategories(item, syncdata));
         }
@@ -465,7 +465,7 @@ var Calendar = {
         //TP PRIORITY (9=LOW, 5=NORMAL, 1=HIGH) not mapable to EAS Event
         //TODO: attachements (needs EAS 16.0!)
 
-        //https://dxr.mozilla.org/comm-central/source/calendar/base/public/calIAlarm.idl
+        // dxr.mozilla.org/comm-central/source/calendar/base/public/calIAlarm.idl
         //TbSync.dump("ALARM ("+i+")", [, alarms[i].related, alarms[i].repeat, alarms[i].repeatOffset, alarms[i].repeatDate, alarms[i].action].join("|"));
 
         return wbxml.getBytes();

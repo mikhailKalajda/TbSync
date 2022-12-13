@@ -356,16 +356,16 @@ EventListener.prototype =
     this.mRequest = new XMLHttpRequest();
 
     // if the url does not begin with http, then add https://
-    if (!/^https?:\/\//.test(this.mUrl))
-      this.mUrl = "https://" + this.mUrl;
+    if (!/^https?:\/\//.test(this.mUrl)) //#asis
+      this.mUrl = "https://" + this.mUrl; //#asis
     
     this.mRequest.addEventListener("load", this, false);
     this.mRequest.addEventListener("error", this, false);
     this.mRequest.addEventListener("abort", this, false);
     this.mRequest.open("POST", this.mUrl, true);
 
-    let ns = 'http://schemas.microsoft.com/exchange/autodiscover/outlook/requestschema/2006';
-    let schema = 'http://schemas.microsoft.com/exchange/autodiscover/outlook/responseschema/2006a';
+    let ns = 'http://schemas.microsoft.com/exchange/autodiscover/outlook/requestschema/2006'; //#asis
+    let schema = 'http://schemas.microsoft.com/exchange/autodiscover/outlook/responseschema/2006a'; //#asis
     let body = 
       '<?xml version="1.0" encoding="utf-8"?>' +
       '<Autodiscover xmlns="' + ns + '">' +
@@ -382,13 +382,13 @@ EventListener.prototype =
     this.mRequest.channel.redirectionLimit = 0;
 
     // we only used http for possible redirect, so do not send credentials
-    if (this.mRequest.channel.URI.scheme != "https")
+    if (this.mRequest.channel.URI.scheme !== "https")
       this.mRequest.channel.loadFlags = Ci.nsIChannel.LOAD_ANONYMOUS;
 
     // Look for custom useragent
     try {
       let useragent = Services.prefs.getCharPref("extensions.exquilla.useragent");
-      if (useragent && useragent.length && useragent != "default")
+      if (useragent && useragent.length && useragent !== "default")
         this.mRequest.setRequestHeader("User-Agent", useragent);
     } catch (e) {}
 
@@ -413,13 +413,13 @@ EventListener.prototype =
     } catch (e) {}
 
     try {
-      if (event.type == "load" || event.type == "error" || event.type == "abort" || event.type == "timeout")
+      if (event.type === "load" || event.type === "error" || event.type === "abort" || event.type === "timeout")
       {
         this.cancelTimeout();
         this.mStatus = this.mRequest.status;
         log.info('autodiscover request status: ' + this.mRequest.status + ' channel status ' + CN(this.mRequest.channel.status));
         
-        if (this.mRequest.status == 200)
+        if (this.mRequest.status === 200)
         { try {
 
           let xml = this.mRequest.responseXML;
@@ -468,31 +468,34 @@ EventListener.prototype =
             {
               let child = children[j];
               if ( Element.isInstance(child) &&
-                   (child.tagName == "Type") )
+                   (child.tagName === "Type") )
               {
-                type = child.textContent
+                type = child.textContent;
                 break;
               }
             }
-            if (type == "EXPR" || type == "EXCH")
+            if (type === "EXPR" || type === "EXCH")
             {
               let url = protocol.getElementsByTagName("ASUrl")[0].textContent;
-              if (!this.mEwsUrl.length && type == "EXPR")
+              if (!this.mEwsUrl.length && type === "EXPR")
                 this.mEwsUrl = url;
-              if (!this.mInternalEwsUrl.length && type == "EXCH")
+              if (!this.mInternalEwsUrl.length && type === "EXCH")
                 this.mInternalEwsUrl = url;
             }
-            if (!this.mEwsOWAGuessUrl.length && type == "WEB")
+            if (!this.mEwsOWAGuessUrl.length && type === "WEB")
             {
               // get the OWA URL and use it to guess an EWS url
               let owaUrl = protocol.getElementsByTagName("External")[0]
                                    .getElementsByTagName("OWAUrl")[0]
                                    .textContent;
-              this.mEwsOWAGuessUrl = owaUrl.replace(/\/owa\//i, "/EWS/") + 'Exchange.asmx';
-              this.mAuthMethod = owaUrl.startsWith("https://outlook.office365.com/owa/") ?
+              this.mEwsOWAGuessUrl = owaUrl.replace(/\/owa\//i, "/EWS/") + 'Exchange.asmx'; //#asis
+              this.mAuthMethod = owaUrl.startsWith("https://outlook.office365.com/owa/") ? //#asis
                 Ci.nsMsgAuthMethod.anything : Ci.nsMsgAuthMethod.passwordCleartext;
             }
-          } catch (e) {log.config("protocol parse error " + e); continue;}}
+          } catch (e) {
+            log.config("protocol parse error " + e); continue;
+          }
+          }
 
           log.config("ewsURL is " + this.mEwsUrl);
           log.info("internalEwsURL is " + this.mInternalEwsUrl);
@@ -592,11 +595,12 @@ EventListener.prototype =
       for (let login of foundLogins)
       {
         log.debug('found login for user ' + login.username);
-        if (login.username == domainAndUser)
+        if (login.username === domainAndUser)
         {
           log.config('found password in login manager');
           localPassword = login.password;
-          //dl('password is ' + login.password); // not written to log file!
+          // not written to log file!
+          //dl('password is ' + login.password);
         }
       }
       // if lookup failed,  then use the passed-in password
@@ -744,9 +748,9 @@ EwsAutoDiscover.doAutodiscover = doAutodiscover;
 // helper functions
 function hostFromSpec(aSpec)
 {
-  // if the url does not begin with http, then add https://
-  let prefix = "https://";
-  if (/^https?:\/\//.test(aSpec))
+  // if the url does not begin with http, then add https:
+  let prefix = "https://"; //#asis
+  if (/^https?:\/\//.test(aSpec)) //#asis
     prefix = "";
   let uri = newParsingURI(prefix + aSpec);
   return uri.host;
@@ -754,19 +758,16 @@ function hostFromSpec(aSpec)
 
 function _newAsyncPromptConsumer(aCallback, aContext)
 {
-  let obj = 
-  {
+  return {
     QueryInterface: ChromeUtils.generateQI([Ci.nsICancelable]),
     callback: aCallback,
     context: aContext,
-    cancel: function() {
+    cancel: function () {
       this.callback.onAuthCancelled(this.context, false);
       this.callback = null;
       this.context = null;
     }
   };
-
-  return obj;
 }
 
 function objectToPropBag(obj) {
@@ -782,7 +783,8 @@ function objectToPropBag(obj) {
 
 function savePassword(aHostname, aUser, aDomain, aPassword)
 {
-  log.config('commonDialogClone adding credentials to login manager for user <' + aUser + '> domain <' + aDomain + '> hostname ' + aHostname);
+  log.config('commonDialogClone adding credentials to login manager for user <'
+      + aUser + '> domain <' + aDomain + '> hostname ' + aHostname);
   // delete existing logins
   let foundLogins = Services.logins.findLogins(aHostname, null, aHostname);
   let domainAndUser = (aDomain && aDomain.length ? aDomain + "\\" : "") + aUser;

@@ -1,4 +1,4 @@
-/// Properties used when creating the component factory.
+// Properties used when creating the component factory.
 var gMessageServiceProperties = {
   contractID: "@mozilla.org/messenger/messageservice;1?type=",
   classDescription: "Message Service",
@@ -58,7 +58,7 @@ MessageService.prototype = {
       throw ex;
     }
   },
-  /// Not used.
+  // Not used.
   CopyMessages: function(aNumKeys, aKeys, aSrcFolder, aCopyListener, aMoveMessage, aUrlListener, aMsgWindow) {
     throw Cr.NS_ERROR_NOT_IMPLEMENTED;
   },
@@ -178,7 +178,7 @@ MessageService.prototype = {
   DisplayMessageForPrinting: function(aMessageURI, aDisplayConsumer, aMsgWindow, aUrlListener, aURL) {
     this.DisplayMessage(aMessageURI + "&header=print", aDisplayConsumer, aMsgWindow, aUrlListener, null, aURL);
   },
-  /// Used for online searching.
+  // Used for online searching.
   Search: function(aSearchSession, aMsgWindow, aMsgFolder, aSearchUri) {
     throw Cr.NS_ERROR_NOT_IMPLEMENTED;
   },
@@ -199,12 +199,12 @@ MessageService.prototype = {
     }
     this.DisplayMessage(aMessageURI, aConsumer, aMsgWindow, aUrlListener, null, null);
   },
-  /// Unused.
+  // Unused.
   streamHeaders: function(aMessageURI, aConsumer, aUrlListener, aLocalOnly) {
     throw Cr.NS_ERROR_NOT_IMPLEMENTED;
   },
-  /// Used if required by protocol-specific handlers.
-  /// OWL currently doesn't use the memory cache.
+  // Used if required by protocol-specific handlers.
+  // OWL currently doesn't use the memory cache.
   isMsgInMemCache: function(aUrl, aFolder) {
     throw Cr.NS_ERROR_NOT_IMPLEMENTED;
   },

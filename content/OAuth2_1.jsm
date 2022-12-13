@@ -228,9 +228,7 @@ OAuth2_1.prototype = {
         if ("error" in result) {
           // RFC 6749 section 5.2. Error Response
           this.log.info(
-            `The authorization server returned an error response: ${JSON.stringify(
-              result
-            )}`
+            `The authorization server returned an error response: ${JSON.stringify(result)}`
           );
           this.connectFailureCallback(result);
           return;

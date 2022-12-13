@@ -5,7 +5,7 @@ ChromeUtils.defineModuleGetter(this, "Utils",
 ChromeUtils.defineModuleGetter(this, "Services",
   "resource://gre/modules/Services.jsm");
 ChromeUtils.defineModuleGetter(this, "MailServices",
-  "resource:///modules/MailServices.jsm");
+  "resource:///modules/MailServices.jsm"); //#asis
 
 var _log = null;
 
@@ -23,7 +23,7 @@ function SearchEwsListener(results, comments, finish) {
 SearchEwsListener.prototype = {
     onEvent: function _onEvent(aItem, aEvent, aData, result)
     {
-      if (aEvent != "StopMachine")
+      if (aEvent !== "StopMachine")
         return;
       if (aData instanceof Ci.nsIArray)
       {

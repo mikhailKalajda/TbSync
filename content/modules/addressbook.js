@@ -176,7 +176,6 @@ var addressbook = {
       switch (aTopic) {
         case "addrbook-removed":
         case "addrbook-updated":
-          //Services.console.logStringMessage("["+ aTopic + "] " + folderData.getFolderProperty("foldername"));
           break;
       }
     }
@@ -186,7 +185,6 @@ var addressbook = {
         case "addrbook-contact-updated":
         case "addrbook-contact-removed":
         case "addrbook-contact-created":
-          //Services.console.logStringMessage("["+ aTopic + "] " + abCardItem.getProperty("DisplayName"));
           break;
       }
     }
@@ -195,16 +193,13 @@ var addressbook = {
       switch (aTopic) {
         case "addrbook-list-member-added":
         case "addrbook-list-member-removed":
-          //Services.console.logStringMessage("["+ aTopic + "] MemberName: " + abListMember.getProperty("DisplayName"));
           break;
         
         case "addrbook-list-removed":
         case "addrbook-list-updated":
-          //Services.console.logStringMessage("["+ aTopic + "] ListName: " + abListItem.getProperty("ListName"));
           break;
         
         case "addrbook-list-created": 
-          //Services.console.logStringMessage("["+ aTopic + "] Created new X-DAV-UID for List <"+abListItem.getProperty("ListName")+">");
           break;
       }
     }
@@ -218,10 +213,6 @@ var addressbook = {
     }    
   },
 
-
-
-
-  
   // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
   // * AbItem and AbDirectory Classes
   // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -278,7 +269,7 @@ var addressbook = {
     set primaryKey(value) {
       //use UID as fallback
       let key = this._abDirectory.primaryKeyField;
-      if (key) this.setProperty(key, value)
+      if (key) this.setProperty(key, value);
       else throw ("TbSync.addressbook.AbItem.set primaryKey: UID is used as primaryKeyField but changing the UID of an item is currently not supported. Please use a custom primaryKeyField.");
     }
 
@@ -293,7 +284,7 @@ var addressbook = {
     // mailinglist aware method to get properties of cards
     // mailinglist properties cannot be stored in mailinglists themselves, so we store them in changelog
     getProperty(property, fallback = "") {
-      if (property == "UID")
+      if (property === "UID")
         return this.UID;
       
       if (this._isMailList) {
@@ -308,7 +299,7 @@ var addressbook = {
     // mailinglist properties cannot be stored in mailinglists themselves, so we store them in changelog
     setProperty(property, value) {
       // UID cannot be changed (currently)
-      if (property == "UID") {
+      if (property === "UID") {
         throw ("TbSync.addressbook.AbItem.setProperty: UID cannot be changed currently.");
         return;
       }
@@ -351,10 +342,6 @@ var addressbook = {
       }
     }    
 
-
-
-
-
     // get the property given from all members and return it as an array (that property better be uniqe)
     getMembersPropertyList(property) {
       let members = [];
@@ -381,7 +368,7 @@ var addressbook = {
           if (card) list.appendElement(card, false);
         }
         mailListDirectory.addressLists = list;
-        if (this.changelogStatus != "modified_by_user") {
+        if (this.changelogStatus !== "modified_by_user") {
           this.changelogStatus = "modified_by_server";
         }
         mailListDirectory.editMailListToDatabase(this._card);                
@@ -417,7 +404,7 @@ var addressbook = {
         foStream.write(binary, binary.length);
         foStream.close();
 
-        filePath = 'file:///' + file.path.replace(/\\/g, '\/').replace(/^\s*\/?/, '').replace(/\ /g, '%20');
+        filePath = 'file:///' + file.path.replace(/\\/g, '\/').replace(/^\s*\/?/, '').replace(/\ /g, '%20'); //#asis
       }
       card.setProperty("PhotoName", photoName64);
       card.setProperty("PhotoType", url ? "web" : "file");
@@ -642,13 +629,13 @@ var addressbook = {
       directory.setStringValue("tbSyncAccountID", folderData.accountData.accountID);
       
       // Prevent gContactSync to inject its stuff into New/EditCard dialogs
-      // https://github.com/jdgeenen/gcontactsync/pull/127
+      // github.com/jdgeenen/gcontactsync/pull/127
       directory.setStringValue("gContactSyncSkipped", "true");
 
       folderData.setFolderProperty("target", directory.UID);            
       folderData.setFolderProperty("targetName", directory.dirName);
       //notify about new created address book
-      Services.obs.notifyObservers(null, 'tbsync.observer.addressbook.created', null)
+      Services.obs.notifyObservers(null, 'tbsync.observer.addressbook.created', null);
       return directory;
     }
     
@@ -657,7 +644,7 @@ var addressbook = {
 
   getFolderFromDirectoryUID: function(bookUID) {
     let folders = TbSync.db.findFolders({"target": bookUID});
-    if (folders.length == 1) {
+    if (folders.length === 1) {
       let accountData = new TbSync.AccountData(folders[0].accountID);
       return new TbSync.FolderData(accountData, folders[0].folderID);
     }
@@ -1140,8 +1127,9 @@ var addressbook = {
       
       //redirect to addrbook-contact-created observers
       if (aItem instanceof Components.interfaces.nsIAbCard 
-          && aParentDir instanceof Components.interfaces.nsIAbDirectory 
-          //&& aItem.getProperty("UID","") == "" //detect the only case where the original addrbook-contact-created observer fails to notify
+          && aParentDir instanceof Components.interfaces.nsIAbDirectory
+          //detect the only case where the original addrbook-contact-created observer fails to notify
+          //&& aItem.getProperty("UID","") == ""
           && !aItem.isMailList
           && !aParentDir.isMailList) {
         TbSync.addressbook.addressbookObserver.observe(aItem, "addrbook-contact-created", aParentDir.UID)

@@ -35,7 +35,7 @@ var tbSyncEditAccountOverlay = {
         }
 
         while (host.endsWith("/")) { host = host.slice(0,-1); }        
-        document.getElementById('tbsync.AccountPropertys.pref.host').value = host
+        document.getElementById('tbsync.AccountPropertys.pref.host').value = host;
        this.accountData.setAccountProperty("host", host);
     },
 

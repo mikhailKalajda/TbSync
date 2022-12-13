@@ -571,10 +571,10 @@ function getQueryVariable(variable, spec) {
 
 // parses ewsMessageURI
  //   adapted from nsParseLocalMessageURI
- // exquilla-message://server/folder1/folder2#123?header=none or
- // exquilla-message://server/folder1/folder2#1234&part=1.2
+ // exquilla-message:/ /server/folder1/folder2#123?header=none or
+ // exquilla-message:/ /server/folder1/folder2#1234&part=1.2
  //
- // puts folder URI in folderURI (exquilla://server/folder1/folder2)
+ // puts folder URI in folderURI (exquilla:/ /server/folder1/folder2)
  // message key number in key
  //
  // returns [folderURI, key, query]
@@ -693,7 +693,7 @@ function extendDisplayName(aDisplayName, aNativeFolder)
     }
     else
     {
-      parentDisplayName = parentFolder.displayName
+      parentDisplayName = parentFolder.displayName;
       parentExtendedDisplayName = parentDisplayName;
     }
 
@@ -934,7 +934,7 @@ function stripRe(aString) {
         }
         // Skip for Re[n]:
         if (result[re.length] === "[") {
-          let closeIndex = result.indexOf("]:")
+          let closeIndex = result.indexOf("]:");
           if (closeIndex < 0 || isNaN(result.substring(re.length + 1, closeIndex)))
             continue; // not a valid strip
           result = result.substring(closeIndex + 2)

@@ -76,7 +76,7 @@ var xmltools = {
             xml = oParser.parseFromString(str, "application/xml");
         } catch (e) {
             //however, domparser does not throw an error, it returns an error document
-            //https://developer.mozilla.org/de/docs/Web/API/DOMParser
+            //developer.mozilla.org/de/docs/Web/API/DOMParser
             //just in case
             throw eas.sync.finish("error", "malformed-xml");
         }
@@ -136,14 +136,14 @@ var xmltools = {
                     if (node.hasChildNodes) {
                         //if this is an element with only one text child, do not dive, but get text childs value
                         let o;
-                        if (node.childNodes.length == 1 && node.childNodes.item(0).nodeType==3) {
+                        if (node.childNodes.length === 1 && node.childNodes.item(0).nodeType===3) {
                             //the passed xml is a save xml with all special chars in the user data encoded by encodeURIComponent
                             o = decodeURIComponent(node.childNodes.item(0).nodeValue);
                         } else {
                             o = this.getDataFromXML(node.childNodes);
                         }
                         //check, if we can add the object directly, or if we have to push it into an array
-                        if (multiplicity[node.nodeName]>1) obj[node.nodeName].push(o)
+                        if (multiplicity[node.nodeName]>1) obj[node.nodeName].push(o);
                         else obj[node.nodeName] = o; 
                     }
                     break;

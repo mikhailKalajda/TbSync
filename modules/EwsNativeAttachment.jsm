@@ -106,7 +106,7 @@ EwsNativeAttachment.prototype = {
                                    .file;
     } catch (e) {}
     if (attachmentFile)
-      return attachmentFile.exists()
+      return attachmentFile.exists();
     return false;
   },
 

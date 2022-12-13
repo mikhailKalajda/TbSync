@@ -16,8 +16,7 @@ ChromeUtils.defineModuleGetter(this, "Utils",
   "resource://tbsync/ewsUtils.jsm");
 ChromeUtils.defineModuleGetter(this, "Services",
   "resource://gre/modules/Services.jsm");
-ChromeUtils.defineModuleGetter(this, "MailServices",
-  "resource:///modules/MailServices.jsm");
+ChromeUtils.defineModuleGetter(this, "MailServices",  "resource:///modules/MailServices.jsm"); //#asis
 var _log = null;
 XPCOMUtils.defineLazyGetter(this, "log", () => {
   if (!_log) _log = Utils.configureLogging("base");
@@ -401,8 +400,8 @@ EwsMsgFolder.prototype = {
 
   },
 
-  ///Extends nsIMsgFolder to include EWS-specific issue
-  //void updateFolderWithListener(in nsIMsgWindow aMsgWindow, in nsIUrlListener aListener);
+  // Extends nsIMsgFolder to include EWS-specific issue
+  // void updateFolderWithListener(in nsIMsgWindow aMsgWindow, in nsIUrlListener aListener);
   async updateFolderWithListener(aMsgWindow, urlListener) {
     let result;
     try {
@@ -415,7 +414,7 @@ EwsMsgFolder.prototype = {
         let nativeFolder = this._nativeFolder;
 
         let ewsServer = safeGetJS(this.server, "EwsIncomingServer");
-        if (ewsServer.unavailable != ewsServer.AVAILABLE)
+        if (ewsServer.unavailable !== ewsServer.AVAILABLE)
         {
           // We'll do a server expand first, which contains the logic to check online
           log.debug("UpdateFolderWithListener doing expand because of server unavailable");
@@ -423,10 +422,10 @@ EwsMsgFolder.prototype = {
           ewsServer.performExpandAsync(aMsgWindow, urlListener);
           let result = await urlListener.promise;
 
-          if (result != Cr.NS_OK)
+          if (result !== Cr.NS_OK)
             throw CE("Failed to perform expand on server", result);
 
-          if (ewsServer.unavailable != ewsServer.AVAILABLE) {
+          if (ewsServer.unavailable !== ewsServer.AVAILABLE) {
             log.config("updateFolderListener returning without update since server is unavailable");
             return Cr.NS_OK;
           }
@@ -453,7 +452,7 @@ EwsMsgFolder.prototype = {
           mailbox.datastore.getSyncState(nativeFolder, dsListener);
           let result = await dsListener.promise;
 
-          if (result.status != Cr.NS_OK)
+          if (result.status !== Cr.NS_OK)
             throw CE("Failed to get sync state from datastore");
           syncState = result.data.QueryInterface(Ci.nsISupportsString).data;
         } catch (e) { log.warn(e);}
@@ -489,7 +488,8 @@ EwsMsgFolder.prototype = {
         }
 
         // this should really be done AFTER update Does nothing because of _updateInProcess
-        //this._notifyFolderLoaded(); // That is, the summary database is OK
+        // That is, the summary database is OK
+        //this._notifyFolderLoaded();
 
         this._updateInProcess = true;
 
@@ -498,7 +498,7 @@ EwsMsgFolder.prototype = {
         mailbox.discoverSubfolders(nativeFolder, discoverFoldersListener);
         let discoverFoldersResult = await discoverFoldersListener.promise;
 
-        if (discoverFoldersResult.status != Cr.NS_OK)
+        if (discoverFoldersResult.status !== Cr.NS_OK)
           throw CE("Failed to discover subfolders");
 
         // If this is the inbox, filters will be applied. Otherwise, we test the
@@ -507,23 +507,23 @@ EwsMsgFolder.prototype = {
         // filters even if this is not the inbox folder.
         let applyIncomingFilters = this.getInheritedStringProperty("applyIncomingFilters");
         if (this.getFlag(Ci.nsMsgFolderFlags.Inbox))
-          this._applyIncomingFilters = !(applyIncomingFilters == "false");
+          this._applyIncomingFilters = !(applyIncomingFilters === "false");
         else
-          this._applyIncomingFilters = (applyIncomingFilters == "true");
+          this._applyIncomingFilters = (applyIncomingFilters === "true");
 
         // Call getNewItems, processing special events that are used
         // to not new messages or folder info.
         let getNewListener = new PromiseUtils.MachineListener(
           async (aItem, aEvent, aData, aResult) => {
 
-            if (aEvent == "GotFolder") {
+            if (aEvent === "GotFolder") {
               // Update the folder summary totals
               mailbox.updateSubfolderIds();
               this.updateFromNative(nativeFolder);
               this.updateSummaryTotals(true);
             }
 
-            if (aEvent == "ItemChanged") {
+            if (aEvent === "ItemChanged") {
               log.debug("ItemChanged in folder " + this.name);
               let item = aData.EwsNativeItem;
               this._reconcileItem(item, true);
@@ -538,7 +538,7 @@ EwsMsgFolder.prototype = {
               //  Hard to propagate an error here, so we will just report any issue.
               try {
                 let result = await datastoreListener.promise;
-                if (result.status != Cr.NS_OK)
+                if (result.status !== Cr.NS_OK)
                   log.warn("Error saving item in database");
               } catch (ex) {
                 log.warn("Error saving item in database: " + ex);
@@ -549,13 +549,13 @@ EwsMsgFolder.prototype = {
 
         log.debug("Entering getNewListener");
         // Is this folder enabled for offline? If so also download attachments.
-        log.debug("Download attachments? " + !!this.getFlag(Ci.nsMsgFolderFlags.Offline))
+        log.debug("Download attachments? " + !!this.getFlag(Ci.nsMsgFolderFlags.Offline));
         if (this.getFlag(Ci.nsMsgFolderFlags.Offline))
           mailbox.getNewItemsAndAttachments(nativeFolder, getNewListener);
         else
           mailbox.getNewItems(nativeFolder, getNewListener);
         let getNewResult = await getNewListener.promise;
-        if (getNewResult.status != Cr.NS_OK)
+        if (getNewResult.status !== Cr.NS_OK)
           throw CE("Failed to get new items");
 
         // junk processing
@@ -626,7 +626,7 @@ EwsMsgFolder.prototype = {
     }
   },
 
-  /// given an up-to-date native folder, update a mail folder and its children.
+  // given an up-to-date native folder, update a mail folder and its children.
   updateFromNative(aNativeFolder)
   {
     log.config("updateFromNative folder " + aNativeFolder.displayName);
@@ -938,14 +938,14 @@ EwsMsgFolder.prototype = {
           if (!childMsgFolder)
             log.config("Did not find existing child folder with URL " + childNativeFolder.folderURI);
         }
-        let childDisplayName = childNativeFolder.displayName
+        let childDisplayName = childNativeFolder.displayName;
         let childClass = childNativeFolder.folderClass;
         if (!childMsgFolder &&
             this._useMail &&
             !childClass.startsWith("IPF.Note.SocialConnector") && // News Feed
             !childClass.startsWith("IPF.Note.OutlookHomepage") && // RSS Feeds
             ( childClass.substring(0, 8) == "IPF.Note" ||
-              childClass =="IPF.StickyNote" ||
+              childClass ==="IPF.StickyNote" ||
               !childClass)) // this folder not updated from locals
         {
           log.config("need to add child folder " + childDisplayName);
@@ -1024,8 +1024,8 @@ EwsMsgFolder.prototype = {
 
   },
 
-  /// resync the msgdb from the native db
-  //void resyncFromNative(in bool aFixProblems, in nsIUrlListener aListener);
+  // resync the msgdb from the native db
+  // void resyncFromNative(in bool aFixProblems, in nsIUrlListener aListener);
   async resyncFromNative(aFixProblems, urlListener) {
     let result;
     try {
@@ -1224,11 +1224,11 @@ EwsMsgFolder.prototype = {
         // What to do with db items with not matching native? I guess we just delete
         //  them, like we do in folder repair.
         let notifier = Cc["@mozilla.org/messenger/msgnotificationservice;1"]
-                         .getService(Ci.nsIMsgFolderNotificationService)
+                         .getService(Ci.nsIMsgFolderNotificationService);
         if (extraHdrs.length)
         {
           log.info("Message DB had messages with no corresponding server entry, deleting. Count: " + extraHdrs.length);
-          notifier.notifyMsgsDeleted(/* COMPAT for TB 68 */database.deleteMessages.length == 3 ? extraHdrs : toArray(extraHdrs, Ci.nsIMsgDBHdr));
+          notifier.notifyMsgsDeleted(/* COMPAT for TB 68 */database.deleteMessages.length === 3 ? extraHdrs : toArray(extraHdrs, Ci.nsIMsgDBHdr));
           for (let index = 0; index < extraHdrs.length; index++)
           {
             let hdr = extraHdrs.queryElementAt(index, Ci.nsIMsgDBHdr);
@@ -1244,7 +1244,7 @@ EwsMsgFolder.prototype = {
           let onDoneListener = new PromiseUtils.EwsEventListener("OnDone", null);
           mailbox.getItemAsync(missingIds[i], onDoneListener);
           let onDoneResult = await onDoneListener.promise;
-          if (onDoneResult.status != Cr.NS_OK) {
+          if (onDoneResult.status !== Cr.NS_OK) {
             log.config("error getting item from database");
             continue;
           }
@@ -1344,13 +1344,13 @@ EwsMsgFolder.prototype = {
     }
   },
 
-  /// get the Skink key from an EWS itemId
-  /// returns undefined if missing.
+  // get the Skink key from an EWS itemId
+  // returns undefined if missing.
   keyFromId(aItemId) {
     return  this._itemIdKeyMap.get(aItemId);
   },
 
-  /// get the itemId from the Skink key
+  // get the itemId from the Skink key
   idFromKey(aKey) {
     let msgHdr = this.msgDatabase.GetMsgHdrForKey(aKey);
     return msgHdr.getProperty("ewsItemId");
@@ -1368,11 +1368,11 @@ EwsMsgFolder.prototype = {
     this._itemIdKeyMap.set(itemId, key);
   },
 
-  /// number of new native messages that have not been reported to skink
+  // number of new native messages that have not been reported to skink
   get numNewNativeMessages() { return this._numNewNativeMessages;},
   set numNewNativeMessages(a) { this._numNewNativeMessages = a;},
 
-  /// reindex the skink database from the local datastore
+  // reindex the skink database from the local datastore
   // void reindex(in nsIMsgWindow aWindow, in nsIUrlListener aListener);
   reindexExperiment(aWindow, urlListener) {
     log.config("msqEwsMailFolder reindex");
@@ -1427,10 +1427,10 @@ EwsMsgFolder.prototype = {
           // Now the native database should be valid, so resync to it.
           {
             this._repairInProcess = false;
-            let resyncListener = new PromiseUtils.UrlListener()
+            let resyncListener = new PromiseUtils.UrlListener();
             this.resyncFromNative(true, resyncListener);
             let resyncResult = await resyncListener.promise;
-            if (resyncResult != Cr.NS_OK)
+            if (resyncResult !== Cr.NS_OK)
               throw CE("Failed to resync from native after reindex");
           }
 
@@ -1438,7 +1438,7 @@ EwsMsgFolder.prototype = {
           let listener = new PromiseUtils.UrlListener();
           this.updateFolderWithListener(null, listener);
           let updateResult = await listener.promise;
-          if (updateResult != Cr.NS_OK)
+          if (updateResult !== Cr.NS_OK)
             throw CE("Failed to update folder after reindex");
           return updateResult;
 
@@ -1744,8 +1744,7 @@ EwsMsgFolder.prototype = {
     })();
   },
 
-/**/
-  /// Delete local representation of messages (in nsIArray aMessages)
+  // Delete local representation of messages (in nsIArray aMessages)
   deleteLocalMessages(messages)
   {
     log.config("msqEwsMailFolder.deleteLocalMessages length " + messages.length);
@@ -1786,7 +1785,7 @@ EwsMsgFolder.prototype = {
     this.enableNotifications(Ci.nsIMsgFolder.allMessageCountNotifications, true, true);
   },
 
-  /// Copy local messages from one folder to this one
+  // Copy local messages from one folder to this one
   copyLocalMessages(aSrcMessages, aDestMessages, aNewItems) {
     log.config("msqEwsMailFolder.copyLocalMessages");
     if (!this._useMail)
@@ -1895,7 +1894,7 @@ EwsMsgFolder.prototype = {
     try {
       destDB = msgDBService.openMailDBFromFile(newPath, null, false, true);
     } catch (e) {
-      if (e.result == Cr.NS_MSG_ERROR_FOLDER_SUMMARY_OUT_OF_DATE && destDB)
+      if (e.result === Cr.NS_MSG_ERROR_FOLDER_SUMMARY_OUT_OF_DATE && destDB)
         destDB.summaryValid = true;
       else
         log.warn("Error opening database: " + e);
@@ -1935,7 +1934,8 @@ EwsMsgFolder.prototype = {
       // The files have already been moved, so delete storage PR_FALSE
       // ???
       //msgParent.propagateDelete(srcFolder, false, msgWindow);
-      //oldPath.remove(false);  // dummy file
+      // dummy file:
+      //oldPath.remove(false);
       //srcFolder.Delete();
       msgParent.propagateDelete(srcFolder, true, msgWindow);
 
@@ -1953,7 +1953,7 @@ EwsMsgFolder.prototype = {
   onCopyCompleted(src, aResult) {
     let srcSupports = src.QueryInterface(Ci.nsISupports);
     log.debug("ewsMsgFolderComponent onCopyCompleted");
-    if (aResult != Cr.NS_OK) {
+    if (aResult !== Cr.NS_OK) {
       log.error("Copy failed for folder " + this.prettyName);
     }
 
@@ -1963,7 +1963,7 @@ EwsMsgFolder.prototype = {
     // prevent that by forcing async
     // copyService->NotifyCompletion(srcSupport, dstFolder, result);
     executeSoon( () => {
-      //let dstFolder = this.QueryInterface(Ci.nsIMsgFolder);
+      // let dstFolder = this.QueryInterface(Ci.nsIMsgFolder);
       // the copy service does a direct compare of msgFolder, so we have
       // to pass the C++ delegator here
       MailServices.copy.NotifyCompletion(srcSupports, this.delegator, aResult);
@@ -3060,7 +3060,7 @@ EwsMsgFolder.prototype = {
       try {
         result = await (async () => {
           // Notify on delete from trash and shift-delete.
-          let trashFolder = this.trashFolder
+          let trashFolder = this.trashFolder;
           if (!isMove && (deleteStorage || isTrashFolder)) {
             MailServices.mfn.notifyMsgsDeleted(/* COMPAT for TB 68 */this.msgDatabase.deleteMessages.length == 3 ? messages : toArray(messages, Ci.nsIMsgDBHdr));
           }
@@ -3969,7 +3969,7 @@ EwsMsgFolder.prototype = {
     let dbFolderInfo = database.dBFolderInfo;
     let hdr;
     let notifier = Cc["@mozilla.org/messenger/msgnotificationservice;1"]
-                     .getService(Ci.nsIMsgFolderNotificationService)
+                     .getService(Ci.nsIMsgFolderNotificationService);
 
     while (aNativeItem.newOnServer || updatedOnServer) // update will fall through to create if fails
     {
@@ -4002,12 +4002,12 @@ EwsMsgFolder.prototype = {
             hdr.setUint32Property("gloda-dirty", 1); // kMessageDirty
             // kick off gloda for the message. Shame on asuth for requiring this kludge!
             // XXX TODO investigate this, seeing if gloda works right on reconcileItem
-            this.orProcessingFlags(key, Ci.nsMsgProcessingFlags.NotReportedClassified)
+            this.orProcessingFlags(key, Ci.nsMsgProcessingFlags.NotReportedClassified);
 
             // In core, we have notifyHdrsNotBeingClassified() but that is not accessible
             // via XPCOM. No matter, we know the key.
             let msgHdrsNotBeingClassified = [hdr];
-            if (database.deleteMessages.length == 3) { /* COMPAT for TB 68 */
+            if (database.deleteMessages.length === 3) { /* COMPAT for TB 68 */
               msgHdrsNotBeingClassified =
                 Cc["@mozilla.org/array;1"].createInstance(Ci.nsIMutableArray);
               msgHdrsNotBeingClassified.appendElement(hdr, false);
@@ -4099,10 +4099,10 @@ EwsMsgFolder.prototype = {
     //aNativeItem.deletedOnServer = false;
   } catch (e) {log.warn("Error in _reconcileItem " + e);}},
 
-  /// iterate through the db, remapping the native ids.
-  ///   aReindex: if true, set REINDEX_FLAG in preparation for reindex.
-  ///
-  ///   returns: [unreadExistingCount, totalExistingCount]
+  // iterate through the db, remapping the native ids.
+  // aReindex: if true, set REINDEX_FLAG in preparation for reindex.
+  //
+  //   returns: [unreadExistingCount, totalExistingCount]
   _remap(aReindex)
   {
     //log.debug("remap itemIds and keys for folder " + this.name);
@@ -4140,7 +4140,7 @@ EwsMsgFolder.prototype = {
           messageCount--;
           if (!hdr.isRead)
             unreadCount--;
-          highWater = oldHighWater
+          highWater = oldHighWater;
           database.DeleteHeader(hdr, this.delegator, false, false);
           log.warn("duplicate header deleted");
           continue;

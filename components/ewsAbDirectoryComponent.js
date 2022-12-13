@@ -366,7 +366,7 @@ EwsAbDirectory.prototype = {
             for (let resolution of resolutions)
             {
               if (!(resolution && resolution.PropertyList))
-                log.warning("resolution not a property list")
+                log.warning("resolution not a property list");
               else
               {
                 //log.debug("Resolution #" + i + " PL is\n" + stringPL(resolution));
@@ -586,7 +586,7 @@ function SearchGALListener_onEvent(aItem, aEvent, aData, result)
     for (let resolution of resolutions || [])
     {
       if (!(resolution && resolution.PropertyList))
-        log.warning("resolution not a property list")
+        log.warning("resolution not a property list");
       else
       {
         let item = this.directory.itemFromResolution(resolution);

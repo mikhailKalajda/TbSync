@@ -54,8 +54,8 @@ var network = {
   
   createTCPErrorFromFailedRequest: function (request) {
     //adapted from :
-    //https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/How_to_check_the_secruity_state_of_an_XMLHTTPRequest_over_SSL		
-    //codes: https://developer.mozilla.org/en-US/docs/Mozilla/Errors
+    // developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/How_to_check_the_secruity_state_of_an_XMLHTTPRequest_over_SSL
+    // codes: developer.mozilla.org/en-US/docs/Mozilla/Errors
     let status = request.status;
 
     if ((status & 0xff0000) === 0x5a0000) { // Security module

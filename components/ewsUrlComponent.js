@@ -16,7 +16,7 @@ ChromeUtils.defineModuleGetter(this, "Utils",
 ChromeUtils.defineModuleGetter(this, "Services",
   "resource://gre/modules/Services.jsm");
 ChromeUtils.defineModuleGetter(this, "MailServices",
-  "resource:///modules/MailServices.jsm");
+  "resource:///modules/MailServices.jsm"); //#asis
 
 var _log = null;
 XPCOMUtils.defineLazyGetter(this, "log", () => {
@@ -94,12 +94,12 @@ EwsUrl.prototype = {
 
   // EwsUrl implementation
 
-  /// EWS id for item, set by prepare url in server
+  // EWS id for item, set by prepare url in server
   // attribute AString itemId;
   get itemId() { return this._itemId;},
   set itemId(aVal) {this._itemId = aVal;},
 
-  /// Does this url refer to an attachment?
+  // Does this url refer to an attachment?
   //readonly attribute boolean isAttachment;
   get isAttachment() {
     // We look to see if the URL has an attachment query
@@ -107,8 +107,8 @@ EwsUrl.prototype = {
     return (query && query.indexOf(ATTACHMENT_QUERY) !== -1);
   },
 
-  /// Attachment sequence number, that is the nth attachment for the item.
-  /// Returns -1 for not valid url
+  // Attachment sequence number, that is the nth attachment for the item.
+  // Returns -1 for not valid url
   //readonly attribute long attachmentSequence;
   get attachmentSequence() {
     try {
@@ -139,18 +139,18 @@ EwsUrl.prototype = {
     }
   },
 
-  /// skink message key, set by prepare url in server
+  // skink message key, set by prepare url in server
   //attribute unsigned long messageKey;
   get messageKey() {return this._messageKey;},
   set messageKey(val) { this._messageKey = val;},
 
-  /// native EWS mailbox
+  // native EWS mailbox
   //readonly attribute EwsNativeMailbox mailbox;
   get mailbox() {
     return safeGetJS(this.server).nativeMailbox;
   },
 
-  /// urlType (copy, move, display) from nsIMsgMailNewsUrl
+  // urlType (copy, move, display) from nsIMsgMailNewsUrl
   //void setUrlType(in unsigned long aType);
   setUrlType: function(aType) {
     this._urlType = aType;

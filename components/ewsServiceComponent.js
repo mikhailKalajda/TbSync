@@ -44,10 +44,10 @@ function prepareEwsUrl(aSrcMsgURI,   // string spec
 {
   //
   // OK I've gone back and forth on this, and it seems like skink feeds me
-  //  protocol://server/folder#key but the #key part really doesn't play well with
+  //  protocol:/ /server/folder#key but the #key part really doesn't play well with
   //  necko. So I will follow the lead of skink, and revert to converting this.
   //
-  // So exquilla-message://server/folder#123 becomes exquilla://server/folder?number=123
+  // So exquilla-message:/ /server/folder#123 becomes exquilla:/ /server/folder?number=123
   //
 
   // we setup all of the required attributes for the message url, including looking
@@ -503,8 +503,8 @@ EwsService.prototype = {
     let URIString = aMessageURI;
     if (aAdditionalHeader)
     {
-      if (URIString.indexOf('?') == -1)
-        URIString += "?"
+      if (URIString.indexOf('?') === -1)
+        URIString += "?";
       else
         URIString += "&";
       URIString += "header=";

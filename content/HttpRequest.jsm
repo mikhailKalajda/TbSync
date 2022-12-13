@@ -74,7 +74,7 @@ var HttpRequest = class {
         
         // Redirects are handled internally, this callback is just called to
         // inform the caller about the redirect.
-        // Flags: (https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIChannelEventSink)
+        // Flags: (developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIChannelEventSink)
         //  - REDIRECT_TEMPORARY = 1 << 0;
         //  - REDIRECT_PERMANENT = 1 << 1;
         //  - REDIRECT_INTERNAL = 1 << 2;
@@ -125,8 +125,8 @@ var HttpRequest = class {
             // nsIChannelEventSink implementation
             asyncOnChannelRedirect: function(aOldChannel, aNewChannel, aFlags, aCallback) {
                 // Disallow redirects from https to http.
-                if (aOldChannel.URI.scheme == "https" && aNewChannel.URI.scheme == "http") {
-                    // Using an unused error code according to https://developer.mozilla.org/en-US/docs/Mozilla/Errors.
+                if (aOldChannel.URI.scheme === "https" && aNewChannel.URI.scheme === "http") {
+                    // Using an unused error code according to developer.mozilla.org/en-US/docs/Mozilla/Errors.
                     // REJECTED_REDIRECT_FROM_HTTPS_TO_HTTP'
                     aCallback.onRedirectVerifyCallback(0x804B002F);
                     return;
@@ -151,7 +151,7 @@ var HttpRequest = class {
                             aNewChannel.setRequestHeader(aHdr, hdrValue, false);
                         }
                     } catch (e) {
-                        if (e.code != Components.results.NS_ERROR_NOT_AVAILIBLE) {
+                        if (e.code !== Components.results.NS_ERROR_NOT_AVAILIBLE) {
                             // The header could possibly not be available, ignore that
                             // case but throw otherwise
                             throw e;
@@ -274,7 +274,7 @@ var HttpRequest = class {
                 if ([301,302,307,308].includes(responseStatus)) {
                     // aChannel is still the old channel
                     let redirected = self.getResponseHeader("location");
-                    if (redirected && redirected != aChannel.URI.spec) {
+                    if (redirected && redirected !== aChannel.URI.spec) {
                         let flag = Ci.nsIChannelEventSink.REDIRECT_TEMPORARY;
                         let uri = Services.io.newURI(redirected);
                         if ([301,308].includes(responseStatus)) {
@@ -290,12 +290,12 @@ var HttpRequest = class {
                     }
                 }
                 
-                // mitigation for bug https://bugzilla.mozilla.org/show_bug.cgi?id=669675
+                // mitigation for bug bugzilla.mozilla.org/show_bug.cgi?id=669675
                 // we need to check, if nsIHttpChannel was in charge of auth:
                 // if there was no Authentication header provided by the user, but a username
                 // nsIHttpChannel should have added one. Is there one?
                 if (
-                    (responseStatus == 401) &&
+                    (responseStatus === 401) &&
                     !self._xhr.mozAnon &&
                     !self.hasRequestHeader("Authorization") && // no user defined header, so nsIHttpChannel should have called the authPrompt
                     self._xhr.username && // we can only add basic auth header if user
@@ -312,7 +312,7 @@ var HttpRequest = class {
                   
                     if (unauthenticated) {
                         if (!bug669675.includes(self._xhr.uri.spec)) {
-                            bug669675.push(self._xhr.uri.spec)
+                            bug669675.push(self._xhr.uri.spec);
                             console.log("Mitigation for bug 669675 for URL <"+self._xhr.uri.spec+"> (Once per URL per session)");
                             // rerun
                             self.send(self._xhr.data);
@@ -424,10 +424,10 @@ var HttpRequest = class {
         
         // Set default accept value.
         if (!this.hasRequestHeader("Accept")) {
-           this.setRequestHeader("Accept", "*/*");
+           this.setRequestHeader("Accept", "*" +"/" + "*"); // чтобы обфускатор не обезумел
         }
 
-        // Set non-standard header to request authorization (https://github.com/jobisoft/DAV-4-TbSync/issues/106)
+        // Set non-standard header to request authorization (github.com/jobisoft/DAV-4-TbSync/issues/106)
         if (this._xhr.username) {
             this.setRequestHeader("X-EnforceAuthentication", "True");
         }
@@ -525,7 +525,7 @@ var HttpRequest = class {
         try {
             return this._xhr.httpchannel.getResponseHeader(header);
         } catch (e) {
-            if (e.code != Components.results.NS_ERROR_NOT_AVAILIBLE) {
+            if (e.code !== Components.results.NS_ERROR_NOT_AVAILIBLE) {
                 // The header could possibly not be available, ignore that
                 // case but throw otherwise
                 throw e;
@@ -627,13 +627,11 @@ var HttpRequestPrompt = class {
         
         // The provided password could be wrong, in whichcase
         //  we would be here more than once.
-        this.mCounts++
+        this.mCounts++;
         return (this.mCounts < 2);
     }
 }
   
-
-
 
 function getSandboxForOrigin(username, uri, containerRealm = "default", containerReset = false) {
     let options = {};
@@ -674,7 +672,7 @@ function getContainerIdForUser(username) {
     let max = 19999;
     
     //reset if adding an entry will exceed allowed range
-    if (containers.length > (max-min) && containers.indexOf(username) == -1) {
+    if (containers.length > (max-min) && containers.indexOf(username) === -1) {
         for (let i=0; i < containers.length; i++) {
             resetContainerWithId(i + min);
         }
@@ -682,7 +680,7 @@ function getContainerIdForUser(username) {
     }
     
     let idx = containers.indexOf(username);
-    return (idx == -1) ? containers.push(username) - 1 + min : (idx + min);
+    return (idx === -1) ? containers.push(username) - 1 + min : (idx + min);
 }
 
 // copied from cardbook
@@ -717,8 +715,8 @@ function prepHttpChannelUploadData(aHttpChannel, aMethod, aUploadData, aContentT
       aHttpChannel.setUploadStream(stream, aContentType, -1);
     }	
 
-    //must be set after setUploadStream
-    //https://developer.mozilla.org/en-US/docs/Mozilla/Creating_sandboxed_HTTP_connections
+    // must be set after setUploadStream
+    // developer.mozilla.org/en-US/docs/Mozilla/Creating_sandboxed_HTTP_connections
     aHttpChannel.QueryInterface(Ci.nsIHttpChannel);
     aHttpChannel.requestMethod = aMethod;
 }

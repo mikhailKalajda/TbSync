@@ -404,7 +404,7 @@ var exquilla = Object.create(
     rootBranch.addObserver("mail.identity.", this, false);
 
     try {
-      //let windowTitle = Services.strings.createBundle("chrome://tbsync/locale/settings.properties").GetStringFromName(AppConstants.XP_UNIX ? "windowTitle" : "windowTitleWin") + "…";
+      //let windowTitle = Services.strings.createBundle("chrome:/ /tbsync/locale/settings.properties").GetStringFromName(AppConstants.XP_UNIX ? "windowTitle" : "windowTitleWin") + "…";
       //document.getElementById("exquilla.openSettingsTab").setAttribute("label", windowTitle);
       //document.getElementById("appmenu_exquilla_openSettingsTab").setAttribute("label", windowTitle);
       // email context menu
@@ -504,7 +504,7 @@ var exquilla = Object.create(
         // see if this folder is on the same server
         let itemServerURI = ewsFolder.nativeMailbox.serverURI;
         let fccMsgFolder = MailUtils.getFolderForURI(fccFolderURI);
-        if (fccMsgFolder.server.serverURI == itemServerURI)
+        if (fccMsgFolder.server.serverURI === itemServerURI)
         {
           doServerFcc = true;
           fccNativeFolderId = ewsFolder.folderId;
@@ -604,11 +604,11 @@ var exquilla = Object.create(
     // gloda only indexes local and imap mail folders (though I hope to fix that in
     // bug 781650). We have to override shouldIndexFolder to get around this.
     try { // COMPAT for TB 68
-      Object.assign(exquilla, ChromeUtils.import("resource:///modules/gloda/IndexMsg.jsm"));
-      Object.assign(exquilla, ChromeUtils.import("resource:///modules/gloda/GlodaDatastore.jsm"));
+      Object.assign(exquilla, ChromeUtils.import("resource:///modules/gloda/IndexMsg.jsm")); //#asis
+      Object.assign(exquilla, ChromeUtils.import("resource:///modules/gloda/GlodaDatastore.jsm")); //#asis
     } catch (ex) { /* COMPAT for TB 68 */
-      Object.assign(exquilla, ChromeUtils.import("resource:///modules/gloda/index_msg.js"));
-      Object.assign(exquilla, ChromeUtils.import("resource:///modules/gloda/datastore.js"));
+      Object.assign(exquilla, ChromeUtils.import("resource:///modules/gloda/index_msg.js")); //#asis
+      Object.assign(exquilla, ChromeUtils.import("resource:///modules/gloda/datastore.js")); //#asis
     } /* COMPAT for TB 68 */
 
     function ewsShouldIndexFolder(aMsgFolder)
@@ -682,13 +682,13 @@ var exquilla = Object.create(
 
   function openSettingsTab()
   {
-    exquilla.Utils.openContentTab("chrome://exquilla/content/settings/settings.html");
+    exquilla.Utils.openContentTab("chrome://exquilla/content/settings/settings.html"); //#asis
   }
 
   function openHelpTab()
   {
-    let handlerRegExp = "^https://www\.(exquilla|beonex)\.com(/.*|$)";
-    exquilla.Utils.openContentTab("https://www.exquilla.com/firstrun", handlerRegExp, 1000);
+    let handlerRegExp = "^https://www\.(exquilla|beonex)\.com(/.*|$)"; //#asis
+    exquilla.Utils.openContentTab("https://www.exquilla.com/firstrun", handlerRegExp, 1000); //#asis
   }
 
   function openLog()
@@ -878,7 +878,7 @@ var exquilla = Object.create(
           log.info('host is ' + tbSyncAccountData.host + '/' + folder.hostname + ', user is ' + tbSyncAccountData.user + '/' + folder.username);
           if (tbSyncAccountData.host === folder.hostname && tbSyncAccountData.user === folder.username)
           {
-            log.info('deleting account ' + accounts.IDs[i])
+            log.info('deleting account ' + accounts.IDs[i]);
             TbSync.db.removeAccount(accounts.IDs[i]);
           }
         }

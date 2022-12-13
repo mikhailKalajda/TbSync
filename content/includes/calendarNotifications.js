@@ -46,23 +46,23 @@ var CalendarNotifications = {
 
         TbSync.dump('ICS=' + ics);
 
-        let mimeContent = `MIME-Version: 1.0
-From: ${cal.email.removeMailTo(item.organizer.id)}
-Subject: ${(item.title) ? item.title : ""}
-Thread-Topic: ${(item.title) ? item.title : ""}
-To: ${attendeeEmail}
-Content-Type: multipart/alternative;
-boundary="---Next Part---"
------Next Part---
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"
-${(item.title) ? item.title : ""}
------Next Part---
-Content-Type: text/calendar; charset="utf-8"; method=REQUEST
-Content-Transfer-Encoding: base64
-
-${btoa(ics)}
------Next Part---`;
+        let mimeContent = `MIME-Version: 1.0\n`+
+`From: ${cal.email.removeMailTo(item.organizer.id)}\n`+
+`Subject: ${(item.title) ? item.title : ""}\n`+
+`Thread-Topic: ${(item.title) ? item.title : ""}\n`+
+`To: ${attendeeEmail}\n`+
+`Content-Type: multipart/alternative;\n`+
+`boundary="---Next Part---"\n`+
+`-----Next Part---\n`+
+`Content-Transfer-Encoding: quoted-printable\n`+
+`Content-Type: text/plain; charset="utf-8"\n`+
+`${(item.title) ? item.title : ""}\n`+
+`-----Next Part---\n`+
+`Content-Type: text/calendar; charset="utf-8"; method=REQUEST\n`+
+`Content-Transfer-Encoding: base64\n`+
+`\n`+
+`${btoa(ics)}\n`+
+`-----Next Part---`;
 
         try {
             let wbxml = eas.wbxmltools.createWBXML();

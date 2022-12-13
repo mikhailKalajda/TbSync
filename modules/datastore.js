@@ -66,7 +66,7 @@ function ResultHandler(aType, aContext, aListener)
 } catch (e) {re(e);}}
 
 
-/// mozIStorageStatementCallback implementation
+// mozIStorageStatementCallback implementation
 /*
 void handleCompletion(in unsigned short aReason);
 void handleError(in mozIStorageError aError);
@@ -297,7 +297,7 @@ EwsDataStore.prototype =
   dbConnection: null,
   bodiesConnection: null,
   dlExpansionConnection: null,
-  /// a list of all of the statements, useful in shutdown.
+  // a list of all of the statements, useful in shutdown.
   _dbStatements: [],
   // statements used in the bodies database
   _bodiesStatements: [],
@@ -305,7 +305,7 @@ EwsDataStore.prototype =
 
   observe(aSubject, aTopic, aData) {
     // Connection shutdown
-    if (aTopic == 'profile-before-change') {
+    if (aTopic === 'profile-before-change') {
       Services.obs.removeObserver(this, 'profile-before-change');
       dl('profile-before-change');
 
@@ -316,7 +316,7 @@ EwsDataStore.prototype =
           for (let stmt of this._dbStatements)
             stmt.finalize();
           this.dbConnection.asyncClose( (status, value) => {
-            if (status == Cr.NS_OK) {
+            if (status === Cr.NS_OK) {
               dl('dbConnection closed');
               resolve();
             } else {
@@ -560,7 +560,7 @@ EwsDataStore.prototype =
     }
     if (!aNativeItem.itemClass)
     {
-      log.warn("Missing itemClass in putItem, using generic item class")
+      log.warn("Missing itemClass in putItem, using generic item class");
       aNativeItem.itemClass = "IPM";
     }
     // sync metadata db
@@ -1169,7 +1169,7 @@ EwsDataStore.prototype =
     else {
       connection = dbService.openUnsharedDatabase(file);
       while (connection.schemaVersion < this._schemaVersion)
-        this._upgradeDb(connection.schemaVersion, connection.schemaVersion + 1, connection, aType)
+        this._upgradeDb(connection.schemaVersion, connection.schemaVersion + 1, connection, aType);
       if (connection.schemaVersion > this._schemaVersion)
         dl('Warning: newer database detected, we will stupidly assume it is backwards compatible');
     }

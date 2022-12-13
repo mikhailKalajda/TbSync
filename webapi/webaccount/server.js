@@ -1,5 +1,5 @@
-/// Delays the restart prompt.
-/// {nsITimer}
+// Delays the restart prompt.
+// {nsITimer}
 var gRestartPromptTimer = null;
 
 /**
@@ -26,7 +26,7 @@ async function PromptRestart(aServer) {
   }
 }
 
-/// Object used by the jsaccount mechanism to create the component factory.
+// Object used by the jsaccount mechanism to create the component factory.
 var gServerProperties = {
   baseContractID: "@mozilla.org/jacppincomingserverdelegator;1",
   baseInterfaces: [
@@ -62,9 +62,9 @@ function Server(aDelegator, aBaseInterfaces, aDiscoveredSubFolders = false) {
 
 Server.prototype = {
   _JsPrototypeToDelegate: true,
-  /// nsISupports
+  // nsISupports
   QueryInterface: ChromeUtils.generateQI(gServerProperties.baseInterfaces),
-  /// nsMsgIncomingServer overrides
+  // nsMsgIncomingServer overrides
   get localStoreType() {
     return this.cppBase.type;
   },
@@ -85,7 +85,7 @@ Server.prototype = {
       }
       return rootFolder;
     } catch (ex) {
-      if (ex.result == Cr.NS_NOINTERFACE) {
+      if (ex.result === Cr.NS_NOINTERFACE) {
         // If the root folder does not have the requested interface,
         // this means that Thunderbird attempted to access it before we were
         // able to register our components. Unfortunately the bogus folder is

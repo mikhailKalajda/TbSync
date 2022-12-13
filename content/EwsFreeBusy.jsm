@@ -144,12 +144,12 @@ EwsFreeBusy.prototype = {
                     mailbox = incomingServer.nativeMailbox;
 
                     if (!mailbox ) {
-                        mailbox = nativeService.getNativeMailbox(server.serverURI)
+                        mailbox = nativeService.getNativeMailbox(server.serverURI);
 
                         if (mailbox) {
                             if (!mailbox.ewsURL) {
                                 // TODO: create uri with schema
-                                mailbox.ewsURL = `https://${server.realHostName}/EWS/Exchange.asmx`;
+                                mailbox.ewsURL = `https://${server.realHostName}/EWS/Exchange.asmx`; //#asis
                             }
                             if (!mailbox.email) {
                                 mailbox.email = server.email;
@@ -170,10 +170,6 @@ EwsFreeBusy.prototype = {
                 TbSync.dump("getFreeBusyIntervals no mailbox, exited");
                 return;
             }
-
-            //mailbox = nativeService.getNativeMailbox("exquilla://plugin%2Etest%40kpr-it%2Ecom@outlook.office365.com");
-
-            //mailbox.ewsURL = "exquilla://plugin%2Etest%40kpr-it%2Ecom@outlook.office365.com";
 
             TbSync.dump("getFreeBusyIntervals ran getNativeMailbox, mailbox.ewsURL=" + mailbox.ewsURL + '/' + mailbox.serverURI);
 

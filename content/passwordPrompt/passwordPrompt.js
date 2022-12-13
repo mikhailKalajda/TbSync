@@ -30,14 +30,14 @@ var tbSyncPassword = {
 
   doOK: function (event) {        
     if (!this.resolved) {
-      this.resolved = true
+      this.resolved = true;
       this.resolve({username: this.userfield.value, password: this.passfield.value});
     }
   },
   
   doCANCEL: function (event) {        
     if (!this.resolved) {
-      this.resolved = true
+      this.resolved = true;
       this.resolve(false);
     }
   },

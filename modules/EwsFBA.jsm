@@ -359,7 +359,7 @@ function doFbaCollapsed(aUsername, aPassword, aUrl, aCallback)
           }
 
           // Since the form will be passing passwords literally, require https
-          if (!/^https:\/\//.test(aUrl))
+          if (!/^https:\/\//.test(aUrl)) //#asis
           {
             log.warn("We only allow FBA to https protocol");
             break;

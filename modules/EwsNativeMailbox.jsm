@@ -37,7 +37,7 @@ ChromeUtils.defineModuleGetter(this, "EwsDataStore",
                                "resource://tbsync/datastore.js");
 
 // used to distinguish regular from distinguished folder ids
-const MAX_DISTINGUISHED_LENGTH = 14
+const MAX_DISTINGUISHED_LENGTH = 14;
 
 function EwsNativeMailbox() {
   // cache of EwsNativeFolder objects, referenced by folder ID.
@@ -516,7 +516,7 @@ EwsNativeMailbox.prototype = {
       }
     }
 
-    /// XXX todo: remove the item from the cache using original ID if present
+    // XXX todo: remove the item from the cache using original ID if present
 
     if (!properties && this._datastore)
     {
@@ -676,7 +676,7 @@ EwsNativeMailbox.prototype = {
     return sa;
   },
 
-  /// array of all folder ids (deep traversal) for a folder from folder cache
+  // array of all folder ids (deep traversal) for a folder from folder cache
   allFolderIds(aParentFolderId, aFolderIds) {
     let parentFolder = this.getNativeFolderFromCache(aParentFolderId);
     if (!parentFolder) {
@@ -713,7 +713,7 @@ EwsNativeMailbox.prototype = {
     this._datastore.putItem(aItem, aEventListener);
   },
 
-  /// queue a soap request. If the request is null, sends any existing requests
+  // queue a soap request. If the request is null, sends any existing requests
   queueRequest(aRequest) {
     try {
       this._checkShutdown();
@@ -749,7 +749,7 @@ EwsNativeMailbox.prototype = {
     }
   },
 
-  /// remove a request from the active queue when it is complete
+  // remove a request from the active queue when it is complete
   finishRequest(aRequest) {
     let requestIndex = this._requestQueue.indexOf(aRequest);
     if (requestIndex >= 0)
@@ -758,7 +758,7 @@ EwsNativeMailbox.prototype = {
     this.queueRequest(null);
   },
 
-  /// The following methods are calls to the server
+  // The following methods are calls to the server
 
   getNewItems(aFolder, aEventListener) {
     this._checkShutdown();

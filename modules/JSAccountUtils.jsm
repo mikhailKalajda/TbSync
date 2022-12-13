@@ -50,7 +50,7 @@ const PREF_LOG_DUMP = PREF_BRANCH_LOG + "dump";
 // Logging usage: set mailnews.jsaccount.log.level as string "debug" to increase logging level
 
 // Set default logging levels.
-const LOG_LEVEL_DEFAULT = "Warn"
+const LOG_LEVEL_DEFAULT = "Warn";
 const LOG_DUMP_DEFAULT = false;
 
 var log = configureLogging();
@@ -126,7 +126,7 @@ JSAccountUtils.jaFactory = function (aProperties, aJsDelegateConstructor)
       for (let name in jsMethods)
       {
         log.debug("processing jsDelegate method: " + name);
-        if (name[0] == '_') { // don't bother with methods explicitly marked as internal.
+        if (name[0] === '_') { // don't bother with methods explicitly marked as internal.
           log.debug("skipping " + name);
           continue;
         }

@@ -574,7 +574,7 @@ function getValuesByPath(aData, aPath) {
   let index = aData._names.indexOf(key);
 
   while (index >= 0) {
-    result.push(getValuesByPath(aData._values[index], newPath))
+    result.push(getValuesByPath(aData._values[index], newPath));
 
     index = aData._names.indexOf(key, index + 1);
   }

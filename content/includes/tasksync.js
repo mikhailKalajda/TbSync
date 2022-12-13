@@ -10,9 +10,9 @@
 
 var Tasks = {
 
-    // --------------------------------------------------------------------------- //
+    // ---------------------------------------------------------------------------
     // Read WBXML and set Thunderbird item
-    // --------------------------------------------------------------------------- //
+    // ---------------------------------------------------------------------------
     setThunderbirdItemFromWbxml: function (tbItem, data, id, syncdata, mode = "standard") {
 
         let item = tbItem instanceof TbSync.lightning.TbItem ? tbItem.nativeItem : tbItem;
@@ -76,7 +76,7 @@ var Tasks = {
 
         //status/percentage cannot be mapped
         if (data.Complete) {
-          if (data.Complete == "0") {
+          if (data.Complete === "0") {
             item.isCompleted = false;
           } else {
             item.isCompleted = true;
@@ -90,16 +90,16 @@ var Tasks = {
 
     */
 
-    // --------------------------------------------------------------------------- //
+    // ---------------------------------------------------------------------------
     //read TB event and return its data as WBXML
-    // --------------------------------------------------------------------------- //
+    // ---------------------------------------------------------------------------
     getWbxmlFromThunderbirdItem: function (tbItem, syncdata) {
         let item = tbItem instanceof TbSync.lightning.TbItem ? tbItem.nativeItem : tbItem;
 
         let asversion = syncdata.accountData.getAccountProperty("asversion");
         let wbxml = eas.wbxmltools.createWBXML("", syncdata.type); //init wbxml with "" and not with precodes, and set initial codepage
 
-        //Order of tags taken from: https://msdn.microsoft.com/en-us/library/dn338924(v=exchg.80).aspx
+        //Order of tags taken from: msdn.microsoft.com/en-us/library/dn338924(v=exchg.80).aspx
         
         //Subject
         wbxml.atag("Subject", (item.title) ? item.title : "");

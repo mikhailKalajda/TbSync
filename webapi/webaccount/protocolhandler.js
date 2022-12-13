@@ -99,24 +99,24 @@ Channel.prototype = {
   asyncOpen: function(aListener) {
     /* IF MINI SYNTH */
     // We can't serve parts if we don't have an offline body.
-    if (/&part=([.\d]+)/.test(this.URI.query) && !(this.hdr.flags & Ci.nsMsgMessageFlags.Offline)) {
+    if (/&part=([.\d]+)/.test(this.URI.query) && !(this.hdr.flags & Ci.nsMsgMessageFlags.Offline)) { //#asis
       throw Cr.NS_ERROR_FAILURE;
     }
     /* END IF */
     this.retrieveMessage(this.maybeConvertData(gContentSecManager.performSecurityCheck(this, aListener)));
   },
-  /// Insert a stream converter if the caller needs one.
+  // Insert a stream converter if the caller needs one.
   maybeConvertData: function(aListener) {
     // It turns out to be way too hard to pass aConvertData from streamMessage
     // so instead we just check for header=filter like everyone else does.
-    if (/&part=\d|&header=filter/.test(this.URI.query)) {
+    if (/&part=\d|&header=filter/.test(this.URI.query)) { //#asis
       // We provide an RFC822 message (with parts omitted if possible),
       // but the original listener only wants a speciifc attachment.
       // We create a MIME stream converter and make it listen to our
       // RFC822 message in place of the original listener, which is
       // provided with the attachment by the MIME stream converter.
       let scs = Cc["@mozilla.org/streamConverters;1"].getService(Ci.nsIStreamConverterService);
-      return scs.asyncConvertData("message/rfc822", "*/*", aListener, this);
+      return scs.asyncConvertData("message/rfc822", "*"+"/"+"*", aListener, this);
     }
     return aListener;
   },
@@ -165,7 +165,7 @@ Channel.prototype = {
       } else { // print and others
         message = await DownloadFullMessage(this.hdr, msgWindow);
       }
-      if (this.status == Cr.NS_OK) {
+      if (this.status === Cr.NS_OK) {
         let stream = Cc["@mozilla.org/io/string-input-stream;1"].createInstance(Ci.nsIStringInputStream);
         stream.setData(message.mime, message.mime.length);
         // Send the data to MIME. (We don't need to pump here because
@@ -203,7 +203,7 @@ Channel.prototype = {
     }
     return false;
   },
-  /// Assemble a synthetic MIME envelope for this message.
+  // Assemble a synthetic MIME envelope for this message.
   assembleSyntheticMIME: async function() {
     // Check whether the caller wants a specific attachment.
     let mimeContent = "";
@@ -358,7 +358,7 @@ Channel.prototype = {
   },
 };
 
-/// Properties used when creating the component factory.
+// Properties used when creating the component factory.
 var gProtocolHandlerProperties = {
   baseInterfaces: [
     Ci.nsIMsgMessageFetchPartService,

@@ -103,7 +103,7 @@ var TbSync = {
 
     //notify about finished init of TbSync
     this.dump("notify about finished init of TbSync");
-    Services.obs.notifyObservers(null, 'tbsync.observer.initialized', null)
+    Services.obs.notifyObservers(null, 'tbsync.observer.initialized', null);
 
     //activate sync timer
     this.syncTimer.start();

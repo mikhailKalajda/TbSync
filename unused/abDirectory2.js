@@ -53,15 +53,9 @@ var abDirectory = {
         this.mURI = "";
         this.mCardCache = {};
 
-            //https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/wrappedJSObject
         this.wrappedJSObject = this;
     },
-
 }
-
-
-
-
 
 abDirectory.Directory.prototype = {
     constructor: abDirectory.Directory,
@@ -193,7 +187,7 @@ abDirectory.Directory.prototype = {
     },
 
     deleteDirectory: function (directory) {
-        ////throw Components.results.NS_ERROR_NOT_IMPLEMENTED;
+        //throw Components.results.NS_ERROR_NOT_IMPLEMENTED;
     },
 
     hasCard: function(cards) {

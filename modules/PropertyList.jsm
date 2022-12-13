@@ -201,7 +201,7 @@ function ParseToPL(aInput, aIndex, result)
         if (cur == '"')
         {
           // at this point, we have a quoted string value. Get that string
-          valueString = ""
+          valueString = "";
           state = GET_VALUE;
           continue;
         }

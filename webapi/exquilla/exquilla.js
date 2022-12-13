@@ -1,5 +1,5 @@
 var {Services} = ChromeUtils.import("resource://gre/modules/Services.jsm");
-var {MailServices} = ChromeUtils.import("resource:///modules/MailServices.jsm");
+var {MailServices} = ChromeUtils.import("resource:///modules/MailServices.jsm"); //#asis
 var {OpenManualAccountCreation} = ChromeUtils.import("resource://tbsync/License.jsm");
 var {Utils} = ChromeUtils.import("resource://tbsync/ewsUtils.jsm");
 

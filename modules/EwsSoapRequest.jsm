@@ -379,7 +379,7 @@ function SoapCall() {
 SoapCall.prototype = {
   __proto__: SoapMessage.prototype,
 
-    /// SOAPCall implementation.
+    // SOAPCall implementation.
 
   // The URI to which the message will be sent
   //attribute AString transportURI;
@@ -444,12 +444,12 @@ function SoapResponse() {
 SoapResponse.prototype = {
   __proto__: SoapMessage.prototype,
 
-  /// HTML request code
+  // HTML request code
   // attribute unsigned long htmlStatus;
   get htmlStatus() { return this._htmlStatus;},
   set htmlStatus(a) { this._htmlStatus = a;},
 
-  /// HTML request text
+  // HTML request text
   // attribute ACString htmlText;
   get htmlText() { return this._htmlText;},
   set htmlText(a) { this._htmlText = a;},
@@ -2634,7 +2634,7 @@ StreamingSubscriptionRequest example from:
               //    !contentDecodedPreamble.startsWith("Received:") &&
               //    !contentDecodedPreamble.startsWith("Date:"))
               //{
-              //  // append a dummy Subject header to the string
+              //  append a dummy Subject header to the string
               //  extraPreamble = "Subject: " + saveName + "\r\n\r\n";
               //}
             }

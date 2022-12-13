@@ -25,8 +25,6 @@ function OverlayManager(extension, options = {}) {
     this.options[userOptions[i]] = options[userOptions[i]];
   }
 
-
-
   this.windowListener = {
     that: this,
     onOpenWindow: function(xulWindow) {
@@ -36,8 +34,6 @@ function OverlayManager(extension, options = {}) {
     onCloseWindow: function(xulWindow) { },
     onWindowTitleChange: function(xulWindow, newTitle) { }
   };
-
-  
 
 
   this.startObserving = function () {
@@ -91,7 +87,7 @@ function OverlayManager(extension, options = {}) {
       
       this.overlays[overlay] = rootNode;
     } else {
-      console.log("Only chrome:// URIs can be registered as overlays.");
+      console.log("Only chrome:/ / URIs can be registered as overlays.");
       return;
     }
   };  
@@ -109,19 +105,19 @@ function OverlayManager(extension, options = {}) {
       xul = oParser.parseFromString(str, "application/xml");
     } catch (e) {
       //however, domparser does not throw an error, it returns an error document
-      //https://developer.mozilla.org/de/docs/Web/API/DOMParser
+      //developer.mozilla.org/de/docs/Web/API/DOMParser
       //just in case
       if (this.options.verbose>1) Services.console.logStringMessage("[OverlayManager] BAD XUL: A provided XUL file could not be parsed correctly, something is wrong.\n" + str);
       return null;
     }
 
     //check if xul is error document
-    if (xul.documentElement.nodeName == "parsererror") {
+    if (xul.documentElement.nodeName === "parsererror") {
       if (this.options.verbose>1) Services.console.logStringMessage("[OverlayManager] BAD XUL: A provided XUL file could not be parsed correctly, something is wrong.\n" + str);
       return null;
     }
     
-    if (xul.documentElement.nodeName != "overlay") {
+    if (xul.documentElement.nodeName !== "overlay") {
       if (this.options.verbose>1) Services.console.logStringMessage("[OverlayManager] BAD XUL: A provided XUL file does not look like an overlay (root node is not overlay).\n" + str);
       return null;
     }
@@ -129,12 +125,8 @@ function OverlayManager(extension, options = {}) {
     return xul;
   };
 
-
-
-
-
   this.injectAllOverlays = async function (window, _href = null) {
-    if (window.document.readyState != "complete") {
+    if (window.document.readyState !== "complete") {
       // Make sure the window load has completed.
       await new Promise(resolve => {
       window.addEventListener("load", resolve, { once: true });
@@ -164,9 +156,6 @@ function OverlayManager(extension, options = {}) {
       this.removeOverlay(window, this.registeredOverlays[window.location.href][i]);
     }        
   };
-
-
-
 
   this.injectOverlay = function (window, overlay) {
     if (!window.hasOwnProperty("injectedOverlays")) window.injectedOverlays = [];
@@ -280,16 +269,6 @@ function OverlayManager(extension, options = {}) {
       }
     }
   };
-  
-
-
-
-
-
-
-
-
-
 
   this.getStyleSheetUrls = function (rootNode) {
     let sheetsIterator = rootNode.evaluate("processing-instruction('xml-stylesheet')", rootNode, null, 0, null); //PathResult.ANY_TYPE = 0
@@ -318,31 +297,22 @@ function OverlayManager(extension, options = {}) {
     return scripts;
   };
 
-
-
-
-
-
-
-
-
-
   this.createXulElement = function (window, node, forcedNodeName = null) {
     //check for namespace
     let typedef = forcedNodeName ? forcedNodeName.split(":") : node.nodeName.split(":");
-    if (typedef.length == 2) typedef[0] = node.lookupNamespaceURI(typedef[0]);
+    if (typedef.length === 2) typedef[0] = node.lookupNamespaceURI(typedef[0]);
     
     let CE = {}
     if (node.attributes && node.attributes.getNamedItem("is")) {
       for  (let i=0; i <node.attributes.length; i++) {
-        if (node.attributes[i].name == "is") {
+        if (node.attributes[i].name === "is") {
           CE = { "is" : node.attributes[i].value };
           break;
         }
       }
     }
 
-    let element = (typedef.length==2) ? window.document.createElementNS(typedef[0], typedef[1]) : window.document.createXULElement(typedef[0], CE);
+    let element = (typedef.length===2) ? window.document.createElementNS(typedef[0], typedef[1]) : window.document.createXULElement(typedef[0], CE);
     if  (node.attributes) {
       for  (let i=0; i <node.attributes.length; i++) {
         element.setAttribute(node.attributes[i].name, node.attributes[i].value);
@@ -353,7 +323,7 @@ function OverlayManager(extension, options = {}) {
     if (node.hasChildNodes) {
       let textContent = "";
       for (let child of node.childNodes) {
-        if (child.nodeType == "3") {
+        if (child.nodeType === "3") {
           textContent += child.nodeValue;
         }
       }
@@ -374,16 +344,16 @@ function OverlayManager(extension, options = {}) {
     if (nodes.length === undefined) nodeList.push(nodes);
     else nodeList = nodes;
     
-    // nodelist contains all childs
+    // nodelist contains all children
     for (let node of nodeList) {
       let element = null;
       let hookMode = null;
       let hookName = null;
       let hookElement = null;
       
-      if (node.nodeName == "script" && node.hasAttribute("src")) {
+      if (node.nodeName === "script" && node.hasAttribute("src")) {
         //skip, since they are handled by getScripts()
-      } else if (node.nodeType == 1) {
+      } else if (node.nodeType === 1) {
 
         if (!parentElement) { //misleading: if it does not have a parentElement, it is a top level element
           //Adding top level elements without id is not allowed, because we need to be able to remove them!
@@ -393,14 +363,14 @@ function OverlayManager(extension, options = {}) {
           }
 
           //check for inline script tags
-          if (node.nodeName == "script") {
+          if (node.nodeName === "script") {
             let element = this.createXulElement(window, node, "html:script"); //force as html:script
             window.document.documentElement.appendChild(element);
             continue;                        
           }
           
           //check for inline style
-          if (node.nodeName == "style") {
+          if (node.nodeName === "style") {
             let element = this.createXulElement(window, node, "html:style"); //force as html:style
             window.document.documentElement.appendChild(element);
             continue;

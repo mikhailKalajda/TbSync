@@ -29,7 +29,7 @@ XPCOMUtils.defineLazyGetter(this, "log", () => {
 var sync = {
 
     finish: function (aStatus = "", msg = "", details = "") {
-        let status = TbSync.StatusData.SUCCESS
+        let status = TbSync.StatusData.SUCCESS;
         switch (aStatus) {
 
             case "":
@@ -478,7 +478,7 @@ var sync = {
                                                     wbxml.otag("ApplicationData");
                                                         wbxml.switchpage(syncData.type);
 
-/*wbxml.atag("TimeZone", "xP///0UAdQByAG8AcABlAC8AQgBlAHIAbABpAG4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAFAAIAAAAAAAAAAAAAAEUAdQByAG8AcABlAC8AQgBlAHIAbABpAG4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAFAAEAAAAAAAAAxP///w==");
+/*wbxml.atag("TimeZone", "xP0UAdQByAG8AcABlAC8AQgBlAHIAbABpAG4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAFAAIAAAAAAAAAAAAAAEUAdQByAG8AcABlAC8AQgBlAHIAbABpAG4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAFAAEAAAAAAAAAxPw==");
 wbxml.atag("AllDayEvent", "0");
 wbxml.switchpage("AirSyncBase");
 wbxml.otag("Body");
@@ -1249,8 +1249,10 @@ wbxml.ctag();*/
                 }
             }
             if (data.Recurrence.FirstDayOfWeek) {
-                //recRule.setComponent("WKST", 1, [data.Recurrence.FirstDayOfWeek]); // WKST is not a valid component
-                //recRule.weekStart = data.Recurrence.FirstDayOfWeek; // - (NS_ERROR_NOT_IMPLEMENTED) [calIRecurrenceRule.weekStart]
+                //recRule.setComponent("WKST", 1, [data.Recurrence.FirstDayOfWeek]);
+                // WKST is not a valid component
+                //recRule.weekStart = data.Recurrence.FirstDayOfWeek;
+                // - (NS_ERROR_NOT_IMPLEMENTED) [calIRecurrenceRule.weekStart]
                 TbSync.eventlog.add("info", syncData.eventLogInfo, "FirstDayOfWeek tag ignored (not supported).", item.icalString);                
             }
 
@@ -1448,7 +1450,8 @@ wbxml.ctag();*/
                             wbxml.atag("Deleted", "1");
                             //Docs say it is allowed, but if present, it does not work
                             //if (asversion == "2.5") {
-                            //    wbxml.atag("UID", item.id); //item.id is not valid, use UID or primaryKey
+                            //item.id is not valid, use UID or primaryKey
+                            //    wbxml.atag("UID", item.id);
                             //}
                         wbxml.ctag();
                     }

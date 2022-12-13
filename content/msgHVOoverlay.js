@@ -178,7 +178,7 @@ exquilla.msgHVOoverlay = (function _msgHVOoverlay()
         }
         if (!ewsUrl.isAttachment)
         {
-          log.warn("This is not an attachment url: " + url.spec)
+          log.warn("This is not an attachment url: " + url.spec);
           hasError = true;
           continue;
         }

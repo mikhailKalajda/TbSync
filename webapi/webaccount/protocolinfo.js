@@ -1,4 +1,4 @@
-/// Properties used when creating the component factory.
+// Properties used when creating the component factory.
 var gProtocolInfoProperties = {
   contractID: "@mozilla.org/messenger/protocol/info;1?type=",
   classDescription: "Protocol Info",

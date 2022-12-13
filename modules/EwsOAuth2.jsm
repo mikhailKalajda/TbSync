@@ -94,7 +94,7 @@ class OAuth2Login {
     this._promiseAccessToken = null; // for getAccessToken() only
   }
 
-  ///////////////////////////
+  // ***************************
   // Public API
 
   /**
@@ -202,7 +202,7 @@ class OAuth2Login {
     }
   }
 
-  ///////////////////////////////
+  //
   // OAuth2 implementation
 
   /**
@@ -345,7 +345,7 @@ class OAuth2Login {
     return { accessToken: data.access_token, refreshToken: data.refresh_token };
   }
 
-  /////////////////////
+  //
   // Store the OAuth refresh token for this account
   // in the password manager.
 
@@ -397,7 +397,7 @@ class OAuth2Login {
     return "oauth://" + newParsingURI(this.account.serverURI).host;
   }
 
-  //////////////////////////////
+  //
   // HTML login window
 
   /**

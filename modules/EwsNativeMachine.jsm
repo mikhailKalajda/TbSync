@@ -1493,7 +1493,7 @@ EwsNativeMachine.prototype = {
             else if ( (result.status !== Cr.NS_OK) && changedItem)
             {
               log.debug("Changed locally id unsuccessful, mark item dirty");
-              changedItem.raiseFlags(changedItem.Dirty)
+              changedItem.raiseFlags(changedItem.Dirty);
               changedItem.clearFlags(changedItem.NewLocally ||
                                      changedItem.DeletedLocally ||
                                      changedItem.UpdatedLocally);
@@ -1501,7 +1501,7 @@ EwsNativeMachine.prototype = {
               let dsListener = new PromiseUtils.DatastoreListener();
               aMailbox.datastore.putItem(changedItem, dsListener);
               let result = await dsListener.promise;
-              if (result.status != Cr.NS_OK)
+              if (result.status !== Cr.NS_OK)
                 log.warn("failed to persist changed item");
             }
             else if (changedItem)
@@ -1641,7 +1641,7 @@ EwsNativeMachine.prototype = {
                   changedItem.itemId = "IamInvalidId";
                   aMailbox.testType = "";
                 }
-                if (aMailbox.testType == "ForceFailedClass")
+                if (aMailbox.testType === "ForceFailedClass")
                 {
                   log.warn("Simulating invalid item class for testing");
                   changedItem.itemClass = "IamInvalidClass";
@@ -1765,7 +1765,7 @@ EwsNativeMachine.prototype = {
                 try {
                   let request = new EwsSoapRequest();
                   request.mailbox = aMailbox;
-                  // simulate random missing bodies, see https://exquilla.zendesk.com/tickets/11
+                  // simulate random missing bodies, see exquilla.zendesk.com/tickets/11
                   if ( (aMailbox.testType === "ForceMissingBody") ||
                        ((aMailbox.testType === "FakeMissingBody") && (Math.random() < 0.1)) )
                   {
@@ -1996,7 +1996,7 @@ function _errorResponse(aRequest, aResponseError, aResponseCode, aMessageText)
     } catch (e) {log.warning("Error running promptUsernameAndPassword: " + e);}
     if (isOK)
     {
-      // signal password changed so that user can rety
+      // signal password changed so that user can retry
       this.passwordChanged = true;
       if (this.listener) {
         this.listener.onEvent(this, "PasswordChanged", null, Cr.NS_OK);
@@ -2045,9 +2045,9 @@ async function promiseCheckOnline(aMailbox, aListener)
     } while (rerun);
     if (result.status === Cr.NS_OK) {
       // Check and fix the mailbox version
-      // xmlns:h="http://schemas.microsoft.com/exchange/services/2006/types"
-      // xmlns:s="http://schemas.xmlsoap.org/soap/envelope/"
-      // <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
+      // xmlns:h="http:/ /schemas.microsoft.com/exchange/services/2006/types"
+      // xmlns:s="http:/ /schemas.xmlsoap.org/soap/envelope/"
+      // <s:Envelope xmlns:s="http:/ /schemas.xmlsoap.org/soap/envelope/">
       //   <s:Header>
       //     <h:ServerVersionInfo MajorVersion="14" MinorVersion="3" MajorBuildNumber="158" MinorBuildNumber="1" Version="Exchange2010_SP2"
       try {
@@ -2273,7 +2273,7 @@ async function promiseDiscoverSubfolders(aMailbox, aFolder, aListener)
           request.soapResponse
                  .envelope
                  .getElementsByTagNameNS(
-                   "http://schemas.microsoft.com/exchange/services/2006/messages",
+                   "http:/ /schemas.microsoft.com/exchange/services/2006/messages",
                    "RootFolder")[0];
         lastItem = !(rootFolderElement.getAttribute("IncludesLastItemInRange") === "false");
       }

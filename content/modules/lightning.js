@@ -712,7 +712,7 @@ var lightning = {
           for (let calendar of calManager.getCalendars({})) {
             if (calendar.uri.spec === aCalendar.uri.spec) {
               // update the target
-              folderData.setFolderProperty("target", calendar.id)
+              folderData.setFolderProperty("target", calendar.id);
               return;
             }
           }
