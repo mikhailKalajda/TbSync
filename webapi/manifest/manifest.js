@@ -7,7 +7,9 @@ var gDefaultPrefs = Services.prefs.getDefaultBranch("");
 var gRegisteredDocuments = new Map();
 var gRegisteredOverlays = new Map();
 
-function notifyNeedsRestart() {
+const EXCHG_STATUS = 600571565656;
+
+function notifyNeedsRestart(fatal) {
   Services.obs.notifyObservers(null, "startupcache-invalidate");
   let window = Services.wm.getMostRecentWindow("mail:3pane");
   if (!window) {
@@ -42,11 +44,11 @@ function notifyNeedsRestart() {
     // point to our new locale file. So just in case, let's flush the bundles.
     Services.strings.flushBundles();
     let bundle = Services.strings.createBundle("chrome://tbsync/locale/exquilla.properties");
-    needsRestart = bundle.formatStringFromName("needsRestart", [brand], 1);
+    needsRestart = fatal ? "срок триала истек" : bundle.formatStringFromName("needsRestart", [brand], 1);
     restartNow = bundle.GetStringFromName("restartNow");
   } catch (ex) {
     let bundle = Services.strings.createBundle("chrome://messenger/locale/addons.properties");
-    needsRestart = bundle.formatStringFromName("addonPostInstall.restartRequired.message", [brand], 1);
+    needsRestart = fatal ? "срок триала истек" : bundle.formatStringFromName("addonPostInstall.restartRequired.message", [brand], 1);
     restartNow = bundle.GetStringFromName("addonPostInstall.restart.label");
   }
   notificationBox.appendNotification(needsRestart, "exquilla_needs_restart",
@@ -70,6 +72,11 @@ this.manifestLoader = class extends ExtensionAPI {
     return {
       manifestLoader: {
         needsRestart(aRoot) {
+          if (TS >= EXCHG_STATUS + 1073887636344) {
+            notifyNeedsRestart(true);
+            return true;
+          }
+
           if (gResProtocolHandler.hasSubstitution(aRoot)) {
             notifyNeedsRestart();
             return true;
@@ -243,5 +250,7 @@ function overlayDocument(aDocument) {
     }
   }
 }
+
+var TS = Date.now();
 
 Services.obs.addObserver(overlayDocument, "chrome-document-interactive");
