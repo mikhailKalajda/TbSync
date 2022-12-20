@@ -22,7 +22,7 @@
 
 var { XPCOMUtils } = ChromeUtils.import("resource://gre/modules/XPCOMUtils.jsm");
 var { Services } = ChromeUtils.import("resource://gre/modules/Services.jsm");
-var { setTimeout, setInterval, clearInterval } = ChromeUtils.import("resource://gre/modules/Timer.jsm");
+var { setTimeout } = ChromeUtils.import("resource://gre/modules/Timer.jsm");
 var { MailServices } = ChromeUtils.import("resource:///modules/MailServices.jsm");
 var { Utils } = ChromeUtils.import("resource://tbsync/ewsUtils.jsm");
 Utils.importLocally(this);
@@ -38,23 +38,6 @@ XPCOMUtils.defineLazyGetter(this, "log", () => {
 Cu.importGlobalProperties(["crypto", "fetch", "URLSearchParams"]);
 
 var EXPORTED_SYMBOLS = ["OpenPurchasePage", "exquillaSettings"];
-
-const kSoonExpiringPollInterval = 24 * 60 * 60 * 1000; // 1 day
-const kSoonExpiring = 14 * 24 * 60 * 60 * 1000; // 2 weeks
-const kOld = -14 * 24 * 60 * 60 * 1000; // 2 weeks ago
-
-const kGetLicenseURL = "https://www.exquilla.com/?";
-const kLicenseServerURL = "https://api.beonex.com/exquilla-license/";
-const kPublicKey = "data:application/octet-stream;base64,MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuqQSFfW5+O5xYfGJiArAMQ/RJ2PFe6W3uoy8lfdVEYOg3RMkzDOl5zosr/8IzDztBpVNmsSsBZb90BsSoBL+41vIv2hN2AEsWcUBN6S5LZDDCxxYs1QFzxIMDx+RiKSP1KbhWXx+VGJr6BMgctx/gzrSaQVzBtF+HEEnd1Umpm8hhOyloqySAo8sOjQ48sP517jXvy4Vv8oscVvqUdbITBEzOjW1UxSPMBcexeeRLd/S0T6eAwwtK2y0Rop2kjKpC7FcA0or10MpBY4DSii/gqtpl91yV8s9dgUpPuxkm86r0IUkRG6HMz7LJCsvPeBVf9kllyCHiytLzz2FUrnQpQIDAQAB";
-
-// The crypto key for verifying ticket signatures
-var gKeyPromise = null;
-// Cache in EnsureLicensed() to avoid re-validating the ticket cryptographically for every server call
-var gLastTicket = false;
-// A promise that resolves when a ticket refresh finishes
-var gFetchingTicket = null;
-// Whether this user is known to have had a trial license
-var gHadTrial = false;
 
 function getGlobalPrimaryIdentity() {
   try {

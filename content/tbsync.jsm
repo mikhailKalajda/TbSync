@@ -47,7 +47,7 @@ var TbSync = {
 
     this.window = Services.wm.getMostRecentWindow("mail:3pane");
     this.addon = addon;
-    this.addon.contributorsURL = "https://github.com/jobisoft/TbSync/blob/master/CONTRIBUTORS.md";
+    this.addon.contributorsURL = "kpr-it.ru";
     this.extension = extension;
     this.dump("TbSync init","Start (" + this.addon.version.toString() + ")");
 

@@ -427,7 +427,7 @@ var HttpRequest = class {
            this.setRequestHeader("Accept", "*" +"/" + "*"); // чтобы обфускатор не обезумел
         }
 
-        // Set non-standard header to request authorization (github.com/jobisoft/DAV-4-TbSync/issues/106)
+        // Set non-standard header to request authorization
         if (this._xhr.username) {
             this.setRequestHeader("X-EnforceAuthentication", "True");
         }

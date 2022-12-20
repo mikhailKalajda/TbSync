@@ -463,7 +463,7 @@ var Calendar = {
 
         this.UpdateAttendeesIn(item, wbxml, asversion, isException, syncdata);
 
-        //Categories (see github.com/jobisoft/TbSync/pull/35#issuecomment-359286374)
+        //Categories
         if (!isException) {
             wbxml.append(eas.sync.getItemCategories(item, syncdata));
         }

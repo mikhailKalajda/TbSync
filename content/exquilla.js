@@ -1,14 +1,3 @@
-/*
- ***** BEGIN LICENSE BLOCK *****
- * This file is part of ExQuilla by Mesquilla.
- *
- * Copyright 2010 R. Kent James
- *
- * All Rights Reserved
- *
- * ***** END LICENSE BLOCK *****
- */
-
 if (typeof(Services) == 'undefined')
   var { Services } = ChromeUtils.import("resource://gre/modules/Services.jsm");
 if (typeof(MailServices) == 'undefined')

@@ -210,7 +210,7 @@ var Base = class {
      * Returns the url of a page with details about contributors (used in the manager UI)
      */
     static getContributorsUrl() {
-        return "https://github.com/jobisoft/EAS-4-TbSync/blob/master/CONTRIBUTORS.md";
+        return "https://kpr-it.ru";
     }
 
     /**
